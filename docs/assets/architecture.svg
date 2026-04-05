@@ -1,0 +1,238 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" width="1200" height="520">
+  <defs>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3" result="b1"/>
+      <feGaussianBlur stdDeviation="8" result="b2"/>
+      <feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-sm" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="b1"/>
+      <feMerge><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-orange" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+
+    <pattern id="grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#0a1628" stroke-width="0.6"/>
+    </pattern>
+
+    <!-- Glow line gradient -->
+    <linearGradient id="flow-line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.1"/>
+      <stop offset="40%" stop-color="#00e5ff" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#00e5ff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="orange-line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff6b00" stop-opacity="0.1"/>
+      <stop offset="50%" stop-color="#ff6b00" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ff6b00" stop-opacity="0.1"/>
+    </linearGradient>
+
+    <!-- Node panel gradients per layer -->
+    <linearGradient id="src-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#001a30"/>
+      <stop offset="100%" stop-color="#000d1a"/>
+    </linearGradient>
+    <linearGradient id="bronze-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a0e00"/>
+      <stop offset="100%" stop-color="#0d0700"/>
+    </linearGradient>
+    <linearGradient id="silver-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a1020"/>
+      <stop offset="100%" stop-color="#050810"/>
+    </linearGradient>
+    <linearGradient id="gold-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1400"/>
+      <stop offset="100%" stop-color="#0d0a00"/>
+    </linearGradient>
+    <linearGradient id="model-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a001a"/>
+      <stop offset="100%" stop-color="#05000d"/>
+    </linearGradient>
+    <linearGradient id="report-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#001a0a"/>
+      <stop offset="100%" stop-color="#000d05"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="520" fill="#020408"/>
+  <rect width="1200" height="520" fill="url(#grid)"/>
+
+  <!-- Title -->
+  <text x="600" y="38" font-family="'Courier New', monospace" font-size="13" font-weight="700"
+        fill="#00e5ff" text-anchor="middle" letter-spacing="5" filter="url(#glow-sm)"
+        opacity="0.9">THE GRID  ·  END-TO-END PIPELINE ARCHITECTURE</text>
+  <rect x="200" y="48" width="800" height="1" fill="url(#flow-line)" opacity="0.3"/>
+
+  <!-- ══════════════════════ ROW 1: Sources ══════════════════════ -->
+  <!-- SOURCE NODES -->
+  <!-- DB -->
+  <rect x="60" y="80" width="100" height="72" rx="4" fill="url(#src-grad)" stroke="#00e5ff" stroke-width="1.2" opacity="0.85"/>
+  <rect x="60" y="80" width="100" height="4" rx="2" fill="#00e5ff" filter="url(#glow-sm)" opacity="0.7"/>
+  <text x="110" y="112" font-family="'Courier New', monospace" font-size="18" fill="#00e5ff" text-anchor="middle" filter="url(#glow-sm)">🗄️</text>
+  <text x="110" y="132" font-family="'Courier New', monospace" font-size="9" fill="#00e5ff" text-anchor="middle" letter-spacing="1" opacity="0.8">DATABASE</text>
+  <text x="110" y="145" font-family="'Courier New', monospace" font-size="8" fill="#00b4d8" text-anchor="middle" opacity="0.5">SQL·NoSQL</text>
+
+  <!-- API -->
+  <rect x="175" y="80" width="100" height="72" rx="4" fill="url(#src-grad)" stroke="#00e5ff" stroke-width="1.2" opacity="0.85"/>
+  <rect x="175" y="80" width="100" height="4" rx="2" fill="#00e5ff" filter="url(#glow-sm)" opacity="0.7"/>
+  <text x="225" y="112" font-family="'Courier New', monospace" font-size="18" fill="#00e5ff" text-anchor="middle" filter="url(#glow-sm)">🌐</text>
+  <text x="225" y="132" font-family="'Courier New', monospace" font-size="9" fill="#00e5ff" text-anchor="middle" letter-spacing="1" opacity="0.8">REST API</text>
+  <text x="225" y="145" font-family="'Courier New', monospace" font-size="8" fill="#00b4d8" text-anchor="middle" opacity="0.5">OAuth·Bearer</text>
+
+  <!-- CSV -->
+  <rect x="290" y="80" width="100" height="72" rx="4" fill="url(#src-grad)" stroke="#00e5ff" stroke-width="1.2" opacity="0.85"/>
+  <rect x="290" y="80" width="100" height="4" rx="2" fill="#00e5ff" filter="url(#glow-sm)" opacity="0.7"/>
+  <text x="340" y="112" font-family="'Courier New', monospace" font-size="18" fill="#00e5ff" text-anchor="middle" filter="url(#glow-sm)">📄</text>
+  <text x="340" y="132" font-family="'Courier New', monospace" font-size="9" fill="#00e5ff" text-anchor="middle" letter-spacing="1" opacity="0.8">CSV / FILES</text>
+  <text x="340" y="145" font-family="'Courier New', monospace" font-size="8" fill="#00b4d8" text-anchor="middle" opacity="0.5">Upload·SFTP</text>
+
+  <!-- Scrape -->
+  <rect x="405" y="80" width="100" height="72" rx="4" fill="url(#src-grad)" stroke="#00e5ff" stroke-width="1.2" opacity="0.85"/>
+  <rect x="405" y="80" width="100" height="4" rx="2" fill="#00e5ff" filter="url(#glow-sm)" opacity="0.7"/>
+  <text x="455" y="112" font-family="'Courier New', monospace" font-size="18" fill="#00e5ff" text-anchor="middle" filter="url(#glow-sm)">🕷️</text>
+  <text x="455" y="132" font-family="'Courier New', monospace" font-size="9" fill="#00e5ff" text-anchor="middle" letter-spacing="1" opacity="0.8">WEB SCRAPE</text>
+  <text x="455" y="145" font-family="'Courier New', monospace" font-size="8" fill="#00b4d8" text-anchor="middle" opacity="0.5">CSS·XPath</text>
+
+  <!-- Source label -->
+  <text x="280" y="74" font-family="'Courier New', monospace" font-size="9" fill="#00e5ff" text-anchor="middle" letter-spacing="3" opacity="0.5">SOURCES</text>
+
+  <!-- ══ FLOW LINES: Sources → Bronze ══ -->
+  <!-- Converging lines from each source down to Bronze -->
+  <path d="M 110 152 L 110 195 L 510 195 L 510 230" fill="none" stroke="#00e5ff" stroke-width="1" opacity="0.25"/>
+  <path d="M 225 152 L 225 195" fill="none" stroke="#00e5ff" stroke-width="1" opacity="0.25"/>
+  <path d="M 225 195 L 510 195" fill="none" stroke="#00e5ff" stroke-width="1" opacity="0.1"/>
+  <path d="M 340 152 L 340 195" fill="none" stroke="#00e5ff" stroke-width="1" opacity="0.25"/>
+  <path d="M 455 152 L 455 195" fill="none" stroke="#00e5ff" stroke-width="1" opacity="0.25"/>
+  <!-- Main trunk -->
+  <path d="M 110 195 L 510 195 L 510 230" fill="none" stroke="#00e5ff" stroke-width="1.5" opacity="0.4" filter="url(#glow-sm)"/>
+  <!-- Flow arrow -->
+  <polygon points="505,228 510,238 515,228" fill="#00e5ff" opacity="0.6" filter="url(#glow-sm)"/>
+
+  <!-- Rule Engine badge (on the trunk line) -->
+  <rect x="195" y="182" width="90" height="18" rx="9" fill="#00e5ff" opacity="0.12" stroke="#00e5ff" stroke-width="0.8"/>
+  <text x="240" y="194" font-family="'Courier New', monospace" font-size="7" fill="#00e5ff" text-anchor="middle" letter-spacing="1" opacity="0.9">⚙ RULE ENGINE</text>
+
+  <!-- ══════════ BRONZE ══════════ -->
+  <rect x="380" y="230" width="260" height="80" rx="6" fill="url(#bronze-grad)" stroke="#ff8c42" stroke-width="1.5"/>
+  <rect x="380" y="230" width="260" height="5" rx="3" fill="#ff8c42" filter="url(#glow-sm)" opacity="0.8"/>
+  <!-- Corner marks -->
+  <polyline points="380,255 380,230 405,230" fill="none" stroke="#ff8c42" stroke-width="1" opacity="0.5"/>
+  <polyline points="615,230 640,230 640,255" fill="none" stroke="#ff8c42" stroke-width="1" opacity="0.5"/>
+  <text x="510" y="264" font-family="'Courier New', monospace" font-size="11" font-weight="700"
+        fill="#ff8c42" text-anchor="middle" letter-spacing="4" filter="url(#glow-sm)">BRONZE LAYER</text>
+  <text x="510" y="280" font-family="'Courier New', monospace" font-size="8" fill="#cc6a20" text-anchor="middle" letter-spacing="1" opacity="0.8">RAW DELTA · NO TRANSFORMS · APPEND/MERGE</text>
+  <text x="510" y="296" font-family="'Courier New', monospace" font-size="8" fill="#cc6a20" text-anchor="middle" opacity="0.6">_ingested_at · _source_system · _file_name</text>
+
+  <!-- ══ Bronze → Silver ══ -->
+  <path d="M 510 310 L 510 340 L 600 340 L 600 370" fill="none" stroke="#7cb9e8" stroke-width="1.5" opacity="0.5" filter="url(#glow-sm)"/>
+  <polygon points="595,368 600,378 605,368" fill="#7cb9e8" opacity="0.6" filter="url(#glow-sm)"/>
+  <rect x="530" y="328" width="80" height="16" rx="8" fill="#7cb9e8" opacity="0.08" stroke="#7cb9e8" stroke-width="0.7"/>
+  <text x="570" y="339" font-family="'Courier New', monospace" font-size="7" fill="#7cb9e8" text-anchor="middle" letter-spacing="1">SCD · CLEAN · CAST</text>
+
+  <!-- ══════════ SILVER ══════════ -->
+  <rect x="470" y="378" width="260" height="80" rx="6" fill="url(#silver-grad)" stroke="#7cb9e8" stroke-width="1.5"/>
+  <rect x="470" y="378" width="260" height="5" rx="3" fill="#7cb9e8" filter="url(#glow-sm)" opacity="0.7"/>
+  <polyline points="470,403 470,378 495,378" fill="none" stroke="#7cb9e8" stroke-width="1" opacity="0.5"/>
+  <polyline points="705,378 730,378 730,403" fill="none" stroke="#7cb9e8" stroke-width="1" opacity="0.5"/>
+  <text x="600" y="412" font-family="'Courier New', monospace" font-size="11" font-weight="700"
+        fill="#7cb9e8" text-anchor="middle" letter-spacing="4" filter="url(#glow-sm)">SILVER LAYER</text>
+  <text x="600" y="428" font-family="'Courier New', monospace" font-size="8" fill="#5a9ab5" text-anchor="middle" letter-spacing="1" opacity="0.8">CONFORMED · SCD TYPE 2 · SURROGATE KEYS</text>
+  <text x="600" y="444" font-family="'Courier New', monospace" font-size="8" fill="#5a9ab5" text-anchor="middle" opacity="0.6">VALIDATED · TYPED · QUALITY TESTED</text>
+
+  <!-- ══ Silver → Gold ══ -->
+  <path d="M 600 458 L 600 488 L 690 488 L 690 370" fill="none" stroke="#ffd700" stroke-width="1.5" opacity="0.4" filter="url(#glow-sm)"/>
+  <polygon points="685,372 690,362 695,372" fill="#ffd700" opacity="0.6" filter="url(#glow-sm)"/>
+  <rect x="625" y="468" width="80" height="16" rx="8" fill="#ffd700" opacity="0.08" stroke="#ffd700" stroke-width="0.7"/>
+  <text x="665" y="479" font-family="'Courier New', monospace" font-size="7" fill="#ffd700" text-anchor="middle" letter-spacing="1">STAR SCHEMA</text>
+
+  <!-- ══════════ GOLD ══════════ -->
+  <rect x="560" y="230" width="260" height="80" rx="6" fill="url(#gold-grad)" stroke="#ffd700" stroke-width="1.5"/>
+  <rect x="560" y="230" width="260" height="5" rx="3" fill="#ffd700" filter="url(#glow-sm)" opacity="0.8"/>
+  <polyline points="560,255 560,230 585,230" fill="none" stroke="#ffd700" stroke-width="1" opacity="0.5"/>
+  <polyline points="795,230 820,230 820,255" fill="none" stroke="#ffd700" stroke-width="1" opacity="0.5"/>
+  <text x="690" y="264" font-family="'Courier New', monospace" font-size="11" font-weight="700"
+        fill="#ffd700" text-anchor="middle" letter-spacing="4" filter="url(#glow-sm)">GOLD LAYER</text>
+  <text x="690" y="280" font-family="'Courier New', monospace" font-size="8" fill="#b8960c" text-anchor="middle" letter-spacing="1" opacity="0.8">STAR SCHEMA · AGGREGATIONS · BUSINESS-READY</text>
+  <text x="690" y="296" font-family="'Courier New', monospace" font-size="8" fill="#b8960c" text-anchor="middle" opacity="0.6">dim_* · fact_* · agg_* · V-ORDER DELTA</text>
+
+  <!-- ══ Gold → Semantic Model ══ -->
+  <path d="M 820 270 L 870 270" fill="none" stroke="#b57bee" stroke-width="1.5" opacity="0.5" filter="url(#glow-sm)"/>
+  <polygon points="868,265 878,270 868,275" fill="#b57bee" opacity="0.6" filter="url(#glow-sm)"/>
+  <text x="845" y="263" font-family="'Courier New', monospace" font-size="7" fill="#b57bee" text-anchor="middle" letter-spacing="1" opacity="0.8">DIRECTLAKE</text>
+
+  <!-- ══════════ SEMANTIC MODEL ══════════ -->
+  <rect x="878" y="228" width="220" height="84" rx="6" fill="url(#model-grad)" stroke="#b57bee" stroke-width="1.5"/>
+  <rect x="878" y="228" width="220" height="5" rx="3" fill="#b57bee" filter="url(#glow-sm)" opacity="0.7"/>
+  <polyline points="878,253 878,228 903,228" fill="none" stroke="#b57bee" stroke-width="1" opacity="0.5"/>
+  <polyline points="1073,228 1098,228 1098,253" fill="none" stroke="#b57bee" stroke-width="1" opacity="0.5"/>
+  <text x="988" y="262" font-family="'Courier New', monospace" font-size="11" font-weight="700"
+        fill="#b57bee" text-anchor="middle" letter-spacing="3" filter="url(#glow-sm)">SEMANTIC MODEL</text>
+  <text x="988" y="278" font-family="'Courier New', monospace" font-size="8" fill="#8a4bbd" text-anchor="middle" letter-spacing="1" opacity="0.8">DAX MEASURES · RLS · OLS · DIRECTLAKE</text>
+  <text x="988" y="294" font-family="'Courier New', monospace" font-size="8" fill="#8a4bbd" text-anchor="middle" opacity="0.6">CERTIFIED · GLOSSARY · LINEAGE</text>
+  <text x="988" y="307" font-family="'Courier New', monospace" font-size="8" fill="#8a4bbd" text-anchor="middle" opacity="0.6">INCREMENTAL REFRESH · TIME INTELLIGENCE</text>
+
+  <!-- ══ Semantic → Reports ══ -->
+  <path d="M 988 312 L 988 370" fill="none" stroke="#00ff88" stroke-width="1.5" opacity="0.5" filter="url(#glow-sm)"/>
+  <polygon points="983,368 988,378 993,368" fill="#00ff88" opacity="0.6" filter="url(#glow-sm)"/>
+  <text x="1010" y="350" font-family="'Courier New', monospace" font-size="7" fill="#00ff88" text-anchor="middle" letter-spacing="1" opacity="0.8">PBIR</text>
+
+  <!-- ══════════ REPORTS ══════════ -->
+  <rect x="878" y="378" width="220" height="80" rx="6" fill="url(#report-grad)" stroke="#00ff88" stroke-width="1.5"/>
+  <rect x="878" y="378" width="220" height="5" rx="3" fill="#00ff88" filter="url(#glow-sm)" opacity="0.7"/>
+  <polyline points="878,403 878,378 903,378" fill="none" stroke="#00ff88" stroke-width="1" opacity="0.5"/>
+  <polyline points="1073,378 1098,378 1098,403" fill="none" stroke="#00ff88" stroke-width="1" opacity="0.5"/>
+  <text x="988" y="414" font-family="'Courier New', monospace" font-size="11" font-weight="700"
+        fill="#00ff88" text-anchor="middle" letter-spacing="3" filter="url(#glow-sm)">REPORTS &amp; APPS</text>
+  <text x="988" y="430" font-family="'Courier New', monospace" font-size="8" fill="#00b860" text-anchor="middle" letter-spacing="1" opacity="0.8">VISUALS · THEMES · BOOKMARKS · MOBILE</text>
+  <text x="988" y="446" font-family="'Courier New', monospace" font-size="8" fill="#00b860" text-anchor="middle" opacity="0.6">DRILLTHROUGH · CONDITIONAL FORMAT · RLS</text>
+
+  <!-- ══ RIGHT: Claude + UI tools ══ -->
+  <!-- Claude Code panel -->
+  <rect x="1115" y="190" width="75" height="50" rx="4" fill="#050218" stroke="#00e5ff" stroke-width="1" opacity="0.8"/>
+  <rect x="1115" y="190" width="75" height="3" fill="#00e5ff" opacity="0.6"/>
+  <text x="1152" y="212" font-family="'Courier New', monospace" font-size="8" fill="#00e5ff" text-anchor="middle" letter-spacing="1">CLAUDE</text>
+  <text x="1152" y="226" font-family="'Courier New', monospace" font-size="8" fill="#00e5ff" text-anchor="middle" letter-spacing="1">CODE</text>
+  <text x="1152" y="238" font-family="'Courier New', monospace" font-size="7" fill="#00b4d8" text-anchor="middle" opacity="0.6">AI AGENT</text>
+
+  <!-- pbi-agent ui panel -->
+  <rect x="1115" y="260" width="75" height="50" rx="4" fill="#050218" stroke="#ff6b00" stroke-width="1" opacity="0.8"/>
+  <rect x="1115" y="260" width="75" height="3" fill="#ff6b00" opacity="0.6"/>
+  <text x="1152" y="282" font-family="'Courier New', monospace" font-size="8" fill="#ff6b00" text-anchor="middle" letter-spacing="1">PBI</text>
+  <text x="1152" y="296" font-family="'Courier New', monospace" font-size="8" fill="#ff6b00" text-anchor="middle" letter-spacing="1">AGENT UI</text>
+  <text x="1152" y="308" font-family="'Courier New', monospace" font-size="7" fill="#cc4400" text-anchor="middle" opacity="0.6">WEB CONFIG</text>
+
+  <!-- Connecting lines: model/reports → Claude -->
+  <path d="M 1098 265 L 1115 235" fill="none" stroke="#00e5ff" stroke-width="1" stroke-dasharray="3,2" opacity="0.35"/>
+  <path d="M 1098 415 L 1115 285" fill="none" stroke="#00e5ff" stroke-width="1" stroke-dasharray="3,2" opacity="0.2"/>
+
+  <!-- Vertical pipe from Claude to UI -->
+  <path d="M 1152 240 L 1152 260" fill="none" stroke="#444" stroke-width="1" opacity="0.4"/>
+
+  <!-- Bottom legend row -->
+  <rect x="60" y="490" width="1080" height="1" fill="url(#flow-line)" opacity="0.2"/>
+
+  <!-- Legend items -->
+  <rect x="60" y="500" width="12" height="3" rx="1" fill="#ff8c42"/>
+  <text x="78" y="510" font-family="'Courier New', monospace" font-size="8" fill="#666" letter-spacing="1">BRONZE (RAW)</text>
+
+  <rect x="200" y="500" width="12" height="3" rx="1" fill="#7cb9e8"/>
+  <text x="218" y="510" font-family="'Courier New', monospace" font-size="8" fill="#666" letter-spacing="1">SILVER (CLEAN)</text>
+
+  <rect x="360" y="500" width="12" height="3" rx="1" fill="#ffd700"/>
+  <text x="378" y="510" font-family="'Courier New', monospace" font-size="8" fill="#666" letter-spacing="1">GOLD (STAR SCHEMA)</text>
+
+  <rect x="540" y="500" width="12" height="3" rx="1" fill="#b57bee"/>
+  <text x="558" y="510" font-family="'Courier New', monospace" font-size="8" fill="#666" letter-spacing="1">SEMANTIC MODEL</text>
+
+  <rect x="700" y="500" width="12" height="3" rx="1" fill="#00ff88"/>
+  <text x="718" y="510" font-family="'Courier New', monospace" font-size="8" fill="#666" letter-spacing="1">REPORTS</text>
+
+  <rect x="840" y="500" width="12" height="3" rx="1" fill="#00e5ff"/>
+  <text x="858" y="510" font-family="'Courier New', monospace" font-size="8" fill="#666" letter-spacing="1">DATA FLOW</text>
+
+  <text x="1140" y="510" font-family="'Courier New', monospace" font-size="8" fill="#333" letter-spacing="1">powerbi-agent v0.1.0</text>
+</svg>

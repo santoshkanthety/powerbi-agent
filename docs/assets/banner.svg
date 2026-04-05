@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" width="1200" height="340">
+  <defs>
+    <!-- Glow filters -->
+    <filter id="glow-cyan" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur1"/>
+      <feGaussianBlur stdDeviation="8" result="blur2"/>
+      <feMerge><feMergeNode in="blur2"/><feMergeNode in="blur1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-strong" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur1"/>
+      <feGaussianBlur stdDeviation="14" result="blur2"/>
+      <feMerge><feMergeNode in="blur2"/><feMergeNode in="blur1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-orange" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur1"/>
+      <feMerge><feMergeNode in="blur1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Grid pattern -->
+    <pattern id="grid-fine" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#0d2a3d" stroke-width="0.5"/>
+    </pattern>
+    <pattern id="grid-major" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+      <path d="M 200 0 L 0 0 0 200" fill="none" stroke="#0a1f2e" stroke-width="1"/>
+    </pattern>
+
+    <!-- Radial spotlight -->
+    <radialGradient id="spotlight" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#001a2e" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000008" stop-opacity="1"/>
+    </radialGradient>
+
+    <!-- Horizontal scan line gradient -->
+    <linearGradient id="scanline" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00e5ff" stop-opacity="0"/>
+      <stop offset="20%" stop-color="#00e5ff" stop-opacity="0.6"/>
+      <stop offset="50%" stop-color="#00e5ff" stop-opacity="1"/>
+      <stop offset="80%" stop-color="#00e5ff" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Cyan line gradient -->
+    <linearGradient id="cyan-h" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00e5ff" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#00e5ff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="orange-h" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff6b00" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#ff6b00" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ff6b00" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="340" fill="#030509"/>
+  <rect width="1200" height="340" fill="url(#grid-fine)"/>
+  <rect width="1200" height="340" fill="url(#grid-major)"/>
+  <rect width="1200" height="340" fill="url(#spotlight)"/>
+
+  <!-- Corner bracket decorations -->
+  <!-- Top-left -->
+  <polyline points="20,70 20,20 70,20" fill="none" stroke="#00e5ff" stroke-width="2" filter="url(#glow-cyan)" opacity="0.8"/>
+  <!-- Top-right -->
+  <polyline points="1130,20 1180,20 1180,70" fill="none" stroke="#00e5ff" stroke-width="2" filter="url(#glow-cyan)" opacity="0.8"/>
+  <!-- Bottom-left -->
+  <polyline points="20,270 20,320 70,320" fill="none" stroke="#00e5ff" stroke-width="2" filter="url(#glow-cyan)" opacity="0.8"/>
+  <!-- Bottom-right -->
+  <polyline points="1130,320 1180,320 1180,270" fill="none" stroke="#00e5ff" stroke-width="2" filter="url(#glow-cyan)" opacity="0.8"/>
+
+  <!-- Horizontal divider lines -->
+  <rect x="0" y="70" width="1200" height="1" fill="url(#cyan-h)" opacity="0.4"/>
+  <rect x="0" y="270" width="1200" height="1" fill="url(#cyan-h)" opacity="0.4"/>
+
+  <!-- Vertical accent lines -->
+  <rect x="55" y="70" width="1" height="200" fill="#00e5ff" opacity="0.15"/>
+  <rect x="1145" y="70" width="1" height="200" fill="#00e5ff" opacity="0.15"/>
+
+  <!-- Circuit traces - left side -->
+  <path d="M 20 140 L 55 140 L 55 200 L 80 200" fill="none" stroke="#00e5ff" stroke-width="1" opacity="0.3"/>
+  <circle cx="80" cy="200" r="3" fill="#00e5ff" opacity="0.5" filter="url(#glow-cyan)"/>
+  <path d="M 20 200 L 40 200 L 40 240 L 55 240" fill="none" stroke="#00b4d8" stroke-width="1" opacity="0.2"/>
+
+  <!-- Circuit traces - right side -->
+  <path d="M 1180 140 L 1145 140 L 1145 200 L 1120 200" fill="none" stroke="#00e5ff" stroke-width="1" opacity="0.3"/>
+  <circle cx="1120" cy="200" r="3" fill="#00e5ff" opacity="0.5" filter="url(#glow-cyan)"/>
+  <path d="M 1180 200 L 1160 200 L 1160 240 L 1145 240" fill="none" stroke="#00b4d8" stroke-width="1" opacity="0.2"/>
+
+  <!-- Node dots on grid -->
+  <circle cx="200" cy="100" r="2" fill="#00e5ff" opacity="0.3"/>
+  <circle cx="400" cy="240" r="2" fill="#00e5ff" opacity="0.3"/>
+  <circle cx="800" cy="100" r="2" fill="#00e5ff" opacity="0.3"/>
+  <circle cx="1000" cy="240" r="2" fill="#00e5ff" opacity="0.3"/>
+
+  <!-- Status bar top -->
+  <text x="90" y="50" font-family="'Courier New', monospace" font-size="10" fill="#00e5ff" opacity="0.6" letter-spacing="2">SYSTEM:ONLINE</text>
+  <text x="1050" y="50" font-family="'Courier New', monospace" font-size="10" fill="#00e5ff" opacity="0.6" letter-spacing="2">v0.1.0</text>
+
+  <!-- Orange accent bars -->
+  <rect x="90" y="290" width="60" height="2" fill="#ff6b00" opacity="0.7" filter="url(#glow-orange)"/>
+  <rect x="1050" y="290" width="60" height="2" fill="#ff6b00" opacity="0.7" filter="url(#glow-orange)"/>
+
+  <!-- MAIN TITLE -->
+  <!-- Shadow/glow layer -->
+  <text x="600" y="168" font-family="'Courier New', monospace" font-size="72" font-weight="700"
+        fill="#00e5ff" opacity="0.08" text-anchor="middle" letter-spacing="8">POWERBI·AGENT</text>
+  <text x="600" y="168" font-family="'Courier New', monospace" font-size="72" font-weight="700"
+        fill="#00e5ff" opacity="0.15" text-anchor="middle" letter-spacing="8"
+        filter="url(#glow-strong)">POWERBI·AGENT</text>
+  <!-- Main text -->
+  <text x="600" y="168" font-family="'Courier New', monospace" font-size="72" font-weight="700"
+        fill="#00e5ff" text-anchor="middle" letter-spacing="8"
+        filter="url(#glow-cyan)">POWERBI·AGENT</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="210" font-family="'Courier New', monospace" font-size="14"
+        fill="#ffffff" opacity="0.75" text-anchor="middle" letter-spacing="6">
+    AI-POWERED ENTERPRISE DATA PLATFORM AUTOMATION
+  </text>
+
+  <!-- Bottom tag line -->
+  <text x="600" y="310" font-family="'Courier New', monospace" font-size="11"
+        fill="#ff6b00" text-anchor="middle" letter-spacing="4" opacity="0.9"
+        filter="url(#glow-orange)">
+    BUILT BY SANTOSH KANTHETY · 20 YEARS IN THE GRID
+  </text>
+
+  <!-- Scan line accent -->
+  <rect x="200" y="230" width="800" height="1" fill="url(#scanline)" opacity="0.25"/>
+</svg>
