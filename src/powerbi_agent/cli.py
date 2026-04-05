@@ -1,10 +1,10 @@
 """Main CLI entry point for powerbi-agent."""
 
 import sys
+
 import click
 from rich.console import Console
 from rich.panel import Panel
-from rich import print as rprint
 
 from powerbi_agent import __version__
 
@@ -35,7 +35,7 @@ def main():
 @click.option("--list", "list_only", is_flag=True, help="List open Power BI Desktop instances")
 def connect(port, list_only):
     """Connect to a running Power BI Desktop instance."""
-    from powerbi_agent.connect import detect_instances, connect_to_instance
+    from powerbi_agent.connect import connect_to_instance, detect_instances
 
     instances = detect_instances()
 
@@ -266,6 +266,63 @@ def doctor():
     """Check your environment and diagnose common issues."""
     from powerbi_agent.doctor import run_checks
     run_checks()
+
+
+# ─── ui ───────────────────────────────────────────────────────────────────────
+
+@main.command()
+@click.option("--host", default="127.0.0.1", help="Bind host")
+@click.option("--port", default=8765, help="Bind port")
+@click.option("--open/--no-open", "auto_open", default=True, help="Open browser automatically")
+@click.option("--project", default="default", help="Project name to load")
+def ui(host, port, auto_open, project):
+    """Launch the web-based Configuration Tool.
+
+    \b
+    Opens a browser UI for:
+      - Configuring data sources (DB, API, CSV, Web Scrape)
+      - Building the rule engine (quality checks + transformations)
+      - Designing the normalized data model (Bronze → Silver → Gold)
+      - Setting up the Fabric & Power BI pipeline
+
+    \b
+    Examples:
+        pbi-agent ui
+        pbi-agent ui --port 9000 --project my-platform
+    """
+    try:
+        import uvicorn
+    except ImportError:
+        console.print(
+            "[red]uvicorn not installed.[/red]\n"
+            "Install: [bold]pip install powerbi-agent[ui][/bold]"
+        )
+        raise SystemExit(1)
+
+    url = f"http://{host}:{port}/?project={project}"
+    console.print(
+        Panel(
+            f"[bold]powerbi-agent Configuration Tool[/bold]\n\n"
+            f"  URL:     [cyan]{url}[/cyan]\n"
+            f"  Project: [green]{project}[/green]\n\n"
+            f"  Press [bold]Ctrl+C[/bold] to stop.",
+            title="Web UI",
+            border_style="blue",
+        )
+    )
+
+    if auto_open:
+        import threading
+        import webbrowser
+        threading.Timer(1.2, lambda: webbrowser.open(url)).start()
+
+    uvicorn.run(
+        "powerbi_agent.web.app:app",
+        host=host,
+        port=port,
+        reload=False,
+        log_level="warning",
+    )
 
 
 if __name__ == "__main__":

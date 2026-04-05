@@ -10,9 +10,7 @@ from __future__ import annotations
 
 import json
 import os
-import subprocess
 from pathlib import Path
-from typing import Optional
 
 from rich.console import Console
 
@@ -52,7 +50,7 @@ def detect_instances() -> list[dict]:
     return instances
 
 
-def _get_pbix_name_for_workspace(workspace_dir: Path) -> Optional[str]:
+def _get_pbix_name_for_workspace(workspace_dir: Path) -> str | None:
     """Try to read the model name from the workspace metadata."""
     try:
         model_schema = workspace_dir / "Data" / "Model" / "model.tmdl"
@@ -85,7 +83,7 @@ def get_connection() -> dict:
     return json.loads(_CONFIG_PATH.read_text(encoding="utf-8"))
 
 
-def get_connection_string(port: Optional[int] = None) -> str:
+def get_connection_string(port: int | None = None) -> str:
     """Return an OLEDB/ADOMD connection string for the local SSAS instance."""
     if port is None:
         conn = get_connection()

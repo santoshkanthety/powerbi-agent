@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import sys
-from typing import Optional
 
 from rich.console import Console
 from rich.table import Table
@@ -22,7 +21,10 @@ def _get_adomd():
     try:
         import clr  # pythonnet
         clr.AddReference("Microsoft.AnalysisServices.AdomdClient")
-        from Microsoft.AnalysisServices.AdomdClient import AdomdConnection, AdomdCommand  # noqa: F401
+        from Microsoft.AnalysisServices.AdomdClient import (  # noqa: F401
+            AdomdCommand,
+            AdomdConnection,
+        )
         return AdomdConnection, AdomdCommand
     except ImportError:
         console.print(
@@ -38,9 +40,9 @@ def _get_adomd():
 
 def run_query(
     expression: str,
-    table: Optional[str] = None,
+    table: str | None = None,
     fmt: str = "table",
-    port: Optional[int] = None,
+    port: int | None = None,
 ) -> None:
     """Execute a DAX query and display results."""
     from powerbi_agent.connect import get_connection_string
@@ -83,7 +85,7 @@ def run_query(
         console.print(f"[dim]{len(rows)} row(s)[/dim]")
 
 
-def validate_expression(expression: str, port: Optional[int] = None) -> None:
+def validate_expression(expression: str, port: int | None = None) -> None:
     """Validate a DAX expression by running an empty EVALUATE."""
     from powerbi_agent.connect import get_connection_string
 

@@ -8,11 +8,10 @@ directly against the Power BI Desktop local SSAS instance.
 from __future__ import annotations
 
 import sys
-from typing import Optional
 
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
+from rich.table import Table
 
 console = Console()
 
@@ -32,7 +31,7 @@ def _get_tom():
         sys.exit(1)
 
 
-def _open_server(port: Optional[int] = None):
+def _open_server(port: int | None = None):
     """Return an open TOM Server connected to the local SSAS instance."""
     from powerbi_agent.connect import get_connection_string
     Server, _, _ = _get_tom()
@@ -42,7 +41,7 @@ def _open_server(port: Optional[int] = None):
     return server
 
 
-def show_info(port: Optional[int] = None) -> None:
+def show_info(port: int | None = None) -> None:
     """Display a summary of the connected model."""
     server = _open_server(port)
     try:
@@ -65,7 +64,7 @@ def show_info(port: Optional[int] = None) -> None:
         server.Disconnect()
 
 
-def list_tables(port: Optional[int] = None) -> None:
+def list_tables(port: int | None = None) -> None:
     """List all tables with column and measure counts."""
     server = _open_server(port)
     try:
@@ -89,7 +88,7 @@ def list_tables(port: Optional[int] = None) -> None:
         server.Disconnect()
 
 
-def list_measures(table: Optional[str] = None, port: Optional[int] = None) -> None:
+def list_measures(table: str | None = None, port: int | None = None) -> None:
     """List measures across all tables, or a specific table."""
     server = _open_server(port)
     try:
@@ -120,8 +119,8 @@ def add_measure(
     name: str,
     expression: str,
     table: str,
-    format_string: Optional[str] = None,
-    port: Optional[int] = None,
+    format_string: str | None = None,
+    port: int | None = None,
 ) -> None:
     """Add or replace a measure in the model."""
     Server, _, Measure = _get_tom()
@@ -157,7 +156,7 @@ def add_measure(
         server.Disconnect()
 
 
-def list_relationships(port: Optional[int] = None) -> None:
+def list_relationships(port: int | None = None) -> None:
     """List all relationships in the model."""
     server = _open_server(port)
     try:

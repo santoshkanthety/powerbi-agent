@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block title %}Rule Engine{% endblock %}
+{% block heading %}Rule Engine{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <p class="text-sm text-slate-500">Define data quality checks and transformations applied at each pipeline stage.</p>
+  <button onclick="document.getElementById('add-rule-modal').classList.remove('hidden')" class="btn-primary">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+    </svg>
+    Add Rule
+  </button>
+</div>
+
+<!-- Rule type legend -->
+<div class="card p-4 mb-6">
+  <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Rule Categories</p>
+  <div class="flex flex-wrap gap-3">
+    {% set categories = [
+      ("Quality Checks", ["not_null","unique","regex","range_check","allowed_values"], "red"),
+      ("Transformations", ["type_cast","rename","derive","trim_whitespace","fill_null"], "blue"),
+      ("Cleanup", ["drop_column","custom_sql"], "slate"),
+    ] %}
+    {% for cat, types, color in categories %}
+    <div class="flex items-start gap-2">
+      <span class="inline-block w-2 h-2 rounded-full bg-{{ color }}-500 mt-1.5 flex-shrink-0"></span>
+      <div>
+        <p class="text-xs font-semibold text-slate-700">{{ cat }}</p>
+        <p class="text-xs text-slate-400">{{ types|join(', ') }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Rules table -->
+{% if cfg.rules %}
+<div class="card overflow-hidden mb-6">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-50 border-b border-slate-200">
+      <tr>
+        <th class="text-left px-4 py-3 font-medium text-slate-600">Rule</th>
+        <th class="text-left px-4 py-3 font-medium text-slate-600">Type</th>
+        <th class="text-left px-4 py-3 font-medium text-slate-600">Applies To</th>
+        <th class="text-left px-4 py-3 font-medium text-slate-600">Column</th>
+        <th class="text-left px-4 py-3 font-medium text-slate-600">On Fail</th>
+        <th class="text-left px-4 py-3 font-medium text-slate-600">Status</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for rule in cfg.rules|sort(attribute='order') %}
+      <tr class="hover:bg-slate-50 {% if not rule.enabled %}opacity-50{% endif %}">
+        <td class="px-4 py-3">
+          <p class="font-medium text-slate-800">{{ rule.name }}</p>
+          {% if rule.description %}<p class="text-xs text-slate-400 mt-0.5">{{ rule.description }}</p>{% endif %}
+        </td>
+        <td class="px-4 py-3">
+          <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
+            {% if rule.rule_type.value in ['not_null','unique','regex','range_check','allowed_values'] %}bg-red-100 text-red-700
+            {% elif rule.rule_type.value in ['type_cast','rename','derive','trim_whitespace','fill_null'] %}bg-blue-100 text-blue-700
+            {% else %}bg-slate-100 text-slate-700{% endif %}">
+            {{ rule.rule_type.value }}
+          </span>
+        </td>
+        <td class="px-4 py-3 text-slate-600">{{ rule.applies_to }}</td>
+        <td class="px-4 py-3 font-mono text-xs text-slate-700">{{ rule.column or "—" }}</td>
+        <td class="px-4 py-3">
+          <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
+            {% if rule.action_on_fail.value == 'fail_pipeline' %}bg-red-100 text-red-700
+            {% elif rule.action_on_fail.value == 'quarantine' %}bg-orange-100 text-orange-700
+            {% elif rule.action_on_fail.value == 'drop_row' %}bg-yellow-100 text-yellow-700
+            {% else %}bg-slate-100 text-slate-600{% endif %}">
+            {{ rule.action_on_fail.value }}
+          </span>
+        </td>
+        <td class="px-4 py-3">
+          <span class="{% if rule.enabled %}badge-enabled{% else %}badge-disabled{% endif %}">
+            {{ "Active" if rule.enabled else "Off" }}
+          </span>
+        </td>
+        <td class="px-4 py-3">
+          <div class="flex items-center gap-1 justify-end">
+            <form method="post" action="/rules/toggle/{{ rule.id }}?project={{ project }}">
+              <button class="text-xs text-slate-500 hover:text-slate-700 px-2 py-1 rounded hover:bg-slate-100">
+                {{ "Pause" if rule.enabled else "Enable" }}
+              </button>
+            </form>
+            <form method="post" action="/rules/delete/{{ rule.id }}?project={{ project }}"
+                  onsubmit="return confirm('Delete rule {{ rule.name }}?')">
+              <button class="btn-danger">✕</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card p-12 text-center mb-6">
+  <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
+    <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+    </svg>
+  </div>
+  <h3 class="font-semibold text-slate-700 mb-1">No rules configured</h3>
+  <p class="text-sm text-slate-400 mb-4">Add quality checks and transformations to protect your data pipeline.</p>
+  <button onclick="document.getElementById('add-rule-modal').classList.remove('hidden')" class="btn-primary mx-auto">Add First Rule</button>
+</div>
+{% endif %}
+
+<!-- Suggested starter rules -->
+<div class="card p-5">
+  <p class="text-sm font-semibold mb-3">Recommended Starter Rules</p>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+    {% set suggestions = [
+      ("No null primary keys", "not_null", "Critical — prevents orphaned records"),
+      ("Unique business keys", "unique", "Prevents duplicates in dimension tables"),
+      ("Valid email format", "regex", "^[^@]+@[^@]+\\.[^@]+$"),
+      ("Trim whitespace", "trim_whitespace", "Cleans leading/trailing spaces from text"),
+      ("Fill null amounts with 0", "fill_null", "Default numeric nulls to 0"),
+      ("Date range check", "range_check", "Catch dates outside expected range"),
+    ] %}
+    {% for name, type, desc in suggestions %}
+    <div class="flex items-start gap-2 p-2 rounded-lg hover:bg-slate-50">
+      <span class="inline-flex px-1.5 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600 flex-shrink-0 mt-0.5">{{ type }}</span>
+      <div>
+        <p class="font-medium text-slate-700">{{ name }}</p>
+        <p class="text-slate-400">{{ desc }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Add Rule Modal -->
+<div id="add-rule-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <div class="absolute inset-0 bg-black/50" onclick="document.getElementById('add-rule-modal').classList.add('hidden')"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+    <div class="bg-slate-900 px-6 py-4 flex items-center justify-between">
+      <h2 class="text-white font-semibold">Add Rule</h2>
+      <button onclick="document.getElementById('add-rule-modal').classList.add('hidden')" class="text-slate-400 hover:text-white">✕</button>
+    </div>
+    <form method="post" action="/rules/add" class="p-6 space-y-4">
+      <input type="hidden" name="project" value="{{ project }}"/>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Rule Name *</label>
+          <input name="name" required placeholder="e.g. No null customer ID" class="form-input"/>
+        </div>
+        <div>
+          <label class="form-label">Rule Type *</label>
+          <select name="rule_type" class="form-select">
+            {% for rt in rule_types %}<option value="{{ rt.value }}">{{ rt.value }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="form-label">Description</label>
+        <input name="description" placeholder="What does this rule check or do?" class="form-input"/>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Applies To (table or "all")</label>
+          <input name="applies_to" value="all" class="form-input"/>
+        </div>
+        <div>
+          <label class="form-label">Column</label>
+          <input name="column" placeholder="column_name (leave blank for table-level)" class="form-input font-mono"/>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Action on Fail</label>
+          <select name="action_on_fail" class="form-select">
+            {% for a in rule_actions %}<option value="{{ a.value }}">{{ a.value }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Order (lower runs first)</label>
+          <input name="order" type="number" value="0" class="form-input"/>
+        </div>
+      </div>
+      <div>
+        <label class="form-label">Parameters (JSON)</label>
+        <textarea name="params_json" rows="3" placeholder='e.g. {"pattern": "^[A-Z]{2}\\d{4}$"}' class="form-input font-mono text-xs">{}</textarea>
+      </div>
+      <div class="flex gap-3 justify-end border-t border-slate-100 pt-3">
+        <button type="button" onclick="document.getElementById('add-rule-modal').classList.add('hidden')" class="btn-secondary">Cancel</button>
+        <button type="submit" class="btn-primary">Add Rule</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -7,10 +7,8 @@ Install the fabric extra: pip install powerbi-agent[fabric]
 
 from __future__ import annotations
 
-import json
 import sys
 import time
-from typing import Optional
 
 import httpx
 from rich.console import Console
@@ -78,7 +76,7 @@ def list_workspaces() -> None:
     console.print(f"[dim]{len(data)} workspace(s)[/dim]")
 
 
-def list_datasets(workspace: Optional[str] = None) -> None:
+def list_datasets(workspace: str | None = None) -> None:
     """List semantic models in a workspace."""
     url = (
         f"{_PBI_BASE}/groups/{_resolve_workspace_id(workspace)}/datasets"
@@ -107,7 +105,7 @@ def list_datasets(workspace: Optional[str] = None) -> None:
 
 def trigger_refresh(
     dataset_name: str,
-    workspace: Optional[str] = None,
+    workspace: str | None = None,
     wait: bool = False,
 ) -> None:
     """Trigger a dataset refresh and optionally wait for completion."""
@@ -128,7 +126,7 @@ def trigger_refresh(
         _poll_refresh(ds_id, ws_id)
 
 
-def _poll_refresh(dataset_id: str, workspace_id: Optional[str]) -> None:
+def _poll_refresh(dataset_id: str, workspace_id: str | None) -> None:
     """Poll refresh status until completed or failed."""
     base = f"{_PBI_BASE}/groups/{workspace_id}" if workspace_id else _PBI_BASE
     url = f"{base}/datasets/{dataset_id}/refreshes?$top=1"
@@ -151,7 +149,7 @@ def _poll_refresh(dataset_id: str, workspace_id: Optional[str]) -> None:
                 sys.exit(1)
 
 
-def _resolve_workspace_id(name_or_id: Optional[str]) -> Optional[str]:
+def _resolve_workspace_id(name_or_id: str | None) -> str | None:
     if not name_or_id:
         return None
     # If it looks like a GUID, use as-is
@@ -167,7 +165,7 @@ def _resolve_workspace_id(name_or_id: Optional[str]) -> Optional[str]:
     sys.exit(1)
 
 
-def _resolve_dataset_id(name_or_id: str, workspace_id: Optional[str]) -> str:
+def _resolve_dataset_id(name_or_id: str, workspace_id: str | None) -> str:
     if len(name_or_id) == 36 and name_or_id.count("-") == 4:
         return name_or_id
     url = (

@@ -5,7 +5,6 @@ Install / uninstall powerbi-agent skills into Claude Code.
 from __future__ import annotations
 
 import shutil
-from importlib import resources
 from pathlib import Path
 
 from rich.console import Console

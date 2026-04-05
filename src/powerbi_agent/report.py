@@ -14,17 +14,15 @@ import json
 import sys
 import uuid
 from pathlib import Path
-from typing import Optional
 
 from rich.console import Console
 from rich.table import Table
-from rich.panel import Panel
 from rich.tree import Tree
 
 console = Console()
 
 
-def _find_pbix(pbix_path: Optional[str] = None) -> Path:
+def _find_pbix(pbix_path: str | None = None) -> Path:
     """Resolve the .pbix or PBIR report directory to work with."""
     if pbix_path:
         p = Path(pbix_path)
@@ -78,10 +76,10 @@ def _load_layout(report_path: Path) -> tuple[dict, Path]:
     return layout, layout_file
 
 
-def _extract_layout_from_pbix(pbix_path: Path) -> Optional[Path]:
+def _extract_layout_from_pbix(pbix_path: Path) -> Path | None:
     """Extract Layout file from a .pbix using Python's zipfile module."""
-    import zipfile
     import tempfile
+    import zipfile
 
     try:
         out_dir = Path(tempfile.mkdtemp())
@@ -94,7 +92,7 @@ def _extract_layout_from_pbix(pbix_path: Path) -> Optional[Path]:
     return None
 
 
-def show_info(pbix_path: Optional[str] = None) -> None:
+def show_info(pbix_path: str | None = None) -> None:
     """Display a tree overview of the report structure."""
     report_path = _find_pbix(pbix_path)
     layout, _ = _load_layout(report_path)
@@ -116,7 +114,7 @@ def show_info(pbix_path: Optional[str] = None) -> None:
     console.print(tree)
 
 
-def list_pages(pbix_path: Optional[str] = None) -> None:
+def list_pages(pbix_path: str | None = None) -> None:
     """List all report pages."""
     report_path = _find_pbix(pbix_path)
     layout, _ = _load_layout(report_path)
@@ -137,7 +135,7 @@ def list_pages(pbix_path: Optional[str] = None) -> None:
     console.print(tbl)
 
 
-def add_page(name: str, pbix_path: Optional[str] = None) -> None:
+def add_page(name: str, pbix_path: str | None = None) -> None:
     """Add a new blank page to the report."""
     report_path = _find_pbix(pbix_path)
     layout, layout_file = _load_layout(report_path)
