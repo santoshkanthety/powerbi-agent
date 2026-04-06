@@ -419,6 +419,8 @@ pbi-agent ui --no-open                # Don't open browser
 │ testing-validation      │ test · validate · UAT · reconciliation            │
 │ project-management      │ delivery · roadmap · sprint · RAID · go-live      │
 │ power-bi-connect        │ connect · local instance · no connection           │
+│ data-governance-trace.. │ GDPR · CCPA · lineage · retention · erasure       │
+│ cyber-security          │ tenant hardening · MFA · embed token · exfiltrat. │
 └─────────────────────────┴──────────────────────────────────────────────────┘
 ```
 
@@ -542,6 +544,7 @@ No code was copied from either project. See [ATTRIBUTIONS.md](ATTRIBUTIONS.md) f
 ║   20+ years delivering enterprise data platforms ║
 ║                                                  ║
 ║   github.com/santoshkanthety/powerbi-agent       ║
+║   linkedin.com/in/YOUR_LINKEDIN_HANDLE           ║
 ║                                                  ║
 ║   If this saves you time — give it a ★           ║
 ║                                                  ║

@@ -18,11 +18,22 @@ CLAUDE_MD = CLAUDE_HOME / "CLAUDE.md"
 
 SKILL_NAMES = [
     "power-bi-connect",
-    "power-bi-dax",
-    "power-bi-model",
-    "power-bi-report",
-    "power-bi-fabric",
-    "power-bi-doctor",
+    "data-catalog-lineage",
+    "data-transformation",
+    "dax-mastery",
+    "fabric-pipelines",
+    "measure-glossary",
+    "medallion-architecture",
+    "performance-scale",
+    "project-management",
+    "report-authoring",
+    "security-rls",
+    "source-integration",
+    "star-schema-modeling",
+    "testing-validation",
+    "time-series-data",
+    "data-governance-traceability",
+    "cyber-security",
 ]
 
 CLAUDE_MD_BLOCK = """
