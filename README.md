@@ -547,7 +547,7 @@ No code was copied from either project. See [ATTRIBUTIONS.md](ATTRIBUTIONS.md) f
 ║   20+ years delivering enterprise data platforms ║
 ║                                                  ║
 ║   github.com/santoshkanthety/powerbi-agent       ║
-║   linkedin.com/in/YOUR_LINKEDIN_HANDLE           ║
+║   linkedin.com/in/santoshkanthety                ║
 ║                                                  ║
 ║   If this saves you time — give it a ★           ║
 ║                                                  ║
