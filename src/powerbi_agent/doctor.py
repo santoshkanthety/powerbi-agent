@@ -5,6 +5,8 @@ Environment diagnostics — help users fix common setup issues.
 from __future__ import annotations
 
 import platform
+import shutil
+import sysconfig
 import sys
 from pathlib import Path
 
@@ -27,13 +29,40 @@ def check(label: str):
 def _check_python():
     v = sys.version_info
     ok = v >= (3, 10)
-    return ok, f"Python {v.major}.{v.minor}.{v.micro}"
+    detail = f"Python {v.major}.{v.minor}.{v.micro}"
+    if v >= (3, 14):
+        detail += " — Desktop integration requires Python <=3.13 (pythonnet limitation)"
+    return ok, detail
 
 
 @check("Operating System (Windows)")
 def _check_os():
     ok = platform.system() == "Windows"
     return ok, platform.platform()
+
+
+@check("Scripts directory on PATH")
+def _check_path():
+    """Detect the common Windows pitfall where pip installs scripts to a dir not on PATH."""
+    scripts_dir = sysconfig.get_path("scripts")
+    if not scripts_dir:
+        return None, "Could not determine scripts directory"
+
+    pbi_agent_bin = shutil.which("pbi-agent")
+    if pbi_agent_bin:
+        return True, f"pbi-agent found at {pbi_agent_bin}"
+
+    # pbi-agent not found on PATH — give the exact fix
+    if sys.platform == "win32":
+        fix = (
+            f"Scripts dir not on PATH: {scripts_dir}\n"
+            "  Fix (PowerShell, run once):\n"
+            f'  [Environment]::SetEnvironmentVariable("PATH", $env:PATH + ";{scripts_dir}", "User")\n'
+            "  Then restart your terminal."
+        )
+    else:
+        fix = f"Scripts dir not on PATH: {scripts_dir} — add it to your shell profile."
+    return False, fix
 
 
 @check("Power BI Desktop installed")
@@ -48,26 +77,38 @@ def _check_pbi_desktop():
     for p in pbi_paths:
         if p.exists():
             return True, str(p)
-    return False, "Not found in standard locations"
+    return None, "Not found in standard locations (required only for Desktop/DAX commands)"
 
 
 @check("pythonnet (for Desktop integration)")
 def _check_pythonnet():
     try:
-        import clr  # noqa
-        import pythonnet
-        return True, f"pythonnet {pythonnet.__version__}"
+        import clr  # noqa: F401
+        # Use importlib.metadata — pythonnet pre-releases lack __version__
+        from importlib.metadata import version as pkg_version, PackageNotFoundError
+        try:
+            ver = pkg_version("pythonnet")
+        except PackageNotFoundError:
+            ver = "unknown"
+        return True, f"pythonnet {ver}"
     except ImportError:
-        return False, "Not installed — run: pip install powerbi-agent[desktop]"
+        if sys.version_info >= (3, 14):
+            return None, (
+                "Not installed — pythonnet has no stable release for Python 3.14 yet. "
+                "Use Python 3.13 for Desktop features, or install pre-release: "
+                "pip install --pre pythonnet"
+            )
+        return None, "Not installed (optional) — run: pip install powerbi-agent[desktop]"
 
 
 @check("azure-identity (for Fabric integration)")
 def _check_azure():
     try:
-        import azure.identity
-        return True, f"azure-identity {azure.identity.__version__}"
-    except ImportError:
-        return None, "Not installed — run: pip install powerbi-agent[fabric]"
+        from importlib.metadata import version as pkg_version
+        ver = pkg_version("azure-identity")
+        return True, f"azure-identity {ver}"
+    except Exception:
+        return None, "Not installed (optional) — run: pip install powerbi-agent[fabric]"
 
 
 @check("Connection config")
@@ -75,7 +116,7 @@ def _check_connection():
     config_path = Path.home() / ".powerbi-agent" / "connection.json"
     if config_path.exists():
         import json
-        cfg = json.loads(config_path.read_text())
+        cfg = json.loads(config_path.read_text(encoding="utf-8"))
         return True, f"Port {cfg.get('port')} — {cfg.get('name', 'unknown')}"
     return None, "Not connected — run: pbi-agent connect"
 
@@ -106,11 +147,11 @@ def run_checks() -> None:
             result, detail = False, str(exc)
 
         if result is True:
-            status = "[green]✓[/green]"
+            status = "[green]OK[/green]"
         elif result is None:
-            status = "[yellow]⚠[/yellow]"
+            status = "[yellow]--[/yellow]"
         else:
-            status = "[red]✗[/red]"
+            status = "[red]FAIL[/red]"
             failed += 1
 
         tbl.add_row(label, status, detail)
@@ -118,6 +159,9 @@ def run_checks() -> None:
     console.print(tbl)
 
     if failed:
-        console.print(f"\n[red]{failed} check(s) failed.[/red] Fix issues above, then re-run [bold]pbi-agent doctor[/bold].")
+        console.print(
+            f"\n[red]{failed} check(s) failed.[/red] "
+            "Fix issues above, then re-run [bold]pbi-agent doctor[/bold]."
+        )
     else:
         console.print("\n[green]All checks passed![/green] You're good to go.")

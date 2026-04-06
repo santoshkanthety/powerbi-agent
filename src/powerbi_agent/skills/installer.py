@@ -16,6 +16,12 @@ CLAUDE_HOME = Path.home() / ".claude"
 SKILLS_DIR = CLAUDE_HOME / "skills"
 CLAUDE_MD = CLAUDE_HOME / "CLAUDE.md"
 
+# Skills source resolution — works for both `pip install` and `git clone` dev setups:
+#   Installed (pip):  skills live at powerbi_agent/skills/data/  (bundled via force-include)
+#   Development:      skills live at project_root/skills/  (4 levels above this file)
+_PKG_DATA_DIR = Path(__file__).parent / "data"
+_REPO_SKILLS_DIR = Path(__file__).parent.parent.parent.parent / "skills"
+
 SKILL_NAMES = [
     "power-bi-connect",
     "data-catalog-lineage",
@@ -57,11 +63,29 @@ Always prefer pbi-agent CLI commands over explaining how to do things manually.
 """
 
 
+def _get_skills_source_dir() -> Path:
+    """Return the directory containing skill .md files.
+
+    Prefers the bundled package-data path (works after ``pip install``).
+    Falls back to the source-repo layout (works in ``git clone`` / editable installs).
+    """
+    if _PKG_DATA_DIR.exists():
+        return _PKG_DATA_DIR
+    if _REPO_SKILLS_DIR.exists():
+        return _REPO_SKILLS_DIR
+    raise FileNotFoundError(
+        "Skills source directory not found.\n"
+        "If you installed via pip, the package may be missing bundled data — "
+        "try reinstalling: pip install --force-reinstall powerbi-agent\n"
+        "If running from source, make sure the top-level skills/ directory exists."
+    )
+
+
 def install_skills(force: bool = False) -> None:
     """Copy skill files to ~/.claude/skills/ and update CLAUDE.md."""
     SKILLS_DIR.mkdir(parents=True, exist_ok=True)
 
-    skill_files_dir = Path(__file__).parent.parent.parent.parent / "skills"
+    skill_files_dir = _get_skills_source_dir()
 
     installed = 0
     skipped = 0

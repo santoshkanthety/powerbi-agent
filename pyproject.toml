@@ -34,8 +34,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-desktop = ["pythonnet>=3.0"]
-fabric  = ["azure-identity>=1.15", "semantic-link-sempy>=0.7"]
+# pythonnet ONLY needed for Power BI Desktop local SSAS connection (Windows, Python <=3.13)
+# It is intentionally NOT included in fabric or ui extras — those work on any OS/Python version
+desktop = [
+    "pythonnet>=3.0; python_version < '3.14' and sys_platform == 'win32'",
+]
+fabric  = ["azure-identity>=1.15"]
 ui      = ["fastapi>=0.111", "uvicorn>=0.29", "jinja2>=3.1", "python-multipart>=0.0.9", "aiofiles>=23.0"]
 dev     = [
     "pytest>=8.0",
@@ -61,6 +65,12 @@ pbia = "powerbi_agent.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/powerbi_agent"]
+
+[tool.hatch.build.targets.wheel.force-include]
+# Bundle the top-level skills/ directory inside the installed package.
+# Installer looks for them at powerbi_agent/skills/data/ when installed via pip,
+# and falls back to project_root/skills/ when running from a cloned source repo.
+"skills" = "powerbi_agent/skills/data"
 
 [tool.ruff]
 line-length = 130

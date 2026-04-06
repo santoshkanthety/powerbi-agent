@@ -98,8 +98,8 @@ Before installing, ensure the following are in place:
 
 | Requirement | Version | Notes |
 |---|---|---|
-| **Python** | 3.10 – 3.14 | `python --version` |
-| **pip** | Latest | `pip install --upgrade pip` |
+| **Python** | 3.10 – 3.13 | `python --version` (3.14+ works for Fabric/UI; Desktop requires ≤3.13) |
+| **pip** | Latest | `python -m pip install --upgrade pip` |
 | **Claude Code** | Latest | [Install guide](https://claude.ai/code) — required for skills |
 | **Power BI Desktop** | Latest | Windows only · Required for `pbi-agent connect` and DAX commands |
 | **Windows OS** | 10 / 11 | Desktop integration uses .NET/pythonnet — Linux/macOS for Fabric-only workflows |
@@ -107,28 +107,42 @@ Before installing, ensure the following are in place:
 | **pbir.tools** | 0.9.4+ | `uv tool install pbir-cli` — required for `report-structure`, `report-theming`, `report-conversion` skills |
 | **Azure AD / Entra ID account** | — | Required for Fabric authentication (`pbi-agent fabric login`) |
 
-> **Minimal setup** (Fabric + Claude Code only, no Desktop): `pip install "powerbi-agent[fabric,ui]"` on any OS.
-> **Full setup** (Desktop + Fabric + UI): Windows only, `pip install "powerbi-agent[desktop,fabric,ui]"`.
+> **Minimal setup** (Fabric + Claude Code only, no Desktop, any OS): `pip install "powerbi-agent[fabric,ui]"`
+> **Full setup** (Desktop + Fabric + UI, Windows + Python ≤3.13): `pip install "powerbi-agent[desktop,fabric,ui]"`
 
 ---
 
 ## `> INITIALIZE_SEQUENCE`
 
-**Three commands. Full stack online.**
+**Four commands. Full stack online.**
 
-```bash
-# STEP 1 ── Install
+> **Not on PyPI yet?** Install directly from GitHub until the first PyPI release:
+> ```powershell
+> pip install "powerbi-agent[desktop,fabric,ui] @ git+https://github.com/santoshkanthety/powerbi-agent.git"
+> ```
+
+```powershell
+# STEP 1 ── Install (Windows PowerShell)
 pip install "powerbi-agent[desktop,fabric,ui]"
+```
 
-# STEP 2 ── Register 15 skills with Claude Code  (one-time)
+```powershell
+# STEP 2 ── Add pip Scripts to PATH (run once — restart terminal after)
+$scripts = python -c "import sysconfig; print(sysconfig.get_path('scripts'))"
+[Environment]::SetEnvironmentVariable("PATH", $env:PATH + ";$scripts", "User")
+# Then restart PowerShell / Command Prompt
+```
+
+```powershell
+# STEP 3 ── Register 20 skills with Claude Code (one-time)
 pbi-agent skills install
 
-# STEP 3 ── Connect to Power BI Desktop
+# STEP 4 ── Connect to Power BI Desktop
 pbi-agent connect
 ```
 
-> **Verify the grid is live:**
-> ```bash
+> **Verify everything is working:**
+> ```powershell
 > pbi-agent doctor
 > ```
 
@@ -136,19 +150,61 @@ pbi-agent connect
 <summary><code>► What pbi-agent doctor checks</code></summary>
 
 ```
-┌──────────────────────────────────────────────────┬────────┐
-│ Check                                            │ Status │
-├──────────────────────────────────────────────────┼────────┤
-│ Python version (>=3.10)                          │   ✓    │
-│ Operating System (Windows)                       │   ✓    │
-│ Power BI Desktop installed                       │   ✓    │
-│ pythonnet (for Desktop integration)              │   ✓    │
-│ azure-identity (for Fabric integration)          │   ✓    │
-│ Connection config                                │   ✓    │
-│ Claude Code skills installed                     │   ✓    │
-└──────────────────────────────────────────────────┴────────┘
-All checks passed. You're good to go.
+Check                                   Status  Detail
+─────────────────────────────────────── ─────── ──────────────────────────────
+Python version (>=3.10)                 OK      Python 3.12.x
+Operating System (Windows)              OK      Windows-11-...
+Scripts directory on PATH               OK      pbi-agent found at C:\...\pbi-agent.exe
+Power BI Desktop installed              OK      C:\Program Files\...\PBIDesktop.exe
+pythonnet (for Desktop integration)     OK      pythonnet 3.0.x
+azure-identity (for Fabric integration) --      Not installed (optional)
+Connection config                       --      Not connected — run: pbi-agent connect
+Claude Code skills installed            OK      20/20 skill(s) installed
+
+All checks passed! You're good to go.
 ```
+
+> **If "Scripts directory on PATH" shows FAIL**, run the PowerShell command in STEP 2 above and restart your terminal.
+</details>
+
+<details>
+<summary><code>► Windows troubleshooting guide</code></summary>
+
+**`pbi-agent` not found after install**
+```powershell
+# Find where pip installed the scripts
+python -c "import sysconfig; print(sysconfig.get_path('scripts'))"
+# Add to PATH permanently
+$scripts = python -c "import sysconfig; print(sysconfig.get_path('scripts'))"
+[Environment]::SetEnvironmentVariable("PATH", $env:PATH + ";$scripts", "User")
+# Restart PowerShell, then verify:
+pbi-agent --version
+```
+
+**UnicodeEncodeError / emoji crashes on install**
+```powershell
+# Force UTF-8 in the current session
+$env:PYTHONUTF8 = "1"
+pip install "powerbi-agent[desktop,fabric,ui]"
+pbi-agent skills install
+```
+
+**pythonnet fails on Python 3.14**
+```powershell
+# pythonnet has no stable release for 3.14 yet — use Python 3.12 or 3.13 for Desktop features
+# Fabric and UI extras work on any Python version including 3.14
+pip install "powerbi-agent[fabric,ui]"   # no [desktop]
+```
+
+**`pbi-agent skills install` reports "Skill file not found"**
+```powershell
+# If installed from PyPI and skills are missing, force-reinstall to get bundled data
+pip install --force-reinstall powerbi-agent
+pbi-agent skills install
+# Or install from source:
+pip install "powerbi-agent[desktop,fabric,ui] @ git+https://github.com/santoshkanthety/powerbi-agent.git"
+```
+
 </details>
 
 ---
@@ -582,7 +638,8 @@ powerbi-agent/
 │
 ├── docs/assets/            ◄── SVG diagrams and visual assets
 ├── tests/                  ◄── pytest suite (no PBI Desktop required)
-├── .github/workflows/ci.yml
+├── .github/workflows/ci.yml        ◄── Test on Windows + Linux + macOS
+├── .github/workflows/publish.yml   ◄── Auto-publish to PyPI on git tag
 ├── pyproject.toml
 ├── CONTRIBUTING.md
 └── ATTRIBUTIONS.md         ◄── License credits (pbi-cli MIT, data-goblin GPL-3.0)
@@ -592,22 +649,35 @@ powerbi-agent/
 
 ## `> INSTALL_OPTIONS`
 
-```bash
-# Core CLI only
+```powershell
+# ── From PyPI (once published) ──────────────────────────────────────────────
+
+# Core CLI only (any OS, any Python 3.10+)
 pip install powerbi-agent
 
-# + Power BI Desktop integration (pythonnet / TOM / ADOMD)
+# + Power BI Desktop integration (Windows, Python ≤3.13 — pythonnet requirement)
 pip install "powerbi-agent[desktop]"
 
-# + Microsoft Fabric / Power BI Service (azure-identity)
+# + Microsoft Fabric / Power BI Service (any OS, any Python 3.10+)
 pip install "powerbi-agent[fabric]"
 
-# + Web configuration tool (FastAPI / uvicorn / Jinja2)
+# + Web configuration tool (any OS, any Python 3.10+)
 pip install "powerbi-agent[ui]"
 
-# Everything
+# Everything (Windows + Python ≤3.13 for full Desktop support)
 pip install "powerbi-agent[desktop,fabric,ui]"
+
+
+# ── From GitHub (before PyPI release or for latest dev builds) ───────────────
+pip install "powerbi-agent[desktop,fabric,ui] @ git+https://github.com/santoshkanthety/powerbi-agent.git"
+
+
+# ── Using pipx (auto-manages PATH — recommended for CLI-first users) ─────────
+pipx install powerbi-agent
+pipx inject powerbi-agent azure-identity fastapi uvicorn
 ```
+
+> **Python 3.14 users**: The `[desktop]` extra (pythonnet) requires Python ≤3.13. Install without it and use Fabric/UI features: `pip install "powerbi-agent[fabric,ui]"`
 
 ---
 

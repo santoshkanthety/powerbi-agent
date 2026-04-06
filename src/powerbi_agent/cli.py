@@ -1,5 +1,6 @@
 """Main CLI entry point for powerbi-agent."""
 
+import io
 import sys
 
 import click
@@ -7,6 +8,16 @@ from rich.console import Console
 from rich.panel import Panel
 
 from powerbi_agent import __version__
+
+# ── Windows Unicode fix ────────────────────────────────────────────────────────
+# The default Windows console uses cp1252 which cannot encode Unicode emoji
+# (e.g. ⚠, ✓, ✗). Force UTF-8 so Rich output never crashes with
+# UnicodeEncodeError: 'charmap' codec can't encode character ...
+if sys.platform == "win32":
+    if hasattr(sys.stdout, "buffer"):
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "buffer"):
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 console = Console()
 
