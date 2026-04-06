@@ -9,6 +9,7 @@
 [![License](https://img.shields.io/badge/License-MIT-00ff88?style=for-the-badge&labelColor=030509)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/santoshkanthety/powerbi-agent?style=for-the-badge&color=ffd700&labelColor=030509)](https://github.com/santoshkanthety/powerbi-agent/stargazers)
 [![CI](https://img.shields.io/github/actions/workflow/status/santoshkanthety/powerbi-agent/ci.yml?style=for-the-badge&color=00e5ff&labelColor=030509&label=CI)](https://github.com/santoshkanthety/powerbi-agent/actions)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Santosh%20Kanthety-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white&labelColor=030509)](https://www.linkedin.com/in/santoshkanthety/)
 
 </div>
 
@@ -35,6 +36,26 @@
 ## `> SYSTEM_OVERVIEW`
 
 ![Architecture](docs/assets/architecture.svg)
+
+---
+
+## `> PREREQUISITES`
+
+Before installing, ensure the following are in place:
+
+| Requirement | Version | Notes |
+|---|---|---|
+| **Python** | 3.10 – 3.14 | `python --version` |
+| **pip** | Latest | `pip install --upgrade pip` |
+| **Claude Code** | Latest | [Install guide](https://claude.ai/code) — required for skills |
+| **Power BI Desktop** | Latest | Windows only · Required for `pbi-agent connect` and DAX commands |
+| **Windows OS** | 10 / 11 | Desktop integration uses .NET/pythonnet — Linux/macOS for Fabric-only workflows |
+| **Microsoft Fabric / Power BI Service** | — | Required for `pbi-agent fabric` commands — Azure subscription needed |
+| **pbir.tools** | 0.9.4+ | `uv tool install pbir-cli` — required for `report-structure`, `report-theming`, `report-conversion` skills |
+| **Azure AD / Entra ID account** | — | Required for Fabric authentication (`pbi-agent fabric login`) |
+
+> **Minimal setup** (Fabric + Claude Code only, no Desktop): `pip install "powerbi-agent[fabric,ui]"` on any OS.
+> **Full setup** (Desktop + Fabric + UI): Windows only, `pip install "powerbi-agent[desktop,fabric,ui]"`.
 
 ---
 
