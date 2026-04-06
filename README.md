@@ -544,7 +544,8 @@ No code was copied from either project. See [ATTRIBUTIONS.md](ATTRIBUTIONS.md) f
 ╔══════════════════════════════════════════════════╗
 ║                                                  ║
 ║   Built by  SANTOSH KANTHETY                     ║
-║   20+ years delivering enterprise data platforms ║
+║   20+ years of Technology & Data transformation  ║
+║   delivery and strategy                          ║
 ║                                                  ║
 ║   github.com/santoshkanthety/powerbi-agent       ║
 ║   linkedin.com/in/santoshkanthety                ║
