@@ -50,13 +50,27 @@ def run_query(
     conn_str = get_connection_string(port)
     AdomdConnection, AdomdCommand = _get_adomd()
 
-    # Wrap in EVALUATE if needed
+    # Wrap in EVALUATE if needed.
+    # If the expression looks like a table expression (contains VALUES, FILTER, ALL, SUMMARIZE,
+    # SELECTCOLUMNS, ADDCOLUMNS, TOPN, or is already a table constructor {…}) use it directly.
+    # Otherwise treat as a scalar and wrap with ROW() so DAX engine accepts it.
     dax = expression.strip()
     if not dax.upper().startswith("EVALUATE"):
+        _TABLE_FUNCS = ("VALUES(", "FILTER(", "ALL(", "SUMMARIZE(", "SELECTCOLUMNS(",
+                        "ADDCOLUMNS(", "TOPN(", "CALCULATETABLE(", "UNION(", "EXCEPT(",
+                        "INTERSECT(", "CROSSJOIN(", "NATURALLEFTOUTERJOIN(", "ALLEXCEPT(")
+        _is_table = (
+            dax.startswith("{")
+            or any(dax.upper().startswith(fn) for fn in _TABLE_FUNCS)
+        )
         if table:
-            dax = f"EVALUATE CALCULATETABLE({{{dax}}}, '{table}')"
+            # Always a table expression scoped to the given table
+            dax = f"EVALUATE CALCULATETABLE({dax}, '{table}')"
+        elif _is_table:
+            dax = f"EVALUATE {dax}"
         else:
-            dax = f"EVALUATE {{{dax}}}"
+            # Scalar expression — wrap in ROW() to produce a single-row table
+            dax = f"EVALUATE ROW(\"Value\", {dax})"
 
     with AdomdConnection(conn_str) as conn:
         conn.Open()

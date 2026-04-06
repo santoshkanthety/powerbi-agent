@@ -48,16 +48,17 @@ def _find_pbix(pbix_path: str | None = None) -> Path:
     sys.exit(1)
 
 
-def _load_layout(report_path: Path) -> tuple[dict, Path]:
+def _load_layout(report_path: Path) -> tuple[dict, Path, str]:
     """
     Load the Layout JSON from a PBIX (requires extraction) or PBIR directory.
-    Returns (layout_dict, layout_path).
+    Returns (layout_dict, layout_path, encoding) where encoding is 'utf-8' or 'utf-16'.
+    PBIR definition/report.json files are UTF-8; extracted PBIX Layout files are UTF-16 LE w/ BOM.
     """
     if report_path.is_dir():
-        # PBIR format
+        # PBIR format: try definition/report.json first, then legacy Layout file
         layout_file = report_path / "definition" / "report.json"
         if not layout_file.exists():
-            layout_file = report_path / "Layout"
+            layout_file = report_path / "Layout" / "report.json"
     else:
         # .pbix — needs extraction; guide user
         console.print(
@@ -72,8 +73,17 @@ def _load_layout(report_path: Path) -> tuple[dict, Path]:
         console.print("[red]Could not load report layout.[/red]")
         sys.exit(1)
 
-    layout = json.loads(layout_file.read_bytes().decode("utf-16-le", errors="replace"))
-    return layout, layout_file
+    raw = layout_file.read_bytes()
+    # PBIX Layout files use UTF-16 LE with BOM (0xFF 0xFE or 0xFE 0xFF)
+    # PBIR JSON files are plain UTF-8
+    if raw[:2] in (b"\xff\xfe", b"\xfe\xff"):
+        encoding = "utf-16"
+        layout = json.loads(raw.decode("utf-16"))
+    else:
+        encoding = "utf-8"
+        layout = json.loads(raw.decode("utf-8"))
+
+    return layout, layout_file, encoding
 
 
 def _extract_layout_from_pbix(pbix_path: Path) -> Path | None:
@@ -95,7 +105,7 @@ def _extract_layout_from_pbix(pbix_path: Path) -> Path | None:
 def show_info(pbix_path: str | None = None) -> None:
     """Display a tree overview of the report structure."""
     report_path = _find_pbix(pbix_path)
-    layout, _ = _load_layout(report_path)
+    layout, _, _enc = _load_layout(report_path)
 
     pages = layout.get("sections", [])
     tree = Tree(f"[bold]{report_path.name}[/bold]")
@@ -117,7 +127,7 @@ def show_info(pbix_path: str | None = None) -> None:
 def list_pages(pbix_path: str | None = None) -> None:
     """List all report pages."""
     report_path = _find_pbix(pbix_path)
-    layout, _ = _load_layout(report_path)
+    layout, _, _enc = _load_layout(report_path)
 
     tbl = Table(show_header=True, header_style="bold cyan")
     tbl.add_column("#", justify="right", style="dim")
@@ -138,7 +148,7 @@ def list_pages(pbix_path: str | None = None) -> None:
 def add_page(name: str, pbix_path: str | None = None) -> None:
     """Add a new blank page to the report."""
     report_path = _find_pbix(pbix_path)
-    layout, layout_file = _load_layout(report_path)
+    layout, layout_file, encoding = _load_layout(report_path)
 
     new_page = {
         "name": str(uuid.uuid4()).replace("-", "")[:20],
@@ -149,5 +159,10 @@ def add_page(name: str, pbix_path: str | None = None) -> None:
     }
     layout.setdefault("sections", []).append(new_page)
 
-    layout_file.write_bytes(json.dumps(layout, ensure_ascii=False).encode("utf-16-le"))
+    serialized = json.dumps(layout, ensure_ascii=False)
+    # Write back in the same encoding the file was originally in
+    if encoding == "utf-16":
+        layout_file.write_bytes(serialized.encode("utf-16"))  # includes BOM
+    else:
+        layout_file.write_text(serialized, encoding="utf-8")
     console.print(f"[green]✓[/green] Added page [bold]{name}[/bold]")

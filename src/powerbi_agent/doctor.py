@@ -82,10 +82,13 @@ def _check_connection():
 
 @check("Claude Code skills installed")
 def _check_skills():
+    from powerbi_agent.skills.installer import SKILL_NAMES
     skills_dir = Path.home() / ".claude" / "skills"
-    installed = list(skills_dir.glob("power-bi-*")) if skills_dir.exists() else []
+    if not skills_dir.exists():
+        return None, "Not installed — run: pbi-agent skills install"
+    installed = [s for s in SKILL_NAMES if (skills_dir / f"{s}.md").exists()]
     if installed:
-        return True, f"{len(installed)} skill(s) installed"
+        return True, f"{len(installed)}/{len(SKILL_NAMES)} skill(s) installed"
     return None, "Not installed — run: pbi-agent skills install"
 
 
