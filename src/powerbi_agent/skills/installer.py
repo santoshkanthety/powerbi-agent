@@ -34,6 +34,9 @@ SKILL_NAMES = [
     "time-series-data",
     "data-governance-traceability",
     "cyber-security",
+    "report-structure",
+    "report-theming",
+    "report-conversion",
 ]
 
 CLAUDE_MD_BLOCK = """

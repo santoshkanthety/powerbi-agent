@@ -421,6 +421,9 @@ pbi-agent ui --no-open                # Don't open browser
 │ power-bi-connect        │ connect · local instance · no connection           │
 │ data-governance-trace.. │ GDPR · CCPA · lineage · retention · erasure       │
 │ cyber-security          │ tenant hardening · MFA · embed token · exfiltrat. │
+│ report-structure        │ add page · add visual · bind field · bookmark     │
+│ report-theming          │ colors · fonts · theme template · cond. format    │
+│ report-conversion       │ PBIR/PBIX/PBIP convert · merge · split · rebind  │
 └─────────────────────────┴──────────────────────────────────────────────────┘
 ```
 
