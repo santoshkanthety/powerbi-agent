@@ -1,7 +1,7 @@
 # Skill: Source Integration & Data Model Development
 
 ## Trigger
-Activate when the user mentions: data source, connect source, ingest data, database connection, API connection, CSV upload, web scrape, source connector, raw data model, normalize, Bronze ingestion, source mapping, data model development, config tool, pbi-agent ui, configuration tool, rule engine, pipeline setup, source to Bronze, multi-source
+Activate when the user mentions: data source, connect source, ingest data, database connection, API connection, CSV upload, web scrape, source connector, raw data model, normalize, Bronze ingestion, source mapping, data model development, config tool, pbi-agent ui, configuration tool, rule engine, pipeline setup, source to Bronze, multi-source, PostgreSQL, postgres, JDBC, RDS, Aurora, Azure Database for PostgreSQL, Cloud SQL, read replica, DirectQuery postgres, incremental refresh postgres
 
 ## What You Know
 
@@ -41,6 +41,166 @@ The UI covers:
 # - Use Key Vault for credentials, never hardcode
 # - Test connection before scheduling pipeline
 ```
+
+---
+
+## PostgreSQL
+
+PostgreSQL is fully supported across all Power BI / Fabric integration paths. Choose the right approach based on data volume and latency requirements.
+
+### Connection Modes — Decision Guide
+
+| Scenario | Recommended Mode |
+|---|---|
+| Small tables (<1M rows), low latency | DirectQuery |
+| Large tables (>1M rows), fast dashboards | Import (scheduled refresh) |
+| Fabric Lakehouse as intermediary | Copy Activity (Fabric Pipeline) → OneLake → DirectLake |
+| Real-time streaming data | Eventstream → Lakehouse → DirectLake |
+
+### Power BI Desktop — Direct Connection
+
+```
+Get Data → Database → PostgreSQL Database
+  Server:   db.example.com          (or db.example.com:5432)
+  Database: prod_db
+  Data Connectivity mode:
+    • Import     — loads data into model (recommended for most cases)
+    • DirectQuery — live queries to PostgreSQL (use only for <10M rows and fast server)
+```
+
+**Credential setup (first time only):**
+```
+Connection settings → Database credentials
+  Authentication type: Database
+  User name: readonly_user          ← always use a dedicated read-only account
+  Password:  [stored in credential manager, not in the .pbix file]
+```
+
+### Native Query (SQL Pushdown)
+
+Use Native Query to push complex SQL directly to PostgreSQL instead of loading whole tables:
+
+```
+Get Data → PostgreSQL → Advanced Options → SQL Statement:
+
+SELECT
+  o.order_id,
+  o.order_date,
+  o.revenue,
+  c.region,
+  c.segment
+FROM public.orders o
+JOIN public.customers c ON o.customer_id = c.customer_id
+WHERE o.order_date >= CURRENT_DATE - INTERVAL '365 days'
+  AND o.order_status != 'cancelled'
+```
+
+> **Important**: Native Query disables query folding for subsequent Power Query steps. Apply all filters in the SQL, then do minimal M transformations after.
+
+### Power Query M — Parameterised Connection
+
+```m
+// Parameterise host and database for environment switching (dev/prod)
+let
+    PgHost     = "db.example.com",
+    PgDatabase = "prod_db",
+    Source     = PostgreSQL.Database(PgHost, PgDatabase,
+                     [Query = "SELECT * FROM public.orders
+                               WHERE updated_at >= #datetimezone(2024,1,1,0,0,0,0,0)"]),
+    Typed = Table.TransformColumnTypes(Source, {
+        {"order_id",   Int64.Type},
+        {"order_date", type date},
+        {"revenue",    type number}
+    })
+in
+    Typed
+```
+
+### SSL / TLS (RDS, Azure Database for PostgreSQL, Cloud SQL)
+
+Managed PostgreSQL services require SSL. Configure in Power BI Desktop:
+
+```
+Get Data → PostgreSQL → Advanced Options
+  Additional connection string properties:
+    sslmode=require
+```
+
+For Azure Database for PostgreSQL — Flexible Server:
+```
+Server: myserver.postgres.database.azure.com
+Additional: sslmode=require;Trust Server Certificate=false
+```
+
+### Incremental Refresh with PostgreSQL
+
+Incremental refresh requires a `RangeStart` / `RangeEnd` Power Query parameter pattern. PostgreSQL supports this via query folding when using the native connector:
+
+```m
+// In Power Query — use RangeStart / RangeEnd parameters (set as Date/Time)
+let
+    Source = PostgreSQL.Database("db.example.com", "prod_db"),
+    orders = Source{[Schema="public", Item="orders"]}[Data],
+    // This WHERE clause folds to PostgreSQL — enables incremental refresh
+    Filtered = Table.SelectRows(orders, each
+        [order_date] >= RangeStart and [order_date] < RangeEnd
+    )
+in
+    Filtered
+```
+
+Then in the dataset settings → Incremental refresh:
+```
+Archive data starting: 3 years before refresh date
+Incrementally refresh data starting: 7 days before refresh date
+Detect data changes: updated_at   ← optional, PostgreSQL supports this
+```
+
+### Fabric Pipeline — PostgreSQL → OneLake (for large tables)
+
+For tables > 5M rows, ingest via Fabric Pipeline into a Lakehouse first, then connect Power BI via DirectLake:
+
+```
+Fabric Pipeline:
+  Source:      PostgreSQL (JDBC)
+    Host:      db.example.com
+    Port:      5432
+    Database:  prod_db
+    Table:     public.orders
+    Query:     SELECT * FROM public.orders WHERE updated_at > @{pipeline().parameters.watermark}
+  Sink:        Lakehouse → Files → bronze/orders/
+  Format:      Parquet (auto-converted to Delta on shortcut)
+
+Next step: Create a Delta table in the Lakehouse from the Parquet files
+           Then attach a Power BI Semantic Model via DirectLake
+```
+
+```bash
+# CLI: configure PostgreSQL source in pbi-agent UI
+pbi-agent ui   # then add PostgreSQL source in Sources tab
+
+# Test connection
+pbi-agent source test-connection --type postgres \
+  --host db.example.com --port 5432 --database prod_db
+
+# Ingest to Bronze lakehouse via Fabric pipeline
+pbi-agent fabric ingest --source postgres \
+  --table public.orders \
+  --target bronze.pg_orders \
+  --mode incremental \
+  --watermark updated_at
+```
+
+### Performance Rules for PostgreSQL in Power BI
+
+| Rule | Detail |
+|---|---|
+| **Use a read replica** | Never point Power BI at your primary write node |
+| **Create covering indexes** | Index every column used in `WHERE` / `JOIN` in your M query |
+| **Avoid VOLATILE functions in SQL** | Prevents query folding (e.g. `NOW()` — use parameters instead) |
+| **Enable query folding** | Check: right-click a step → "View Native Query" — if greyed out, folding is broken |
+| **Import over DirectQuery** | For dashboards with >100K rows, Import + scheduled refresh outperforms DirectQuery |
+| **Connection pool size** | Set `Max connections` to match your pg_hba.conf limit (default 100) |
 
 ### REST API Sources
 ```python
