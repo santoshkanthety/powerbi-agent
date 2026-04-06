@@ -37,6 +37,59 @@
 
 ![Architecture](docs/assets/architecture.svg)
 
+```mermaid
+flowchart TD
+    U(["👤 You in Claude Code"]):::user
+
+    subgraph SKILLS ["⚡ 20 Skills Layer  ·  pure knowledge, zero code execution"]
+        direction LR
+        S1["🏗️ Medallion\nArchitecture"]:::skill
+        S2["📐 Star Schema\nModeling"]:::skill
+        S3["📊 DAX\nMastery"]:::skill
+        S4["⚙️ Fabric\nPipelines"]:::skill
+        S5["🔒 Security\n& RLS"]:::skill
+        S6["📋 GDPR\nTraceability"]:::skill
+        S7["🛡️ Cyber\nSecurity"]:::skill
+        S8["🎨 Report\nStructure"]:::skill
+        S9["🖌️ Report\nTheming"]:::skill
+        SA["🔄 Report\nConversion"]:::skill
+    end
+
+    subgraph CLI ["🛠️ CLI Layer  ·  pbi-agent commands"]
+        direction LR
+        C1["connect"]:::cmd
+        C2["dax"]:::cmd
+        C3["model"]:::cmd
+        C4["report"]:::cmd
+        C5["fabric"]:::cmd
+        C6["security"]:::cmd
+    end
+
+    subgraph PBIRT ["🔧 pbir.tools Layer"]
+        P1["Pages &\nVisuals"]:::pbir
+        P2["Themes &\nColors"]:::pbir
+        P3["Format\nConversion"]:::pbir
+    end
+
+    subgraph TARGET ["🎯 Outputs"]
+        T1["Power BI\nDesktop"]:::out
+        T2["Microsoft\nFabric"]:::out
+        T3["PBIR / PBIX\nFiles"]:::out
+    end
+
+    U -->|"natural language"| SKILLS
+    SKILLS -->|"Claude executes"| CLI
+    CLI -->|"pythonnet / TOM"| TARGET
+    SKILLS -->|"Claude executes"| PBIRT
+    PBIRT --> TARGET
+
+    classDef user fill:#ff4e00,color:#fff,stroke:none
+    classDef skill fill:#030c1a,color:#00e5ff,stroke:#00e5ff,stroke-width:1px
+    classDef cmd fill:#030c08,color:#00ff88,stroke:#007a40,stroke-width:1px
+    classDef pbir fill:#0a0514,color:#d080ff,stroke:#7030c0,stroke-width:1px
+    classDef out fill:#1a0a00,color:#ffb060,stroke:#ff6600,stroke-width:1px
+```
+
 ---
 
 ## `> PREREQUISITES`
@@ -140,6 +193,23 @@ pbi-agent ui --port 9000 --no-open   # Headless mode
 ## `> PIPELINE_SEQUENCE`
 
 **The exact order. Every time.**
+
+```mermaid
+flowchart LR
+    C1["⚙️ 01\nCONFIGURE\npbi-agent ui"]:::step
+    C2["🔌 02\nCONNECT\nfabric login"]:::step
+    C3["📥 03\nINGEST\nBronze layer"]:::step
+    C4["🔄 04\nTRANSFORM\nSilver + tests"]:::step
+    C5["📐 05\nMODEL\nDAX measures"]:::step
+    C6["🔒 06\nSECURE\nRLS + OLS"]:::step
+    C7["📊 07\nREPORT\nPBIR layout"]:::step
+    C8["🔁 08\nREFRESH\nFabric sync"]:::step
+    C9["✅ 09\nAUDIT\ngovernance"]:::step
+
+    C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8 --> C9
+
+    classDef step fill:#030c1a,color:#00e5ff,stroke:#00e5ff,stroke-width:1px
+```
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -419,32 +489,67 @@ pbi-agent ui --no-open                # Don't open browser
 
 ## `> SKILL_MATRIX`
 
-**15 domain skills loaded into Claude Code by `pbi-agent skills install`:**
+**20 domain skills loaded into Claude Code by `pbi-agent skills install`:**
+
+```mermaid
+mindmap
+  root((**pbi-agent**\n20 skills))
+    🏗️ Architecture
+      medallion-architecture
+      star-schema-modeling
+      data-transformation
+    📊 Analytics
+      dax-mastery
+      measure-glossary
+      time-series-data
+    ⚙️ Pipelines
+      fabric-pipelines
+      source-integration
+      testing-validation
+    🎨 Reports
+      report-authoring
+      report-structure
+      report-theming
+      report-conversion
+    🔒 Security
+      security-rls
+      cyber-security
+      data-governance-traceability
+    📋 Governance
+      data-catalog-lineage
+      project-management
+      power-bi-connect
+```
 
 ```
 ┌─────────────────────────┬──────────────────────────────────────────────────┐
 │ SKILL                   │ TRIGGERS ON                                      │
-├─────────────────────────┼──────────────────────────────────────────────────┤
+├─ 🏗️ ARCHITECTURE ───────┼──────────────────────────────────────────────────┤
 │ medallion-architecture  │ medallion · bronze · silver · gold · lakehouse   │
 │ star-schema-modeling    │ star schema · Kimball · SCD · dimension · fact    │
-│ dax-mastery             │ DAX · CALCULATE · time intelligence · YTD · YoY  │
-│ fabric-pipelines        │ pipeline · ingestion · ETL · watermark · Spark   │
-│ source-integration      │ source · connect · ingest · CSV · API · scrape   │
-│ report-authoring        │ report · visual · chart · page · bookmark        │
-│ security-rls            │ RLS · OLS · row-level security · USERPRINCIPALNAME│
-│ data-catalog-lineage    │ catalog · lineage · Purview · glossary · impact   │
-│ measure-glossary        │ measure description · formula · dependency        │
-│ performance-scale       │ slow · DirectLake · aggregations · V-Order        │
-│ time-series-data        │ time series · gaps · binning · intervals · spine  │
 │ data-transformation     │ union · append · type cast · hash key · schema    │
+├─ 📊 ANALYTICS ──────────┼──────────────────────────────────────────────────┤
+│ dax-mastery             │ DAX · CALCULATE · time intelligence · YTD · YoY  │
+│ measure-glossary        │ measure description · formula · dependency        │
+│ time-series-data        │ time series · gaps · binning · intervals · spine  │
+├─ ⚙️ PIPELINES ──────────┼──────────────────────────────────────────────────┤
+│ fabric-pipelines        │ pipeline · ingestion · ETL · watermark · Spark   │
+│ source-integration      │ PostgreSQL · JDBC · CSV · REST API · web scrape  │
 │ testing-validation      │ test · validate · UAT · reconciliation            │
+├─ 🎨 REPORTS ────────────┼──────────────────────────────────────────────────┤
+│ report-authoring        │ report · visual · chart · page · bookmark        │
+│ report-structure        │ add page · add visual · bind field · pbir.tools  │
+│ report-theming          │ colors · fonts · theme template · cond. format   │
+│ report-conversion       │ PBIR/PBIX/PBIP convert · merge · split · rebind  │
+├─ 🔒 SECURITY ───────────┼──────────────────────────────────────────────────┤
+│ security-rls            │ RLS · OLS · row-level security · USERPRINCIPALNAME│
+│ cyber-security          │ tenant hardening · MFA · embed token · exfiltrat. │
+│ data-governance-trace.. │ GDPR · CCPA · lineage · retention · erasure       │
+├─ 📋 GOVERNANCE ─────────┼──────────────────────────────────────────────────┤
+│ data-catalog-lineage    │ catalog · lineage · Purview · glossary · impact   │
+│ performance-scale       │ slow · DirectLake · aggregations · V-Order        │
 │ project-management      │ delivery · roadmap · sprint · RAID · go-live      │
 │ power-bi-connect        │ connect · local instance · no connection           │
-│ data-governance-trace.. │ GDPR · CCPA · lineage · retention · erasure       │
-│ cyber-security          │ tenant hardening · MFA · embed token · exfiltrat. │
-│ report-structure        │ add page · add visual · bind field · bookmark     │
-│ report-theming          │ colors · fonts · theme template · cond. format    │
-│ report-conversion       │ PBIR/PBIX/PBIP convert · merge · split · rebind  │
 └─────────────────────────┴──────────────────────────────────────────────────┘
 ```
 
@@ -562,18 +667,20 @@ No code was copied from either project. See [ATTRIBUTIONS.md](ATTRIBUTIONS.md) f
 <div align="center">
 
 ```
-╔══════════════════════════════════════════════════╗
-║                                                  ║
-║   Built by  SANTOSH KANTHETY                     ║
-║   20+ years of Technology & Data transformation  ║
-║   delivery and strategy                          ║
-║                                                  ║
-║   github.com/santoshkanthety/powerbi-agent       ║
-║   linkedin.com/in/santoshkanthety                ║
-║                                                  ║
-║   If this saves you time — give it a ★           ║
-║                                                  ║
-╚══════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║   ⚡  POWERBI · AGENT  //  TRON ARES  //  v0.1.0             ║
+║                                                               ║
+║   Built by  SANTOSH KANTHETY                                  ║
+║   20+ years of Technology & Data transformation               ║
+║   delivery and strategy                                       ║
+║                                                               ║
+║   github.com/santoshkanthety/powerbi-agent                    ║
+║   linkedin.com/in/santoshkanthety                             ║
+║                                                               ║
+║   If this saves you time — give it a ★                        ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
 ```
 
 </div>
