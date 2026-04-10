@@ -23,40 +23,123 @@ _PKG_DATA_DIR = Path(__file__).parent / "data"
 _REPO_SKILLS_DIR = Path(__file__).parent.parent.parent.parent / "skills"
 
 SKILL_NAMES = [
+    # Core connectivity
     "power-bi-connect",
-    "data-catalog-lineage",
-    "data-transformation",
+    "connect-pbid",
+    "fabric-cli",
+    # Semantic model authoring
     "dax-mastery",
-    "fabric-pipelines",
-    "measure-glossary",
-    "medallion-architecture",
-    "performance-scale",
-    "project-management",
+    "dax-performance",
+    "tmdl",
+    "power-query",
+    "review-semantic-model",
+    "standardize-naming-conventions",
+    "refreshing-semantic-model",
+    "lineage-analysis",
+    "bpa-rules",
+    "c-sharp-scripting",
+    "te2-cli",
+    # Report authoring
     "report-authoring",
-    "security-rls",
-    "source-integration",
-    "star-schema-modeling",
-    "testing-validation",
-    "time-series-data",
-    "data-governance-traceability",
-    "cyber-security",
+    "pbi-report-design",
+    "create-pbi-report",
+    "review-report",
     "report-structure",
     "report-theming",
     "report-conversion",
+    "modifying-theme-json",
+    # Visuals
+    "deneb-visuals",
+    "python-visuals",
+    "r-visuals",
+    "svg-visuals",
+    # PBIP / PBIR format
+    "pbip-format",
+    "pbir-format-enhanced",
+    "pbir-cli",
+    # Fabric / data platform
+    "fabric-pipelines",
+    "medallion-architecture",
+    "data-transformation",
+    "data-catalog-lineage",
+    "source-integration",
+    # Modeling & design
+    "star-schema-modeling",
+    "measure-glossary",
+    "performance-scale",
+    "security-rls",
+    "time-series-data",
+    # Governance & process
+    "data-governance-traceability",
+    "testing-validation",
+    "project-management",
+    "cyber-security",
 ]
 
 CLAUDE_MD_BLOCK = """
 <!-- powerbi-agent:start -->
 ## powerbi-agent Skills
 
-You have access to the following Power BI skills. Trigger them based on context:
+You have access to the following Power BI / Fabric skills. Load and apply them automatically based on context:
 
-- **power-bi-connect**: Use when the user wants to connect to Power BI Desktop
-- **power-bi-dax**: Use when the user wants to run, validate, or explain DAX
-- **power-bi-model**: Use when the user wants to inspect or modify the data model
-- **power-bi-report**: Use when the user wants to work with report pages or visuals
-- **power-bi-fabric**: Use when the user mentions Fabric, Power BI Service, workspace, or refresh
-- **power-bi-doctor**: Use when the user reports connection problems or setup issues
+### Connectivity
+- **power-bi-connect**: Connect to Power BI Desktop via pbi-agent CLI
+- **connect-pbid**: Connect via TOM/ADOMD.NET in PowerShell; query and modify live models
+- **fabric-cli**: fab CLI, nb CLI, DuckDB — workspace navigation, notebook management, deployment, refresh, APIs
+
+### Semantic Model Authoring
+- **dax-mastery**: DAX measures, calculated columns, time intelligence, evaluation context
+- **dax-performance**: DAX optimization, query plans, server timings, anti-patterns
+- **tmdl**: TMDL file authoring for PBIP projects; measures, columns, roles, relationships
+- **power-query**: Power Query M expressions, query folding, partitions
+- **review-semantic-model**: Audit and validate semantic models against best practices
+- **standardize-naming-conventions**: Interactive naming convention standardization
+- **refreshing-semantic-model**: Trigger, monitor, and validate semantic model refreshes
+- **lineage-analysis**: Trace model-to-report lineage across Fabric workspaces
+- **bpa-rules**: Tabular Editor Best Practice Analyzer rules — authoring and execution
+- **c-sharp-scripting**: C# scripting in Tabular Editor for bulk model operations
+- **te2-cli**: Tabular Editor 2 CLI for TMDL deployment, BPA, scripting
+
+### Report Authoring
+- **report-authoring**: General Power BI report authoring patterns
+- **pbi-report-design**: Report design principles, UX, accessibility, layout best practices
+- **create-pbi-report**: Step-by-step new report creation workflow
+- **review-report**: Audit reports against design and best practice standards
+- **report-structure**: PBIR report structure, pages, visuals
+- **report-theming**: Power BI theme JSON authoring
+- **report-conversion**: PBIX → PBIR / PBIP conversion
+- **modifying-theme-json**: Edit and extend theme JSON for custom branding
+
+### Custom Visuals
+- **deneb-visuals**: Deneb / Vega / Vega-Lite custom visuals in Power BI
+- **python-visuals**: Python visuals (matplotlib, seaborn, plotly)
+- **r-visuals**: R visuals (ggplot2, plotly)
+- **svg-visuals**: SVG-based custom visuals
+
+### PBIP / PBIR Format
+- **pbip-format**: PBIP project structure, file types, connection, Git workflows
+- **pbir-format-enhanced**: PBIR JSON schemas, visual.json, report.json editing
+- **pbir-cli**: PBIR CLI operations and scripting
+
+### Fabric / Data Platform
+- **fabric-pipelines**: Fabric Data Factory pipelines, orchestration
+- **medallion-architecture**: Bronze/Silver/Gold lakehouse design
+- **data-transformation**: ETL/ELT transformation patterns
+- **data-catalog-lineage**: Data catalog and lineage management
+- **source-integration**: Source system integration patterns
+
+### Modeling & Design
+- **star-schema-modeling**: Star schema design, dimensions, facts
+- **measure-glossary**: Standard measure naming and documentation
+- **performance-scale**: Performance optimization and scaling
+- **security-rls**: Row-level security design and implementation
+- **time-series-data**: Time series analysis patterns
+
+### Governance & Process
+- **data-governance-traceability**: Data governance and traceability
+- **testing-validation**: Testing and validation frameworks
+- **project-management**: Project management for BI projects
+- **cyber-security**: Security considerations for Power BI
 
 Always prefer pbi-agent CLI commands over explaining how to do things manually.
 <!-- powerbi-agent:end -->
@@ -136,12 +219,49 @@ def list_skills() -> None:
     tbl.add_column("Description")
 
     descriptions = {
-        "power-bi-connect": "Connect to Power BI Desktop instances",
-        "power-bi-dax": "Run and validate DAX queries",
-        "power-bi-model": "Inspect and modify semantic model",
-        "power-bi-report": "Work with report pages and visuals",
-        "power-bi-fabric": "Power BI Service / Fabric operations",
-        "power-bi-doctor": "Diagnose environment issues",
+        "power-bi-connect": "Connect to Power BI Desktop via CLI",
+        "connect-pbid": "Connect via TOM/ADOMD.NET PowerShell; query/modify live models",
+        "fabric-cli": "fab CLI, DuckDB — workspace, notebook, deployment, refresh",
+        "dax-mastery": "DAX measures, time intelligence, evaluation context",
+        "dax-performance": "DAX optimization, query plans, server timings",
+        "tmdl": "TMDL file authoring for PBIP projects",
+        "power-query": "Power Query M expressions and query folding",
+        "review-semantic-model": "Audit semantic models against best practices",
+        "standardize-naming-conventions": "Interactive naming convention standardization",
+        "refreshing-semantic-model": "Trigger, monitor, and validate model refreshes",
+        "lineage-analysis": "Trace model-to-report lineage across workspaces",
+        "bpa-rules": "Tabular Editor Best Practice Analyzer rules",
+        "c-sharp-scripting": "C# scripting in Tabular Editor for bulk operations",
+        "te2-cli": "Tabular Editor 2 CLI for deployment and scripting",
+        "report-authoring": "General report authoring patterns",
+        "pbi-report-design": "Report design, UX, accessibility, layout",
+        "create-pbi-report": "Step-by-step new report creation workflow",
+        "review-report": "Audit reports against design best practices",
+        "report-structure": "PBIR report structure, pages, visuals",
+        "report-theming": "Power BI theme JSON authoring",
+        "report-conversion": "PBIX → PBIR/PBIP conversion",
+        "modifying-theme-json": "Edit and extend theme JSON for custom branding",
+        "deneb-visuals": "Deneb/Vega/Vega-Lite custom visuals",
+        "python-visuals": "Python visuals (matplotlib, seaborn, plotly)",
+        "r-visuals": "R visuals (ggplot2, plotly)",
+        "svg-visuals": "SVG-based custom visuals",
+        "pbip-format": "PBIP project structure and Git workflows",
+        "pbir-format-enhanced": "PBIR JSON schemas, visual.json, report.json",
+        "pbir-cli": "PBIR CLI operations and scripting",
+        "fabric-pipelines": "Fabric Data Factory pipelines and orchestration",
+        "medallion-architecture": "Bronze/Silver/Gold lakehouse design",
+        "data-transformation": "ETL/ELT transformation patterns",
+        "data-catalog-lineage": "Data catalog and lineage management",
+        "source-integration": "Source system integration patterns",
+        "star-schema-modeling": "Star schema design, dimensions, facts",
+        "measure-glossary": "Standard measure naming and documentation",
+        "performance-scale": "Performance optimization and scaling",
+        "security-rls": "Row-level security design and implementation",
+        "time-series-data": "Time series analysis patterns",
+        "data-governance-traceability": "Data governance and traceability",
+        "testing-validation": "Testing and validation frameworks",
+        "project-management": "Project management for BI projects",
+        "cyber-security": "Security considerations for Power BI",
     }
 
     for skill_name in SKILL_NAMES:

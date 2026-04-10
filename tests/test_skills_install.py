@@ -1,7 +1,7 @@
 """
 Tests for powerbi-agent skills installer.
 
-Validates all 20 skill files exist in the skills/ directory and install correctly.
+Validates all skill files exist in the skills/ directory and install correctly.
 """
 
 from __future__ import annotations
@@ -35,24 +35,32 @@ def test_all_skill_files_exist():
 
 
 def test_skill_files_have_trigger_sections():
-    """Each skill .md must have a trigger section so Claude activates it."""
+    """Each skill .md must have a trigger/activation section so Claude activates it."""
     for name in SKILL_NAMES:
         src = SKILLS_SOURCE / f"{name}.md"
         if not src.exists():
             continue
         content = src.read_text(encoding="utf-8")
+        # Accepts: ## Trigger, triggers: YAML key, ## What You Know,
+        # YAML frontmatter with name: (data-goblin format uses description for auto-invoke)
         has_trigger = (
             "## Trigger" in content
             or "triggers:" in content
             or "## What You Know" in content
+            or (content.startswith("---") and "name:" in content[:500])
+            or "When to Use This Skill" in content
+            or "Automatically invoke" in content
         )
         assert has_trigger, f"{name}.md has no trigger/frontmatter section"
 
 
 def test_skill_names_count():
-    """Sanity check — should have exactly 20 skills."""
-    assert len(SKILL_NAMES) == 20, (
-        f"Expected 20 skills, got {len(SKILL_NAMES)}: {SKILL_NAMES}"
+    """Sanity check — skill count should match the number of .md files in skills/."""
+    skills_dir = Path(__file__).parent.parent / "skills"
+    md_files = len(list(skills_dir.glob("*.md")))
+    assert len(SKILL_NAMES) == md_files, (
+        f"SKILL_NAMES has {len(SKILL_NAMES)} entries but skills/ has {md_files} .md files. "
+        "Update SKILL_NAMES in installer.py to match."
     )
 
 
