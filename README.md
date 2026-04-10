@@ -25,6 +25,7 @@
 ║  Between you and that goal:  medallion architecture decisions,   ║
 ║  Delta table optimization, Kimball star schemas, 400 lines of    ║
 ║  DAX, RLS for 5,000 users, PBIR report layouts, Fabric pipelines ║
+║  TMDL authoring, BPA audits, Deneb visuals, TOM scripting        ║
 ║                                                                  ║
 ║  You know all of this.  It takes time.                           ║
 ║  POWERBI·AGENT gives that time back.                             ║
@@ -41,18 +42,13 @@
 flowchart TD
     U(["👤 You in Claude Code"]):::user
 
-    subgraph SKILLS ["⚡ 20 Skills Layer  ·  pure knowledge, zero code execution"]
+    subgraph SKILLS ["⚡ 43 Skills Layer  ·  pure knowledge, zero code execution"]
         direction LR
-        S1["🏗️ Medallion\nArchitecture"]:::skill
-        S2["📐 Star Schema\nModeling"]:::skill
-        S3["📊 DAX\nMastery"]:::skill
-        S4["⚙️ Fabric\nPipelines"]:::skill
-        S5["🔒 Security\n& RLS"]:::skill
-        S6["📋 GDPR\nTraceability"]:::skill
-        S7["🛡️ Cyber\nSecurity"]:::skill
-        S8["🎨 Report\nStructure"]:::skill
-        S9["🖌️ Report\nTheming"]:::skill
-        SA["🔄 Report\nConversion"]:::skill
+        S1["🔌 Connectivity\nconnect-pbid · fabric-cli"]:::skill
+        S2["📊 Semantic Model\nDAX · TMDL · Power Query\nBPA · TOM · TE2-CLI"]:::skill
+        S3["🎨 Reports & Visuals\nDesign · Deneb · Python\nR · SVG · PBIR/PBIP"]:::skill
+        S4["⚙️ Fabric Platform\nPipelines · Medallion\nRefresh · Lineage"]:::skill
+        S5["🔒 Security & Governance\nRLS · GDPR · Cyber\nCatalog · Naming"]:::skill
     end
 
     subgraph CLI ["🛠️ CLI Layer  ·  pbi-agent commands"]
@@ -62,7 +58,9 @@ flowchart TD
         C3["model"]:::cmd
         C4["report"]:::cmd
         C5["fabric"]:::cmd
-        C6["security"]:::cmd
+        C6["skills"]:::cmd
+        C7["doctor"]:::cmd
+        C8["ui"]:::cmd
     end
 
     subgraph PBIRT ["🔧 pbir.tools Layer"]
@@ -72,14 +70,14 @@ flowchart TD
     end
 
     subgraph TARGET ["🎯 Outputs"]
-        T1["Power BI\nDesktop"]:::out
+        T1["Power BI\nDesktop / TOM"]:::out
         T2["Microsoft\nFabric"]:::out
-        T3["PBIR / PBIX\nFiles"]:::out
+        T3["PBIR / PBIX\nPBIP / TMDL"]:::out
     end
 
     U -->|"natural language"| SKILLS
     SKILLS -->|"Claude executes"| CLI
-    CLI -->|"pythonnet / TOM"| TARGET
+    CLI -->|"pythonnet / TOM / fab CLI"| TARGET
     SKILLS -->|"Claude executes"| PBIRT
     PBIRT --> TARGET
 
@@ -101,9 +99,10 @@ Before installing, ensure the following are in place:
 | **Python** | 3.10 – 3.13 | `python --version` (3.14+ works for Fabric/UI; Desktop requires ≤3.13) |
 | **pip** | Latest | `python -m pip install --upgrade pip` |
 | **Claude Code** | Latest | [Install guide](https://claude.ai/code) — required for skills |
-| **Power BI Desktop** | Latest | Windows only · Required for `pbi-agent connect` and DAX commands |
+| **Power BI Desktop** | Latest | Windows only · Required for `pbi-agent connect`, DAX, TOM/ADOMD commands |
 | **Windows OS** | 10 / 11 | Desktop integration uses .NET/pythonnet — Linux/macOS for Fabric-only workflows |
 | **Microsoft Fabric / Power BI Service** | — | Required for `pbi-agent fabric` commands — Azure subscription needed |
+| **fab CLI** | Latest | `pip install ms-fabric-cli` — required for `fabric-cli` skill |
 | **pbir.tools** | 0.9.4+ | `uv tool install pbir-cli` — required for `report-structure`, `report-theming`, `report-conversion` skills |
 | **Azure AD / Entra ID account** | — | Required for Fabric authentication (`pbi-agent fabric login`) |
 
@@ -134,7 +133,7 @@ $scripts = python -c "import sysconfig; print(sysconfig.get_path('scripts'))"
 ```
 
 ```powershell
-# STEP 3 ── Register 20 skills with Claude Code (one-time)
+# STEP 3 ── Register 43 skills with Claude Code (one-time)
 pbi-agent skills install
 
 # STEP 4 ── Connect to Power BI Desktop
@@ -159,7 +158,7 @@ Power BI Desktop installed              OK      C:\Program Files\...\PBIDesktop.
 pythonnet (for Desktop integration)     OK      pythonnet 3.0.x
 azure-identity (for Fabric integration) --      Not installed (optional)
 Connection config                       --      Not connected — run: pbi-agent connect
-Claude Code skills installed            OK      20/20 skill(s) installed
+Claude Code skills installed            OK      43/43 skill(s) installed
 
 All checks passed! You're good to go.
 ```
@@ -275,6 +274,7 @@ flowchart LR
 │                                                                     │
 │  02. CONNECT      pbi-agent fabric login                            │
 │      ────────     Authenticate with Microsoft Fabric / Azure        │
+│                   pbi-agent connect  (Power BI Desktop / TOM)       │
 │                                                                     │
 │  03. INGEST       Ask Claude:                                       │
 │      ───────      "Run the Bronze ingestion for all sources"        │
@@ -285,18 +285,20 @@ flowchart LR
 │  05. MODEL        pbi-agent model info                              │
 │      ─────        pbi-agent model measures                          │
 │                   pbi-agent model add-measure "Total Sales" ...     │
+│                   Ask Claude: "Review the semantic model for BPA"   │
 │                                                                     │
 │  06. SECURE       pbi-agent security roles                          │
 │      ──────       pbi-agent security test-rls --user alice@...      │
 │                                                                     │
 │  07. REPORT       pbi-agent report pages report.pbix                │
 │      ──────       pbi-agent report add-page "Executive Summary"     │
+│                   Ask Claude: "Review the report design"            │
 │                                                                     │
 │  08. REFRESH      pbi-agent fabric refresh "Sales Analytics" --wait │
 │      ───────                                                        │
 │                                                                     │
 │  09. AUDIT        pbi-agent model audit --all                       │
-│      ─────                                                          │
+│      ─────        Ask Claude: "Run lineage analysis on this model"  │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -312,6 +314,13 @@ flowchart LR
 pbi-agent connect                     # Auto-detect first instance
 pbi-agent connect --list              # List all open PBI instances
 pbi-agent connect --port 59856        # Specify SSAS port manually
+```
+
+Once connected, Claude can use the `connect-pbid` skill to work directly via TOM and ADOMD.NET:
+```
+"Add a [Total Revenue] measure to the Sales table"
+"Run a DAX query showing top 10 customers by lifetime value"
+"List all measures with missing descriptions"
 ```
 </details>
 
@@ -331,11 +340,12 @@ pbi-agent dax validate "CALCULATE([Total Sales], SAMEPERIODLASTYEAR(Date[Date]))
 pbi-agent dax validate "SUMX(FILTER(Sales, Sales[Amount] > 1000), Sales[Amount])"
 ```
 
-**Ask Claude instead:**
+**Ask Claude instead (uses `dax-mastery` + `dax-performance` skills):**
 ```
 "Run a DAX query showing top 10 products by sales for 2024"
 "Validate this RANKX expression before I add it to the model"
 "What's wrong with my time intelligence measure?"
+"Optimize this slow measure — server timings show 4.2s FE time"
 ```
 </details>
 
@@ -349,16 +359,10 @@ pbi-agent model tables                        # All tables with counts
 pbi-agent model measures                      # All measures
 pbi-agent model measures --table Sales        # Filtered by table
 pbi-agent model relationships                 # All relationships
-pbi-agent model relationships --flag-m2m      # Flag many-to-many
 
 # Build
 pbi-agent model add-measure "Total Sales" \
   "SUM(fact_sales[sales_amount])" \
-  --table Sales \
-  --format-string "#,0"
-
-pbi-agent model add-measure "Sales YTD" \
-  "CALCULATE([Total Sales], DATESYTD(Date[Date]))" \
   --table Sales \
   --format-string "#,0"
 
@@ -367,21 +371,22 @@ pbi-agent model add-measure "Sales YoY%" \
   --table Sales \
   --format-string "0.0%"
 
-# Document
-pbi-agent model set-description \
-  --measure "Total Sales" \
-  --description "Sum of completed order amounts. Source: fact_sales. Refreshed daily."
-
 # Audit
 pbi-agent model audit --check missing-descriptions
 pbi-agent model audit --check duplicate-expressions
-pbi-agent model audit --check unused-measures
 pbi-agent model audit --all --output audit.html
 
 # Lineage
 pbi-agent model lineage --measure "Sales YoY%"
-pbi-agent model impact --table "fact_sales" --column "sales_amount"
 pbi-agent model export-glossary --format markdown --output glossary.md
+```
+
+**Ask Claude instead (uses `tmdl`, `review-semantic-model`, `bpa-rules`, `standardize-naming-conventions` skills):**
+```
+"Review this semantic model against best practices and flag BPA violations"
+"Standardize naming conventions — use SQLBI style"
+"Edit the TMDL directly to fix the summarizeBy on the ProductKey column"
+"Find all measures that reference a deprecated column"
 ```
 </details>
 
@@ -392,17 +397,18 @@ pbi-agent model export-glossary --format markdown --output glossary.md
 # Inspect
 pbi-agent report info  report.pbix              # Full structure tree
 pbi-agent report pages report.pbix              # List all pages
-pbi-agent report visuals report.pbix            # Visual types used
 
 # Build
 pbi-agent report add-page "Executive Summary" report.pbix
 pbi-agent report add-page "Operations"        report.pbix
+```
 
-# Validate
-pbi-agent report validate --check design-standards report.pbix
-
-# Generate UAT checklist
-pbi-agent report generate-uat --report "Sales Dashboard" --output uat.md
+**Ask Claude instead (uses `pbi-report-design`, `review-report`, `deneb-visuals`, `modifying-theme-json` skills):**
+```
+"Review this report against UX and accessibility best practices"
+"Create a Deneb bar chart with custom tooltip and IBCS formatting"
+"Update the theme JSON to use our brand colors #1a237e and #e53935"
+"Add a Python visual showing the sales distribution as a violin plot"
 ```
 </details>
 
@@ -421,46 +427,15 @@ pbi-agent fabric datasets --workspace "Analytics Platform"
 pbi-agent fabric refresh "Sales Analytics" \
   --workspace "Analytics Platform" \
   --wait                                        # Blocks until complete
-
-# Validate DirectLake readiness
-pbi-agent fabric validate-delta \
-  --lakehouse "Analytics" \
-  --table "fact_sales"
-
-# Optimize Delta tables for DirectLake
-pbi-agent fabric optimize-delta \
-  --table "gold.fact_sales" \
-  --vorder
-
-# Endorsement
-pbi-agent fabric endorse \
-  --dataset "Sales Analytics" \
-  --level certified \
-  --justification "Passed all UAT checks, Q4 2024"
 ```
-</details>
 
-<details>
-<summary><code>► security — RLS, OLS and governance</code></summary>
-
-```bash
-# Inspect roles
-pbi-agent security roles
-
-# Add dynamic RLS role
-pbi-agent security add-role "RegionFilter" \
-  --filter "[Region] IN CALCULATETABLE(VALUES(UserAccess[region]), \
-    UserAccess[email] = USERPRINCIPALNAME())"
-
-# Test RLS as a specific user
-pbi-agent security test-rls \
-  --role "RegionFilter" \
-  --user "alice@company.com"
-
-# Validate all users in UserAccess have coverage
-pbi-agent security validate-coverage \
-  --table UserAccess \
-  --email-col email
+**Ask Claude instead (uses `fabric-cli` skill with fab CLI):**
+```
+"List all semantic models in the Analytics workspace"
+"Trigger a full refresh of the Sales model and wait for completion"
+"Query the lakehouse Delta table for freshness — show last 5 rows"
+"Deploy the updated model from dev to prod workspace"
+"Find all reports connected to the Sales semantic model"
 ```
 </details>
 
@@ -468,11 +443,21 @@ pbi-agent security validate-coverage \
 <summary><code>► skills — Claude Code skill management</code></summary>
 
 ```bash
-pbi-agent skills install              # Register all 15 skills
+pbi-agent skills install              # Register all 43 skills with Claude Code
 pbi-agent skills install --force      # Overwrite existing
-pbi-agent skills list                 # Show install status
+pbi-agent skills list                 # Show install status for all skills
 pbi-agent skills uninstall            # Remove all skills
 ```
+</details>
+
+<details>
+<summary><code>► doctor — Environment diagnostics</code></summary>
+
+```bash
+pbi-agent doctor                      # Run all environment checks
+```
+
+Checks: Python version, OS, PATH, Power BI Desktop install, pythonnet, azure-identity, connection config, Claude Code skills installed.
 </details>
 
 <details>
@@ -510,6 +495,22 @@ pbi-agent ui --no-open                # Don't open browser
        LASTDATE(Date[Date]), -12, MONTH))" \
     --table Revenue --format-string "$#,0"
 
+╠══════════════════════════ TMDL AUTHORING ═════════════════════════════╣
+
+  "Fix the summarizeBy on all key columns in the TMDL files"
+
+  → Claude edits definition/tables/*.tmdl directly, applying
+    correct indentation, quoting rules, and property ordering.
+    Checks for referential integrity before saving.
+
+╠══════════════════════════ LIVE MODEL VIA TOM ═════════════════════════╣
+
+  "Add 15 measures from this spec to the live Power BI Desktop model"
+
+  → Claude uses PowerShell + TOM/ADOMD.NET via connect-pbid skill:
+    validates each DAX expression, adds measures atomically,
+    calls $model.SaveChanges() — changes appear instantly in PBI Desktop
+
 ╠══════════════════════════ PERFORMANCE ════════════════════════════════╣
 
   "The Executive Dashboard takes 9 seconds to load — fix it"
@@ -520,6 +521,15 @@ pbi-agent ui --no-open                # Don't open browser
   pbi-agent model add-aggregation --table agg_sales_monthly
   → Page load: 9.2s → 0.8s
 
+╠══════════════════════════ DENEB VISUALS ══════════════════════════════╣
+
+  "Create a Deneb bar chart ranked by sales with conditional color
+   based on target attainment — IBCS style"
+
+  → Claude generates the full Vega-Lite spec with Power BI field
+    bindings, data transforms, and conditional encoding rules.
+    Outputs as a PBIR visual.json ready to paste.
+
 ╠══════════════════════════ SECURITY ═══════════════════════════════════╣
 
   "Set up RLS for 300 sales reps — each sees only their territory"
@@ -528,7 +538,15 @@ pbi-agent ui --no-open                # Don't open browser
     --filter "[Territory] IN CALCULATETABLE(VALUES(UserAccess[territory]),
        UserAccess[email] = USERPRINCIPALNAME())"
   pbi-agent security test-rls --role TerritoryFilter --user rep@co.com
-  → ✓ RLS applied · 300 users mapped · 5 test profiles passed
+  → RLS applied · 300 users mapped · 5 test profiles passed
+
+╠═══════════════════════════ BPA AUDIT ═════════════════════════════════╣
+
+  "Run Best Practice Analyzer on the model and fix all critical issues"
+
+  → Claude executes Tabular Editor 2 CLI BPA rules, reports violations
+    by severity, auto-fixes summarizeBy, formatString, hidden measures,
+    and description coverage. Re-runs BPA to confirm zero critical issues.
 
 ╠═══════════════════════════ GOVERNANCE ════════════════════════════════╣
 
@@ -545,68 +563,119 @@ pbi-agent ui --no-open                # Don't open browser
 
 ## `> SKILL_MATRIX`
 
-**20 domain skills loaded into Claude Code by `pbi-agent skills install`:**
+**43 domain skills loaded into Claude Code by `pbi-agent skills install`:**
 
 ```mermaid
 mindmap
-  root((**pbi-agent**\n20 skills))
-    🏗️ Architecture
-      medallion-architecture
-      star-schema-modeling
-      data-transformation
-    📊 Analytics
+  root((**pbi-agent**\n43 skills))
+    🔌 Connectivity
+      connect-pbid
+      fabric-cli
+      power-bi-connect
+    📊 Semantic Model
       dax-mastery
-      measure-glossary
-      time-series-data
-    ⚙️ Pipelines
-      fabric-pipelines
-      source-integration
-      testing-validation
+      dax-performance
+      tmdl
+      power-query
+      review-semantic-model
+      standardize-naming-conventions
+      refreshing-semantic-model
+      lineage-analysis
+      bpa-rules
+      c-sharp-scripting
+      te2-cli
     🎨 Reports
+      pbi-report-design
+      create-pbi-report
+      review-report
       report-authoring
       report-structure
       report-theming
       report-conversion
-    🔒 Security
-      security-rls
-      cyber-security
-      data-governance-traceability
-    📋 Governance
+      modifying-theme-json
+    🖼️ Visuals
+      deneb-visuals
+      python-visuals
+      r-visuals
+      svg-visuals
+    📁 PBIP Format
+      pbip-format
+      pbir-format-enhanced
+      pbir-cli
+    ⚙️ Platform
+      fabric-pipelines
+      medallion-architecture
+      data-transformation
       data-catalog-lineage
+      source-integration
+    🏗️ Modeling
+      star-schema-modeling
+      measure-glossary
+      performance-scale
+      security-rls
+      time-series-data
+    📋 Governance
+      data-governance-traceability
+      testing-validation
       project-management
-      power-bi-connect
+      cyber-security
 ```
 
 ```
-┌─────────────────────────┬──────────────────────────────────────────────────┐
-│ SKILL                   │ TRIGGERS ON                                      │
-├─ 🏗️ ARCHITECTURE ───────┼──────────────────────────────────────────────────┤
-│ medallion-architecture  │ medallion · bronze · silver · gold · lakehouse   │
-│ star-schema-modeling    │ star schema · Kimball · SCD · dimension · fact    │
-│ data-transformation     │ union · append · type cast · hash key · schema    │
-├─ 📊 ANALYTICS ──────────┼──────────────────────────────────────────────────┤
-│ dax-mastery             │ DAX · CALCULATE · time intelligence · YTD · YoY  │
-│ measure-glossary        │ measure description · formula · dependency        │
-│ time-series-data        │ time series · gaps · binning · intervals · spine  │
-├─ ⚙️ PIPELINES ──────────┼──────────────────────────────────────────────────┤
-│ fabric-pipelines        │ pipeline · ingestion · ETL · watermark · Spark   │
-│ source-integration      │ PostgreSQL · JDBC · CSV · REST API · web scrape  │
-│ testing-validation      │ test · validate · UAT · reconciliation            │
-├─ 🎨 REPORTS ────────────┼──────────────────────────────────────────────────┤
-│ report-authoring        │ report · visual · chart · page · bookmark        │
-│ report-structure        │ add page · add visual · bind field · pbir.tools  │
-│ report-theming          │ colors · fonts · theme template · cond. format   │
-│ report-conversion       │ PBIR/PBIX/PBIP convert · merge · split · rebind  │
-├─ 🔒 SECURITY ───────────┼──────────────────────────────────────────────────┤
-│ security-rls            │ RLS · OLS · row-level security · USERPRINCIPALNAME│
-│ cyber-security          │ tenant hardening · MFA · embed token · exfiltrat. │
-│ data-governance-trace.. │ GDPR · CCPA · lineage · retention · erasure       │
-├─ 📋 GOVERNANCE ─────────┼──────────────────────────────────────────────────┤
-│ data-catalog-lineage    │ catalog · lineage · Purview · glossary · impact   │
-│ performance-scale       │ slow · DirectLake · aggregations · V-Order        │
-│ project-management      │ delivery · roadmap · sprint · RAID · go-live      │
-│ power-bi-connect        │ connect · local instance · no connection           │
-└─────────────────────────┴──────────────────────────────────────────────────┘
+┌─────────────────────────────────┬──────────────────────────────────────────────────────┐
+│ SKILL                           │ TRIGGERS ON                                          │
+├─ 🔌 CONNECTIVITY ───────────────┼──────────────────────────────────────────────────────┤
+│ connect-pbid                    │ TOM · ADOMD · PowerShell · connect PBI Desktop        │
+│ fabric-cli                      │ fab · fab CLI · OneLake · deploy Fabric · lakehouse   │
+│ power-bi-connect                │ connect · local instance · no connection              │
+├─ 📊 SEMANTIC MODEL ─────────────┼──────────────────────────────────────────────────────┤
+│ dax-mastery                     │ DAX · CALCULATE · time intelligence · YTD · YoY       │
+│ dax-performance                 │ slow DAX · server timings · FE/SE · anti-patterns     │
+│ tmdl                            │ TMDL · .tmdl · edit TMDL · PBIP model files           │
+│ power-query                     │ Power Query · M code · M expression · query folding   │
+│ review-semantic-model           │ review model · audit model · check model quality      │
+│ standardize-naming-conventions  │ naming · rename · SQLBI conventions · clean names     │
+│ refreshing-semantic-model       │ refresh · dataset refresh · incremental refresh       │
+│ lineage-analysis                │ lineage · downstream reports · impact analysis        │
+│ bpa-rules                       │ BPA · best practice · Tabular Editor rules            │
+│ c-sharp-scripting               │ C# script · Tabular Editor script · bulk model ops   │
+│ te2-cli                         │ Tabular Editor CLI · te2 · BPA CLI · deploy TMDL     │
+├─ 🎨 REPORTS ────────────────────┼──────────────────────────────────────────────────────┤
+│ pbi-report-design               │ report design · UX · layout · accessibility           │
+│ create-pbi-report               │ create report · new report · build report             │
+│ review-report                   │ review report · audit report · check report           │
+│ report-authoring                │ report · visual · chart · page · bookmark             │
+│ report-structure                │ add page · add visual · bind field · pbir.tools       │
+│ report-theming                  │ colors · fonts · theme template · conditional format  │
+│ report-conversion               │ PBIR/PBIX/PBIP convert · merge · split · rebind      │
+│ modifying-theme-json            │ theme JSON · brand colors · custom theme · fonts      │
+├─ 🖼️ VISUALS ─────────────────────┼──────────────────────────────────────────────────────┤
+│ deneb-visuals                   │ Deneb · Vega · Vega-Lite · custom visual · IBCS       │
+│ python-visuals                  │ Python visual · matplotlib · seaborn · plotly         │
+│ r-visuals                       │ R visual · ggplot2 · R chart · R script               │
+│ svg-visuals                     │ SVG · SVG visual · custom SVG · vector graphic        │
+├─ 📁 PBIP / PBIR FORMAT ─────────┼──────────────────────────────────────────────────────┤
+│ pbip-format                     │ PBIP · PBIP project · definition.pbir · Git           │
+│ pbir-format-enhanced            │ PBIR · visual.json · report.json · PBIR schema        │
+│ pbir-cli                        │ PBIR CLI · pbir-cli · export report · import report   │
+├─ ⚙️ PLATFORM ───────────────────┼──────────────────────────────────────────────────────┤
+│ fabric-pipelines                │ pipeline · ingestion · ETL · watermark · Spark        │
+│ medallion-architecture          │ medallion · bronze · silver · gold · lakehouse         │
+│ data-transformation             │ union · append · type cast · hash key · schema        │
+│ data-catalog-lineage            │ catalog · lineage · Purview · glossary · impact       │
+│ source-integration              │ PostgreSQL · JDBC · CSV · REST API · web scrape       │
+├─ 🏗️ MODELING & DESIGN ──────────┼──────────────────────────────────────────────────────┤
+│ star-schema-modeling            │ star schema · Kimball · SCD · dimension · fact        │
+│ measure-glossary                │ measure description · formula · dependency            │
+│ performance-scale               │ slow · DirectLake · aggregations · V-Order            │
+│ security-rls                    │ RLS · OLS · row-level security · USERPRINCIPALNAME    │
+│ time-series-data                │ time series · gaps · binning · intervals · spine      │
+├─ 📋 GOVERNANCE ─────────────────┼──────────────────────────────────────────────────────┤
+│ data-governance-traceability    │ GDPR · CCPA · lineage · retention · erasure           │
+│ testing-validation              │ test · validate · UAT · reconciliation                │
+│ project-management              │ delivery · roadmap · sprint · RAID · go-live          │
+│ cyber-security                  │ tenant hardening · MFA · embed token · exfiltration   │
+└─────────────────────────────────┴──────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -617,29 +686,72 @@ mindmap
 powerbi-agent/
 │
 ├── src/powerbi_agent/
-│   ├── cli.py              ◄── Click CLI · connect · dax · model · report
+│   ├── cli.py              ◄── Click CLI · connect · dax · model · report · fabric
 │   ├── connect.py          ◄── SSAS auto-detection via workspace port files
 │   ├── dax.py              ◄── DAX execution via ADOMD.NET (pythonnet)
 │   ├── model.py            ◄── TOM read/write (measures · tables · RLS)
 │   ├── report.py           ◄── PBIR JSON manipulation (no Desktop needed)
 │   ├── fabric.py           ◄── Power BI REST API · workspace · refresh
-│   ├── doctor.py           ◄── Environment health checks
+│   ├── doctor.py           ◄── Environment health checks (PATH, pythonnet, skills)
+│   ├── skills/
+│   │   ├── installer.py    ◄── install/uninstall/list 43 skills in ~/.claude/skills/
+│   │   └── data/           ◄── Bundled skill .md files (pip install distributes these)
 │   └── web/                ◄── FastAPI config tool (pbi-agent ui)
 │       ├── app.py
 │       ├── models/config.py    ◄── Pydantic models for all config entities
 │       ├── routes/             ◄── sources · rules · model · pipeline · api
 │       └── templates/          ◄── Tailwind CSS + HTMX pages
 │
-├── skills/                 ◄── 15 Claude Code skill markdown files
-│   ├── medallion-architecture.md
-│   ├── star-schema-modeling.md
+├── skills/                 ◄── 43 Claude Code skill markdown files
+│   │
+│   ├── ── CONNECTIVITY ──
+│   ├── connect-pbid.md         ◄── TOM/ADOMD.NET via PowerShell (v0.22.4)
+│   ├── fabric-cli.md           ◄── fab CLI, DuckDB, OneLake (v0.22.4)
+│   ├── power-bi-connect.md
+│   │
+│   ├── ── SEMANTIC MODEL ──
 │   ├── dax-mastery.md
-│   └── ...
+│   ├── dax-performance.md      ◄── Server timings, FE/SE, anti-patterns (v0.22.4)
+│   ├── tmdl.md                 ◄── TMDL authoring, indentation, quoting (v0.22.4)
+│   ├── power-query.md          ◄── M expressions, query folding (v0.22.4)
+│   ├── review-semantic-model.md ◄── Audit, BPA, AI readiness (v0.22.4)
+│   ├── standardize-naming-conventions.md ◄── SQLBI style (v0.22.4)
+│   ├── refreshing-semantic-model.md (v0.22.4)
+│   ├── lineage-analysis.md     ◄── Cross-workspace lineage (v0.22.4)
+│   ├── bpa-rules.md            ◄── Tabular Editor BPA (v0.22.4)
+│   ├── c-sharp-scripting.md    ◄── TE C# bulk scripting (v0.22.4)
+│   ├── te2-cli.md              ◄── Tabular Editor 2 CLI (v0.22.4)
+│   │
+│   ├── ── REPORTS ──
+│   ├── pbi-report-design.md    ◄── Design principles, UX (v0.22.4)
+│   ├── create-pbi-report.md    ◄── Step-by-step creation (v0.22.4)
+│   ├── review-report.md        ◄── Design audit (v0.22.4)
+│   ├── report-authoring.md
+│   ├── report-structure.md
+│   ├── report-theming.md
+│   ├── report-conversion.md
+│   ├── modifying-theme-json.md ◄── Custom branding (v0.22.4)
+│   │
+│   ├── ── VISUALS ──
+│   ├── deneb-visuals.md        ◄── Vega/Vega-Lite (v0.22.4)
+│   ├── python-visuals.md       ◄── matplotlib, plotly (v0.22.4)
+│   ├── r-visuals.md            ◄── ggplot2, plotly (v0.22.4)
+│   ├── svg-visuals.md          ◄── SVG custom visuals (v0.22.4)
+│   │
+│   ├── ── PBIP / PBIR ──
+│   ├── pbip-format.md          ◄── PBIP project structure (v0.22.4)
+│   ├── pbir-format-enhanced.md ◄── PBIR JSON schemas (v0.22.4)
+│   ├── pbir-cli.md             ◄── PBIR CLI operations (v0.22.4)
+│   │
+│   └── ── PLATFORM / GOVERNANCE ──
+│       ├── fabric-pipelines.md
+│       ├── medallion-architecture.md
+│       ├── [+ 10 more governance, modeling, security skills]
 │
 ├── docs/assets/            ◄── SVG diagrams and visual assets
-├── tests/                  ◄── pytest suite (no PBI Desktop required)
-├── .github/workflows/ci.yml        ◄── Test on Windows + Linux + macOS
-├── .github/workflows/publish.yml   ◄── Auto-publish to PyPI on git tag
+├── tests/                  ◄── pytest suite · 44 tests · no PBI Desktop required
+├── .github/workflows/ci.yml        ◄── Test on Windows + Linux + macOS, Python 3.10–3.13
+├── .github/workflows/publish.yml   ◄── Auto-publish to PyPI on git tag (OIDC)
 ├── pyproject.toml
 ├── CONTRIBUTING.md
 └── ATTRIBUTIONS.md         ◄── License credits (pbi-cli MIT, data-goblin GPL-3.0)
@@ -650,7 +762,7 @@ powerbi-agent/
 ## `> INSTALL_OPTIONS`
 
 ```powershell
-# ── From PyPI (once published) ──────────────────────────────────────────────
+# ── From PyPI ───────────────────────────────────────────────────────────────
 
 # Core CLI only (any OS, any Python 3.10+)
 pip install powerbi-agent
@@ -668,7 +780,7 @@ pip install "powerbi-agent[ui]"
 pip install "powerbi-agent[desktop,fabric,ui]"
 
 
-# ── From GitHub (before PyPI release or for latest dev builds) ───────────────
+# ── From GitHub (latest dev builds) ─────────────────────────────────────────
 pip install "powerbi-agent[desktop,fabric,ui] @ git+https://github.com/santoshkanthety/powerbi-agent.git"
 
 
@@ -688,20 +800,20 @@ The grid is open. All skill levels welcome.
 
 No Python required to contribute:
   · Improve a skill file in skills/  (pure Markdown)
-  · Add a real-world DAX pattern
+  · Add a real-world DAX pattern or TMDL example
   · Report a bug with reproduction steps
-  · Suggest a new CLI command
+  · Suggest a new CLI command or skill
 
 With Python:
   · Add CLI commands or Fabric API coverage
   · Improve error messages and UX
-  · Write tests
+  · Write tests (pytest, no PBI Desktop required)
 
 SETUP:
   git clone https://github.com/santoshkanthety/powerbi-agent
   cd powerbi-agent
   pip install -e ".[dev]"
-  pytest
+  pytest                    # all 44 tests should pass
 ```
 
 [![Issues](https://img.shields.io/github/issues/santoshkanthety/powerbi-agent?style=for-the-badge&color=00e5ff&labelColor=030509)](https://github.com/santoshkanthety/powerbi-agent/issues)
@@ -712,12 +824,15 @@ SETUP:
 ## `> ROADMAP`
 
 ```
-v0.2  ── Power Query / M skill + PQTest.exe integration
-v0.3  ── Tabular Editor C# script generation via Claude
-v0.4  ── Deneb / Vega-Lite visual authoring
-v0.5  ── Auto-generated model documentation (HTML / PDF export)
-v1.0  ── Full multi-agent workflow:
-          ingest → transform → model → test → refresh → validate → deploy
+v0.1  ✓ Core CLI (connect · dax · model · report · fabric · doctor · ui)
+v0.2  ✓ Windows installation fixes (PATH · UTF-8 · pythonnet · bundled skills)
+v0.3  ✓ 43-skill library (TMDL · BPA · Deneb · Python/R visuals · fab CLI ·
+         TOM/ADOMD · PBIR/PBIP · Power Query · Naming Conventions · Lineage)
+v0.4  ── fab CLI deep integration (DuckDB querying · OneLake · notebook mgmt)
+v0.5  ── Tabular Editor 3 CLI integration (full TE3 support + BPA automation)
+v0.6  ── Multi-agent workflows (model-auditor · pbip-validator · deneb-reviewer)
+v1.0  ── Full agentic pipeline:
+          ingest → transform → model → BPA → test → refresh → validate → deploy
 ```
 
 ---
@@ -726,9 +841,9 @@ v1.0  ── Full multi-agent workflow:
 
 Inspired by and building on:
 - **[pbi-cli](https://github.com/MinaSaad1/pbi-cli)** (Mina Saad) — MIT · direct .NET TOM/ADOMD interop pattern
-- **[power-bi-agentic-development](https://github.com/data-goblin/power-bi-agentic-development)** (Kurt Buhler) — GPL-3.0 · agentic skill architecture concept
+- **[power-bi-agentic-development](https://github.com/data-goblin/power-bi-agentic-development)** (Kurt Buhler) — GPL-3.0 · 23 production-grade skills ported (v0.22.4)
 
-No code was copied from either project. See [ATTRIBUTIONS.md](ATTRIBUTIONS.md) for full license details.
+No code was copied from either project. Skill content adapted under GPL-3.0. See [ATTRIBUTIONS.md](ATTRIBUTIONS.md) for full license details.
 
 *Not affiliated with or endorsed by Microsoft Corporation.*
 
@@ -739,11 +854,13 @@ No code was copied from either project. See [ATTRIBUTIONS.md](ATTRIBUTIONS.md) f
 ```
 ╔═══════════════════════════════════════════════════════════════╗
 ║                                                               ║
-║   ⚡  POWERBI · AGENT  //  TRON ARES  //  v0.1.0             ║
+║   ⚡  POWERBI · AGENT  //  TRON ARES  //  v0.3.0             ║
 ║                                                               ║
 ║   Built by  SANTOSH KANTHETY                                  ║
 ║   20+ years of Technology & Data transformation               ║
 ║   delivery and strategy                                       ║
+║                                                               ║
+║   43 skills  ·  8 CLI commands  ·  44 tests                   ║
 ║                                                               ║
 ║   github.com/santoshkanthety/powerbi-agent                    ║
 ║   linkedin.com/in/santoshkanthety                             ║
