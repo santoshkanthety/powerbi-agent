@@ -17,7 +17,9 @@ console = Console()
 
 
 def _get_adomd():
-    """Import AdomdClient via pythonnet. Raises ImportError with guidance if unavailable."""
+    """Import AdomdClient via pythonnet with assembly resolver. Raises SystemExit with guidance if unavailable."""
+    from powerbi_agent._asm import ensure_assemblies
+    ensure_assemblies()
     try:
         import clr  # pythonnet
         clr.AddReference("Microsoft.AnalysisServices.AdomdClient")
@@ -26,15 +28,12 @@ def _get_adomd():
             AdomdConnection,
         )
         return AdomdConnection, AdomdCommand
-    except ImportError:
-        console.print(
-            "[red]pythonnet not installed.[/red] Install the desktop extra:\n"
-            "  [bold]pip install powerbi-agent[desktop][/bold]"
-        )
-        sys.exit(1)
     except Exception as exc:
         console.print(f"[red]Failed to load ADOMD client:[/red] {exc}")
-        console.print("[dim]Make sure Power BI Desktop is installed on this machine.[/dim]")
+        console.print(
+            "[dim]Make sure Power BI Report Builder is installed, or set the\n"
+            "PBI_REPORT_BUILDER environment variable to its install directory.[/dim]"
+        )
         sys.exit(1)
 
 
@@ -45,6 +44,7 @@ def run_query(
     port: int | None = None,
 ) -> None:
     """Execute a DAX query and display results."""
+    from powerbi_agent._asm import disposable
     from powerbi_agent.connect import get_connection_string
 
     conn_str = get_connection_string(port)
@@ -72,7 +72,9 @@ def run_query(
             # Scalar expression — wrap in ROW() to produce a single-row table
             dax = f"EVALUATE ROW(\"Value\", {dax})"
 
-    with AdomdConnection(conn_str) as conn:
+    # Bug fix: pythonnet 3.x removed automatic IDisposable → context manager
+    # mapping. Use disposable() wrapper instead of bare `with AdomdConnection(...)`.
+    with disposable(AdomdConnection(conn_str)) as conn:
         conn.Open()
         cmd = AdomdCommand(dax, conn)
         reader = cmd.ExecuteReader()
@@ -101,6 +103,7 @@ def run_query(
 
 def validate_expression(expression: str, port: int | None = None) -> None:
     """Validate a DAX expression by running an empty EVALUATE."""
+    from powerbi_agent._asm import disposable
     from powerbi_agent.connect import get_connection_string
 
     conn_str = get_connection_string(port)
@@ -110,7 +113,8 @@ def validate_expression(expression: str, port: int | None = None) -> None:
     test_dax = f"DEFINE MEASURE __test__ = {expression}\nEVALUATE ROW(\"x\", [__test__])"
 
     try:
-        with AdomdConnection(conn_str) as conn:
+        # Bug fix: use disposable() wrapper for pythonnet 3.x compatibility
+        with disposable(AdomdConnection(conn_str)) as conn:
             conn.Open()
             cmd = AdomdCommand(test_dax, conn)
             cmd.ExecuteNonQuery()

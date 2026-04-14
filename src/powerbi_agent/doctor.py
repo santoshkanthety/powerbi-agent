@@ -80,6 +80,57 @@ def _check_pbi_desktop():
     return None, "Not found in standard locations (required only for Desktop/DAX commands)"
 
 
+@check("Power BI Report Builder (TOM/ADOMD DLLs)")
+def _check_report_builder():
+    from powerbi_agent._asm import find_report_builder_dir
+    rb_dir = find_report_builder_dir()
+    if rb_dir is not None:
+        return True, str(rb_dir)
+    return None, (
+        "Not found — install Power BI Report Builder or set PBI_REPORT_BUILDER env var. "
+        "Required for Desktop model/DAX commands."
+    )
+
+
+@check("Workspace directories")
+def _check_workspaces():
+    import os as _os
+
+    from powerbi_agent.connect import WORKSPACE_GLOB
+
+    local_app_data = Path(_os.environ.get("LOCALAPPDATA", ""))
+    pbi_root = local_app_data / "Microsoft" / "Power BI Desktop"
+    if not pbi_root.exists():
+        return None, "Power BI Desktop AppData folder not found (expected on Windows)"
+    workspaces = list(pbi_root.glob(WORKSPACE_GLOB))
+    if not workspaces:
+        return None, f"No active workspaces in {pbi_root}"
+    return True, f"{len(workspaces)} workspace(s) in {pbi_root}"
+
+
+@check("SSAS connectivity")
+def _check_connectivity():
+    config_path = Path.home() / ".powerbi-agent" / "connection.json"
+    if not config_path.exists():
+        return None, "Not connected — run: pbi-agent connect"
+    import json
+    cfg = json.loads(config_path.read_text(encoding="utf-8"))
+    port = cfg.get("port")
+    if port is None:
+        return None, "Connection config missing port"
+    try:
+        import socket
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(2)
+        result = sock.connect_ex(("localhost", port))
+        sock.close()
+        if result == 0:
+            return True, f"Port {port} is reachable"
+        return False, f"Port {port} is not reachable — is Power BI Desktop running?"
+    except Exception as exc:
+        return None, f"Could not test port {port}: {exc}"
+
+
 @check("pythonnet (for Desktop integration)")
 def _check_pythonnet():
     try:
@@ -110,15 +161,6 @@ def _check_azure():
     except Exception:
         return None, "Not installed (optional) — run: pip install powerbi-agent[fabric]"
 
-
-@check("Connection config")
-def _check_connection():
-    config_path = Path.home() / ".powerbi-agent" / "connection.json"
-    if config_path.exists():
-        import json
-        cfg = json.loads(config_path.read_text(encoding="utf-8"))
-        return True, f"Port {cfg.get('port')} — {cfg.get('name', 'unknown')}"
-    return None, "Not connected — run: pbi-agent connect"
 
 
 @check("Claude Code skills installed")
