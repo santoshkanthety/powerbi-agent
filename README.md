@@ -100,6 +100,7 @@ Before installing, ensure the following are in place:
 | **pip** | Latest | `python -m pip install --upgrade pip` |
 | **Claude Code** | Latest | [Install guide](https://claude.ai/code) — required for skills |
 | **Power BI Desktop** | Latest | Windows only · Required for `pbi-agent connect`, DAX, TOM/ADOMD commands |
+| **Power BI Report Builder** | Latest | Windows only · Provides TOM & ADOMD DLLs for model/DAX commands. [Download](https://www.microsoft.com/en-us/download/details.aspx?id=58158). Override path with `PBI_REPORT_BUILDER` env var |
 | **Windows OS** | 10 / 11 | Desktop integration uses .NET/pythonnet — Linux/macOS for Fabric-only workflows |
 | **Microsoft Fabric / Power BI Service** | — | Required for `pbi-agent fabric` commands — Azure subscription needed |
 | **fab CLI** | Latest | `pip install ms-fabric-cli` — required for `fabric-cli` skill |

@@ -33,10 +33,21 @@ def detect_instances() -> list[dict]:
         local_app_data = Path(os.environ.get("LOCALAPPDATA", ""))
         pbi_root = local_app_data / "Microsoft" / "Power BI Desktop"
 
-        for workspace_dir in pbi_root.glob("AnalysisServicesWorkspace*/"):
+        # Bug fix: The container directory is named "AnalysisServicesWorkspace"
+        # (no suffix), while individual workspaces are named
+        # "AnalysisServicesWorkspace_<guid>".  The old glob
+        # "AnalysisServicesWorkspace*/" matched the container itself,
+        # causing detection to always fail.  Use "_*" to match only the
+        # per-instance workspace sub-directories.
+        for workspace_dir in pbi_root.glob("AnalysisServicesWorkspace_*/"):
             port_file = workspace_dir / "Data" / "msmdsrv.port.txt"
             if port_file.exists():
-                port = int(port_file.read_text(encoding="utf-8").strip())
+                # Bug fix: Power BI Desktop writes this file in UTF-16 LE.
+                # Reading as UTF-8 leaves embedded NUL bytes that make
+                # int() crash.  Decode as utf-16-le and strip NULs/BOM.
+                raw = port_file.read_bytes()
+                text = raw.decode("utf-16-le").strip().replace("\ufeff", "")
+                port = int(text)
                 name = _get_pbix_name_for_workspace(workspace_dir)
                 instances.append({
                     "port": port,

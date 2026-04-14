@@ -17,16 +17,19 @@ console = Console()
 
 
 def _get_tom():
-    """Load TOM assembly via pythonnet."""
+    """Load TOM assembly via pythonnet with assembly resolver."""
+    from powerbi_agent._asm import ensure_assemblies
+    ensure_assemblies()
     try:
         import clr
         clr.AddReference("Microsoft.AnalysisServices.Tabular")
         from Microsoft.AnalysisServices.Tabular import Server, Database, Measure  # noqa
         return Server, Database, Measure
-    except ImportError:
+    except Exception as exc:
+        console.print(f"[red]Failed to load TOM assembly:[/red] {exc}")
         console.print(
-            "[red]pythonnet not installed.[/red]\n"
-            "Install: [bold]pip install powerbi-agent[desktop][/bold]"
+            "[dim]Make sure Power BI Report Builder is installed, or set the\n"
+            "PBI_REPORT_BUILDER environment variable to its install directory.[/dim]"
         )
         sys.exit(1)
 
@@ -64,53 +67,91 @@ def show_info(port: int | None = None) -> None:
         server.Disconnect()
 
 
-def list_tables(port: int | None = None) -> None:
+def list_tables(port: int | None = None, fmt: str = "table") -> None:
     """List all tables with column and measure counts."""
     server = _open_server(port)
     try:
-        tbl = Table(show_header=True, header_style="bold cyan")
-        tbl.add_column("Table", style="bold")
-        tbl.add_column("Columns", justify="right")
-        tbl.add_column("Measures", justify="right")
-        tbl.add_column("Rows (est.)", justify="right")
-        tbl.add_column("Hidden", justify="center")
-
+        tables_data = []
         for t in server.Databases[0].Model.Tables:
-            tbl.add_row(
-                t.Name,
-                str(t.Columns.Count),
-                str(t.Measures.Count),
-                "—",
-                "✓" if t.IsHidden else "",
-            )
-        console.print(tbl)
+            tables_data.append({
+                "name": t.Name,
+                "columns": t.Columns.Count,
+                "measures": t.Measures.Count,
+                "hidden": t.IsHidden,
+            })
+
+        if fmt == "json":
+            import json as _json
+            print(_json.dumps(tables_data, indent=2, ensure_ascii=False))
+        elif fmt == "csv":
+            print("Table,Columns,Measures,Hidden")
+            for row in tables_data:
+                print(f"{row['name']},{row['columns']},{row['measures']},{row['hidden']}")
+        else:
+            tbl = Table(show_header=True, header_style="bold cyan")
+            tbl.add_column("Table", style="bold")
+            tbl.add_column("Columns", justify="right")
+            tbl.add_column("Measures", justify="right")
+            tbl.add_column("Rows (est.)", justify="right")
+            tbl.add_column("Hidden", justify="center")
+
+            for row in tables_data:
+                tbl.add_row(
+                    row["name"],
+                    str(row["columns"]),
+                    str(row["measures"]),
+                    "—",
+                    "✓" if row["hidden"] else "",
+                )
+            console.print(tbl)
     finally:
         server.Disconnect()
 
 
-def list_measures(table: str | None = None, port: int | None = None) -> None:
+def list_measures(table: str | None = None, port: int | None = None, fmt: str = "table") -> None:
     """List measures across all tables, or a specific table."""
     server = _open_server(port)
     try:
-        tbl = Table(show_header=True, header_style="bold cyan")
-        tbl.add_column("Table", style="dim")
-        tbl.add_column("Measure", style="bold")
-        tbl.add_column("Expression")
-        tbl.add_column("Format")
-        tbl.add_column("Hidden", justify="center")
-
+        measures_data = []
         for t in server.Databases[0].Model.Tables:
             if table and t.Name.lower() != table.lower():
                 continue
             for m in t.Measures:
+                measures_data.append({
+                    "table": t.Name,
+                    "measure": m.Name,
+                    "expression": m.Expression,
+                    "format": m.FormatString or "",
+                    "hidden": m.IsHidden,
+                })
+
+        if fmt == "json":
+            import json as _json
+            print(_json.dumps(measures_data, indent=2, ensure_ascii=False))
+        elif fmt == "csv":
+            print("Table,Measure,Expression,Format,Hidden")
+            for row in measures_data:
+                # Escape commas in expression for CSV
+                expr = row["expression"].replace('"', '""')
+                print(f'{row["table"]},"{row["measure"]}","{expr}","{row["format"]}",{row["hidden"]}')
+        else:
+            tbl = Table(show_header=True, header_style="bold cyan")
+            tbl.add_column("Table", style="dim")
+            tbl.add_column("Measure", style="bold")
+            tbl.add_column("Expression")
+            tbl.add_column("Format")
+            tbl.add_column("Hidden", justify="center")
+
+            for row in measures_data:
+                expr = row["expression"]
                 tbl.add_row(
-                    t.Name,
-                    m.Name,
-                    m.Expression[:80] + ("…" if len(m.Expression) > 80 else ""),
-                    m.FormatString or "",
-                    "✓" if m.IsHidden else "",
+                    row["table"],
+                    row["measure"],
+                    expr[:80] + ("…" if len(expr) > 80 else ""),
+                    row["format"],
+                    "✓" if row["hidden"] else "",
                 )
-        console.print(tbl)
+            console.print(tbl)
     finally:
         server.Disconnect()
 

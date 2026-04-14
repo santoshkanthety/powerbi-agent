@@ -42,11 +42,19 @@ def main():
 # ─── connect ──────────────────────────────────────────────────────────────────
 
 @main.command()
-@click.option("--port", default=None, type=int, help="SSAS port (auto-detected if omitted)")
+@click.option("--port", default=None, type=int,
+              help="SSAS port (auto-detected if omitted). Bypasses detection when given.")
 @click.option("--list", "list_only", is_flag=True, help="List open Power BI Desktop instances")
 def connect(port, list_only):
     """Connect to a running Power BI Desktop instance."""
     from powerbi_agent.connect import connect_to_instance, detect_instances
+
+    # Rec 6: When --port is given, bypass detection and connect directly.
+    if port and not list_only:
+        target = {"port": port, "name": f"manual (port {port})"}
+        connect_to_instance(target)
+        console.print(f"[green]✓[/green] Connected to [bold]{target['name']}[/bold] on port [cyan]{port}[/cyan]")
+        return
 
     instances = detect_instances()
 
@@ -64,13 +72,6 @@ def connect(port, list_only):
         return
 
     target = instances[0]
-    if port:
-        matching = [i for i in instances if i["port"] == port]
-        if not matching:
-            console.print(f"[red]No instance found on port {port}[/red]")
-            sys.exit(1)
-        target = matching[0]
-
     connect_to_instance(target)
     console.print(f"[green]✓[/green] Connected to [bold]{target['name']}[/bold] on port [cyan]{target['port']}[/cyan]")
 
@@ -125,19 +126,21 @@ def model_info(port):
 
 @model.command("tables")
 @click.option("--port", default=None, type=int)
-def model_tables(port):
+@click.option("--format", "fmt", type=click.Choice(["table", "json", "csv"]), default="table", help="Output format")
+def model_tables(port, fmt):
     """List all tables in the model."""
     from powerbi_agent.model import list_tables
-    list_tables(port=port)
+    list_tables(port=port, fmt=fmt)
 
 
 @model.command("measures")
 @click.option("--table", "-t", default=None, help="Filter by table name")
 @click.option("--port", default=None, type=int)
-def model_measures(table, port):
+@click.option("--format", "fmt", type=click.Choice(["table", "json", "csv"]), default="table", help="Output format")
+def model_measures(table, port, fmt):
     """List all measures, optionally filtered by table."""
     from powerbi_agent.model import list_measures
-    list_measures(table=table, port=port)
+    list_measures(table=table, port=port, fmt=fmt)
 
 
 @model.command("add-measure")
