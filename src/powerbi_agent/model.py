@@ -131,9 +131,12 @@ def list_measures(table: str | None = None, port: int | None = None, fmt: str = 
         elif fmt == "csv":
             print("Table,Measure,Expression,Format,Hidden")
             for row in measures_data:
-                # Escape commas in expression for CSV
-                expr = row["expression"].replace('"', '""')
-                print(f'{row["table"]},"{row["measure"]}","{expr}","{row["format"]}",{row["hidden"]}')
+                # Escape all string fields for CSV (double-quote embedded quotes, wrap in quotes)
+                def _csv_esc(val: str) -> str:
+                    return '"' + val.replace('"', '""') + '"'
+
+                print(f'{_csv_esc(row["table"])},{_csv_esc(row["measure"])},'
+                      f'{_csv_esc(row["expression"])},{_csv_esc(row["format"])},{row["hidden"]}')
         else:
             tbl = Table(show_header=True, header_style="bold cyan")
             tbl.add_column("Table", style="dim")

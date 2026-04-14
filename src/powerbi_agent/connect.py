@@ -19,6 +19,11 @@ console = Console()
 # Config file stores the last used connection
 _CONFIG_PATH = Path.home() / ".powerbi-agent" / "connection.json"
 
+# Glob pattern for individual workspace subdirectories.
+# The container dir is "AnalysisServicesWorkspace" (no suffix); each running
+# instance creates "AnalysisServicesWorkspace_<guid>".
+WORKSPACE_GLOB = "AnalysisServicesWorkspace_*/"
+
 
 def detect_instances() -> list[dict]:
     """
@@ -39,7 +44,7 @@ def detect_instances() -> list[dict]:
         # "AnalysisServicesWorkspace*/" matched the container itself,
         # causing detection to always fail.  Use "_*" to match only the
         # per-instance workspace sub-directories.
-        for workspace_dir in pbi_root.glob("AnalysisServicesWorkspace_*/"):
+        for workspace_dir in pbi_root.glob(WORKSPACE_GLOB):
             port_file = workspace_dir / "Data" / "msmdsrv.port.txt"
             if port_file.exists():
                 # Bug fix: Power BI Desktop writes this file in UTF-16 LE.

@@ -89,6 +89,9 @@ def _register_assembly_resolver() -> None:
 
     def _resolve(sender: object, args: object) -> object | None:
         """Resolve assemblies by probing the Report Builder directory."""
+        # .NET fully-qualified assembly names include version/culture info
+        # after the first comma, e.g. "AssemblyName, Version=1.0, Culture=neutral, ...".
+        # We only need the short name to locate the DLL file.
         name = str(args.Name).split(",")[0]  # type: ignore[union-attr]
         dll = rb_dir / f"{name}.dll"
         if dll.exists():

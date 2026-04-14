@@ -95,11 +95,14 @@ def _check_report_builder():
 @check("Workspace directories")
 def _check_workspaces():
     import os as _os
+
+    from powerbi_agent.connect import WORKSPACE_GLOB
+
     local_app_data = Path(_os.environ.get("LOCALAPPDATA", ""))
     pbi_root = local_app_data / "Microsoft" / "Power BI Desktop"
     if not pbi_root.exists():
         return None, "Power BI Desktop AppData folder not found (expected on Windows)"
-    workspaces = list(pbi_root.glob("AnalysisServicesWorkspace_*/"))
+    workspaces = list(pbi_root.glob(WORKSPACE_GLOB))
     if not workspaces:
         return None, f"No active workspaces in {pbi_root}"
     return True, f"{len(workspaces)} workspace(s) in {pbi_root}"
