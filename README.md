@@ -42,7 +42,7 @@
 flowchart TD
     U(["👤 You in Claude Code"]):::user
 
-    subgraph SKILLS ["⚡ 43 Skills Layer  ·  pure knowledge, zero code execution"]
+    subgraph SKILLS ["⚡ 44 Skills Layer  ·  pure knowledge, zero code execution"]
         direction LR
         S1["🔌 Connectivity\nconnect-pbid · fabric-cli"]:::skill
         S2["📊 Semantic Model\nDAX · TMDL · Power Query\nBPA · TOM · TE2-CLI"]:::skill
@@ -134,7 +134,7 @@ $scripts = python -c "import sysconfig; print(sysconfig.get_path('scripts'))"
 ```
 
 ```powershell
-# STEP 3 ── Register 43 skills with Claude Code (one-time)
+# STEP 3 ── Register 44 skills with Claude Code (one-time)
 pbi-agent skills install
 
 # STEP 4 ── Connect to Power BI Desktop
@@ -159,7 +159,7 @@ Power BI Desktop installed              OK      C:\Program Files\...\PBIDesktop.
 pythonnet (for Desktop integration)     OK      pythonnet 3.0.x
 azure-identity (for Fabric integration) --      Not installed (optional)
 Connection config                       --      Not connected — run: pbi-agent connect
-Claude Code skills installed            OK      43/43 skill(s) installed
+Claude Code skills installed            OK      44/44 skill(s) installed
 
 All checks passed! You're good to go.
 ```
@@ -444,7 +444,7 @@ pbi-agent fabric refresh "Sales Analytics" \
 <summary><code>► skills — Claude Code skill management</code></summary>
 
 ```bash
-pbi-agent skills install              # Register all 43 skills with Claude Code
+pbi-agent skills install              # Register all 44 skills with Claude Code
 pbi-agent skills install --force      # Overwrite existing
 pbi-agent skills list                 # Show install status for all skills
 pbi-agent skills uninstall            # Remove all skills
@@ -564,11 +564,11 @@ pbi-agent ui --no-open                # Don't open browser
 
 ## `> SKILL_MATRIX`
 
-**43 domain skills loaded into Claude Code by `pbi-agent skills install`:**
+**44 domain skills loaded into Claude Code by `pbi-agent skills install`:**
 
 ```mermaid
 mindmap
-  root((**pbi-agent**\n43 skills))
+  root((**pbi-agent**\n44 skills))
     🔌 Connectivity
       connect-pbid
       fabric-cli
@@ -580,7 +580,7 @@ mindmap
       power-query
       review-semantic-model
       standardize-naming-conventions
-      refreshing-semantic-model
+      refresh-semantic-model
       lineage-analysis
       bpa-rules
       c-sharp-scripting
@@ -616,6 +616,7 @@ mindmap
       security-rls
       time-series-data
     📋 Governance
+      audit-tenant-settings
       data-governance-traceability
       testing-validation
       project-management
@@ -636,7 +637,7 @@ mindmap
 │ power-query                     │ Power Query · M code · M expression · query folding   │
 │ review-semantic-model           │ review model · audit model · check model quality      │
 │ standardize-naming-conventions  │ naming · rename · SQLBI conventions · clean names     │
-│ refreshing-semantic-model       │ refresh · dataset refresh · incremental refresh       │
+│ refresh-semantic-model          │ refresh · dataset refresh · incremental refresh       │
 │ lineage-analysis                │ lineage · downstream reports · impact analysis        │
 │ bpa-rules                       │ BPA · best practice · Tabular Editor rules            │
 │ c-sharp-scripting               │ C# script · Tabular Editor script · bulk model ops   │
@@ -672,6 +673,7 @@ mindmap
 │ security-rls                    │ RLS · OLS · row-level security · USERPRINCIPALNAME    │
 │ time-series-data                │ time series · gaps · binning · intervals · spine      │
 ├─ 📋 GOVERNANCE ─────────────────┼──────────────────────────────────────────────────────┤
+│ audit-tenant-settings           │ tenant settings · Fabric admin · governance audit     │
 │ data-governance-traceability    │ GDPR · CCPA · lineage · retention · erasure           │
 │ testing-validation              │ test · validate · UAT · reconciliation                │
 │ project-management              │ delivery · roadmap · sprint · RAID · go-live          │
@@ -695,7 +697,7 @@ powerbi-agent/
 │   ├── fabric.py           ◄── Power BI REST API · workspace · refresh
 │   ├── doctor.py           ◄── Environment health checks (PATH, pythonnet, skills)
 │   ├── skills/
-│   │   ├── installer.py    ◄── install/uninstall/list 43 skills in ~/.claude/skills/
+│   │   ├── installer.py    ◄── install/uninstall/list 44 skills in ~/.claude/skills/
 │   │   └── data/           ◄── Bundled skill .md files (pip install distributes these)
 │   └── web/                ◄── FastAPI config tool (pbi-agent ui)
 │       ├── app.py
@@ -703,7 +705,7 @@ powerbi-agent/
 │       ├── routes/             ◄── sources · rules · model · pipeline · api
 │       └── templates/          ◄── Tailwind CSS + HTMX pages
 │
-├── skills/                 ◄── 43 Claude Code skill markdown files
+├── skills/                 ◄── 44 Claude Code skill markdown files
 │   │
 │   ├── ── CONNECTIVITY ──
 │   ├── connect-pbid.md         ◄── TOM/ADOMD.NET via PowerShell (v0.22.4)
@@ -717,7 +719,7 @@ powerbi-agent/
 │   ├── power-query.md          ◄── M expressions, query folding (v0.22.4)
 │   ├── review-semantic-model.md ◄── Audit, BPA, AI readiness (v0.22.4)
 │   ├── standardize-naming-conventions.md ◄── SQLBI style (v0.22.4)
-│   ├── refreshing-semantic-model.md (v0.22.4)
+│   ├── refresh-semantic-model.md (v0.26.0)
 │   ├── lineage-analysis.md     ◄── Cross-workspace lineage (v0.22.4)
 │   ├── bpa-rules.md            ◄── Tabular Editor BPA (v0.22.4)
 │   ├── c-sharp-scripting.md    ◄── TE C# bulk scripting (v0.22.4)
@@ -747,6 +749,7 @@ powerbi-agent/
 │   └── ── PLATFORM / GOVERNANCE ──
 │       ├── fabric-pipelines.md
 │       ├── medallion-architecture.md
+│       ├── audit-tenant-settings.md  ◄── Fabric/PBI tenant governance audit (v0.26.0)
 │       ├── [+ 10 more governance, modeling, security skills]
 │
 ├── docs/assets/            ◄── SVG diagrams and visual assets
@@ -827,7 +830,7 @@ SETUP:
 ```
 v0.1  ✓ Core CLI (connect · dax · model · report · fabric · doctor · ui)
 v0.2  ✓ Windows installation fixes (PATH · UTF-8 · pythonnet · bundled skills)
-v0.3  ✓ 43-skill library (TMDL · BPA · Deneb · Python/R visuals · fab CLI ·
+v0.3  ✓ 44-skill library (TMDL · BPA · Deneb · Python/R visuals · fab CLI ·
          TOM/ADOMD · PBIR/PBIP · Power Query · Naming Conventions · Lineage)
 v0.4  ── fab CLI deep integration (DuckDB querying · OneLake · notebook mgmt)
 v0.5  ── Tabular Editor 3 CLI integration (full TE3 support + BPA automation)
@@ -861,7 +864,7 @@ No code was copied from either project. Skill content adapted under GPL-3.0. See
 ║   20+ years of Technology & Data transformation               ║
 ║   delivery and strategy                                       ║
 ║                                                               ║
-║   43 skills  ·  8 CLI commands  ·  44 tests                   ║
+║   44 skills  ·  8 CLI commands  ·  44 tests                   ║
 ║                                                               ║
 ║   github.com/santoshkanthety/powerbi-agent                    ║
 ║   linkedin.com/in/santoshkanthety                             ║

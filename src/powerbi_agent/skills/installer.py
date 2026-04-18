@@ -34,11 +34,12 @@ SKILL_NAMES = [
     "power-query",
     "review-semantic-model",
     "standardize-naming-conventions",
-    "refreshing-semantic-model",
+    "refresh-semantic-model",
     "lineage-analysis",
     "bpa-rules",
     "c-sharp-scripting",
     "te2-cli",
+    "audit-tenant-settings",
     # Report authoring
     "report-authoring",
     "pbi-report-design",
@@ -94,7 +95,8 @@ You have access to the following Power BI / Fabric skills. Load and apply them a
 - **power-query**: Power Query M expressions, query folding, partitions
 - **review-semantic-model**: Audit and validate semantic models against best practices
 - **standardize-naming-conventions**: Interactive naming convention standardization
-- **refreshing-semantic-model**: Trigger, monitor, and validate semantic model refreshes
+- **refresh-semantic-model**: Trigger, monitor, and validate semantic model refreshes
+- **audit-tenant-settings**: Audit Fabric/Power BI tenant settings for governance
 - **lineage-analysis**: Trace model-to-report lineage across Fabric workspaces
 - **bpa-rules**: Tabular Editor Best Practice Analyzer rules — authoring and execution
 - **c-sharp-scripting**: C# scripting in Tabular Editor for bulk model operations
@@ -228,7 +230,8 @@ def list_skills() -> None:
         "power-query": "Power Query M expressions and query folding",
         "review-semantic-model": "Audit semantic models against best practices",
         "standardize-naming-conventions": "Interactive naming convention standardization",
-        "refreshing-semantic-model": "Trigger, monitor, and validate model refreshes",
+        "refresh-semantic-model": "Trigger, monitor, and validate model refreshes",
+        "audit-tenant-settings": "Audit Fabric/Power BI tenant settings for governance",
         "lineage-analysis": "Trace model-to-report lineage across workspaces",
         "bpa-rules": "Tabular Editor Best Practice Analyzer rules",
         "c-sharp-scripting": "C# scripting in Tabular Editor for bulk operations",
