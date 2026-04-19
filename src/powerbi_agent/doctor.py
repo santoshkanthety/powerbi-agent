@@ -13,7 +13,10 @@ from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 
-console = Console()
+# legacy_windows=False avoids Rich's Win32 console renderer, which tries to
+# write box-drawing chars through APIs that hit the active code page (cp1252
+# by default on Windows). safe_box further restricts to ASCII-compatible boxes.
+console = Console(legacy_windows=False, safe_box=True)
 
 CHECKS = []
 
