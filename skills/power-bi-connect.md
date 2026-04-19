@@ -1,3 +1,9 @@
+---
+name: Power BI Connect
+description: Connect powerbi-agent to a running Power BI Desktop instance. Invoke when the user wants to connect to Power BI Desktop, mentions "connect", "pbi connect", "local instance", sees "no connection" errors, or cannot run DAX/model commands against their model.
+tools: powerbi-agent CLI (pbi-agent)
+---
+
 # Skill: Connect to Power BI Desktop
 
 ## Trigger
