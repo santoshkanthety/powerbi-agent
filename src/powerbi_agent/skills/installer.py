@@ -10,7 +10,12 @@ from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 
-console = Console()
+# force_terminal=False + legacy_windows=False avoids the cp1252 crash when Rich
+# tries to render Unicode glyphs (e.g. U+26A0) to a Windows console that is
+# configured with a non-UTF-8 code page. Rich's default Windows renderer
+# attempts direct console writes that bypass PYTHONIOENCODING and fall back
+# to the active code page — which on Windows 10/11 is still cp1252 by default.
+console = Console(legacy_windows=False, safe_box=True)
 
 CLAUDE_HOME = Path.home() / ".claude"
 SKILLS_DIR = CLAUDE_HOME / "skills"
@@ -23,8 +28,14 @@ _PKG_DATA_DIR = Path(__file__).parent / "data"
 _REPO_SKILLS_DIR = Path(__file__).parent.parent.parent.parent / "skills"
 
 SKILL_NAMES = [
-    # Core connectivity
+    # pbi-agent CLI skills (thin wrappers around this package's commands)
     "power-bi-connect",
+    "power-bi-dax",
+    "power-bi-model",
+    "power-bi-report",
+    "power-bi-fabric",
+    "power-bi-doctor",
+    # Core connectivity
     "connect-pbid",
     "fabric-cli",
     # Semantic model authoring
@@ -83,8 +94,15 @@ CLAUDE_MD_BLOCK = """
 
 You have access to the following Power BI / Fabric skills. Load and apply them automatically based on context:
 
+### pbi-agent CLI
+- **power-bi-connect**: Connect to a running Power BI Desktop instance via pbi-agent
+- **power-bi-dax**: Run and validate DAX queries against the connected model
+- **power-bi-model**: Inspect and modify tables, measures, relationships via pbi-agent
+- **power-bi-report**: Inspect PBIR report structure; list pages; scaffold new pages
+- **power-bi-fabric**: Fabric / Power BI Service auth, workspaces, datasets, refresh
+- **power-bi-doctor**: Diagnose pbi-agent environment, connection, and auth issues
+
 ### Connectivity
-- **power-bi-connect**: Connect to Power BI Desktop via pbi-agent CLI
 - **connect-pbid**: Connect via TOM/ADOMD.NET in PowerShell; query and modify live models
 - **fabric-cli**: fab CLI, nb CLI, DuckDB — workspace navigation, notebook management, deployment, refresh, APIs
 
@@ -180,7 +198,7 @@ def install_skills(force: bool = False) -> None:
         dst = SKILLS_DIR / f"{skill_name}.md"
 
         if not src.exists():
-            console.print(f"[yellow]⚠[/yellow] Skill file not found: {src.name}")
+            console.print(f"[yellow][!][/yellow] Skill file not found: {src.name}")
             continue
 
         if dst.exists() and not force:
@@ -189,7 +207,7 @@ def install_skills(force: bool = False) -> None:
             continue
 
         shutil.copy2(src, dst)
-        console.print(f"[green]✓[/green]  {skill_name}: installed")
+        console.print(f"[green][+][/green]  {skill_name}: installed")
         installed += 1
 
     _update_claude_md()
@@ -206,7 +224,7 @@ def uninstall_skills() -> None:
         dst = SKILLS_DIR / f"{skill_name}.md"
         if dst.exists():
             dst.unlink()
-            console.print(f"[red]✗[/red]  {skill_name}: removed")
+            console.print(f"[red][-][/red]  {skill_name}: removed")
             removed += 1
 
     _remove_claude_md_block()
@@ -221,7 +239,12 @@ def list_skills() -> None:
     tbl.add_column("Description")
 
     descriptions = {
-        "power-bi-connect": "Connect to Power BI Desktop via CLI",
+        "power-bi-connect": "Connect to Power BI Desktop via pbi-agent CLI",
+        "power-bi-dax": "Run and validate DAX via pbi-agent",
+        "power-bi-model": "Inspect/modify tables, measures, relationships via pbi-agent",
+        "power-bi-report": "Inspect PBIR structure; list/add pages via pbi-agent",
+        "power-bi-fabric": "Fabric/Service auth, workspaces, datasets, refresh via pbi-agent",
+        "power-bi-doctor": "Diagnose pbi-agent environment, connection, and auth issues",
         "connect-pbid": "Connect via TOM/ADOMD.NET PowerShell; query/modify live models",
         "fabric-cli": "fab CLI, DuckDB — workspace, notebook, deployment, refresh",
         "dax-mastery": "DAX measures, time intelligence, evaluation context",
@@ -271,7 +294,7 @@ def list_skills() -> None:
         installed = (SKILLS_DIR / f"{skill_name}.md").exists()
         tbl.add_row(
             skill_name,
-            "[green]✓ installed[/green]" if installed else "[dim]not installed[/dim]",
+            "[green][+] installed[/green]" if installed else "[dim]not installed[/dim]",
             descriptions.get(skill_name, ""),
         )
     console.print(tbl)
@@ -284,7 +307,7 @@ def _update_claude_md() -> None:
     if "<!-- powerbi-agent:start -->" not in existing:
         with CLAUDE_MD.open("a", encoding="utf-8") as f:
             f.write(CLAUDE_MD_BLOCK)
-        console.print("[green]✓[/green]  CLAUDE.md updated")
+        console.print("[green][+][/green]  CLAUDE.md updated")
 
 
 def _remove_claude_md_block() -> None:
@@ -300,4 +323,4 @@ def _remove_claude_md_block() -> None:
         flags=re.DOTALL,
     )
     CLAUDE_MD.write_text(cleaned.strip() + "\n", encoding="utf-8")
-    console.print("[green]✓[/green]  CLAUDE.md cleaned up")
+    console.print("[green][+][/green]  CLAUDE.md cleaned up")
