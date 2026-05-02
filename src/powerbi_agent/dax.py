@@ -8,16 +8,17 @@ directly against the local Power BI Desktop SSAS instance.
 from __future__ import annotations
 
 import json
-import sys
 
 from rich.console import Console
 from rich.table import Table
+
+from powerbi_agent.errors import DaxQueryError, DotNetNotFoundError
 
 console = Console()
 
 
 def _get_adomd():
-    """Import AdomdClient via pythonnet with assembly resolver. Raises SystemExit with guidance if unavailable."""
+    """Import AdomdClient via pythonnet with assembly resolver."""
     from powerbi_agent._asm import ensure_assemblies
     ensure_assemblies()
     try:
@@ -29,12 +30,11 @@ def _get_adomd():
         )
         return AdomdConnection, AdomdCommand
     except Exception as exc:
-        console.print(f"[red]Failed to load ADOMD client:[/red] {exc}")
-        console.print(
-            "[dim]Make sure Power BI Report Builder is installed, or set the\n"
-            "PBI_REPORT_BUILDER environment variable to its install directory.[/dim]"
-        )
-        sys.exit(1)
+        raise DotNetNotFoundError(
+            f"Failed to load ADOMD client: {exc}\n"
+            "Install Power BI Report Builder, or set the "
+            "PBI_REPORT_BUILDER environment variable to its install directory."
+        ) from exc
 
 
 def run_query(
@@ -120,7 +120,4 @@ def validate_expression(expression: str, port: int | None = None) -> None:
             cmd.ExecuteNonQuery()
         console.print("[green]✓[/green] DAX expression is valid.")
     except Exception as exc:
-        # Parse the SSAS error for a friendly message
-        msg = str(exc)
-        console.print(f"[red]✗ DAX error:[/red] {msg}")
-        sys.exit(1)
+        raise DaxQueryError(str(exc)) from exc

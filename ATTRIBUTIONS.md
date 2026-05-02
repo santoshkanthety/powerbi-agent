@@ -10,9 +10,14 @@ This project was inspired by the broader Power BI open-source community. We grat
 
 ### pbi-cli — Mina Saad
 - Repository: https://github.com/MinaSaad1/pbi-cli
-- License: MIT
+- License: MIT (compatible with this project's MIT license)
 - Inspired the direct .NET TOM/ADOMD interop pattern for connecting to Power BI Desktop's local Analysis Services instance.
-- No code was copied or derived from this project. The connection architecture in `connect.py` and `dax.py` was independently written using the same underlying Windows APIs.
+- The connection architecture in `connect.py` and `dax.py` is original work, written independently using the same underlying Windows APIs.
+- The following hardening behaviours were patterned after pbi-cli (no code copied; equivalent logic written from scratch). Each module carries an attribution comment in its docstring:
+  - Microsoft Store install path detection in addition to MSI — `connect._workspace_roots`
+  - UTF-16 LE → UTF-8 fallback when reading `msmdsrv.port.txt` — `connect._read_port_file`
+  - Most-recent-instance ordering when multiple Power BI Desktop sessions are open
+  - Click-integrated error hierarchy — `powerbi_agent.errors`
 
 ### power-bi-agentic-development — Kurt Buhler (data-goblin)
 - Repository: https://github.com/data-goblin/power-bi-agentic-development
