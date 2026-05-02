@@ -15,6 +15,8 @@
 
 ---
 
+> **The agent layer for Power BI.** A Click CLI plus 44 Claude Code skills that turn natural-language prompts into TOM, ADOMD, TMDL, PBIR, and Fabric REST calls — board-ready analytics, without the ceremony.
+
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║  MISSION BRIEFING                                                ║
@@ -31,6 +33,83 @@
 ║  POWERBI·AGENT gives that time back.                             ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
+
+### `> 30-SECOND TOUR`
+
+```powershell
+pip install "powerbi-agent[desktop,fabric,ui]"   # 1. install
+pbi-agent skills install                         # 2. wire 44 skills into Claude Code
+pbi-agent connect                                # 3. attach to open Power BI Desktop
+```
+
+Then in Claude Code:
+
+> *"Add a rolling 12-month revenue measure with a June fiscal year-end, run BPA, and refresh the Sales Analytics dataset in Fabric."*
+
+Claude picks the right skill, calls `pbi-agent` (TOM / ADOMD / Fabric REST), and reports back with a real diff — not a code suggestion you have to paste.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as 👤 You
+    participant C as 🤖 Claude Code
+    participant S as ⚡ Skill<br/>(dax-mastery · tmdl · fabric-cli)
+    participant A as 🛠️ pbi-agent CLI
+    participant P as 🪟 Power BI Desktop / Fabric
+
+    U->>C: natural-language request
+    C->>S: route by trigger keywords
+    S->>A: pbi-agent model add-measure …
+    A->>P: TOM · ADOMD · Fabric REST
+    P-->>A: live model diff
+    A-->>C: structured result
+    C-->>U: explained outcome + next step
+```
+
+### `> WHAT'S NEW`
+
+![v0.4 hardening release](docs/assets/v04-hardening.svg)
+
+| Release | Highlights |
+|---|---|
+| **v0.4 — hardening** | Microsoft Store install of Power BI Desktop now auto-detected · UTF-16 / UTF-8 port file fallback for older PBI builds · multi-instance detection sorts by most-recently-opened · Click-integrated typed errors (`PowerBIAgentError`, `ConnectionRequiredError`, `DotNetNotFoundError`, `DaxQueryError` …) · 63 tests, all green |
+
+```mermaid
+flowchart LR
+    A["%LOCALAPPDATA%/<br/>Microsoft/Power BI Desktop"]:::msi
+    B["~/Microsoft/Power BI<br/>Desktop Store App"]:::store
+    A --> X
+    B --> X
+    X{"AnalysisServicesWorkspace_*<br/>port file present?"}:::check
+    X -- yes --> Y["decode UTF-16 LE<br/>↓ fallback ↓<br/>decode UTF-8"]:::decode
+    Y --> Z["sort by mtime DESC<br/>(most-recent PBI first)"]:::sort
+    Z --> R["✓ instance list<br/>port · workspace · model name"]:::ok
+    X -- no --> N["[] empty result<br/>(typed ConnectionRequiredError on use)"]:::skip
+
+    classDef msi fill:#0a0c1a,color:#00e5ff,stroke:#00e5ff
+    classDef store fill:#0a0c1a,color:#d080ff,stroke:#7030c0
+    classDef check fill:#1a0a00,color:#ffb060,stroke:#ff6600
+    classDef decode fill:#030c1a,color:#00e5ff,stroke:#00b4d8
+    classDef sort fill:#030c08,color:#00ff88,stroke:#007a40
+    classDef ok fill:#001a0a,color:#00ff88,stroke:#00ff88,stroke-width:2px
+    classDef skip fill:#1a0000,color:#ff6060,stroke:#aa0000
+```
+*v0.4 detection hardening — both PBI Desktop install variants resolve through the same fallback chain.*
+| **v0.3** | 44-skill library — TMDL, BPA, Deneb, Python/R visuals, fab CLI, TOM/ADOMD, PBIR/PBIP, Power Query, naming conventions, lineage |
+| **v0.2** | Windows installation hardening — PATH, UTF-8 console, pythonnet, bundled skill assets |
+| **v0.1** | Core CLI — `connect`, `dax`, `model`, `report`, `fabric`, `doctor`, `ui` |
+
+### `> WHY POWERBI·AGENT`
+
+| | **Skill packs alone** | **Raw `pbi-cli`** | **`powerbi-agent`** |
+|---|---|---|---|
+| Natural-language Power BI workflows in Claude Code | ✓ | — | ✓ |
+| Direct TOM / ADOMD interop with PBI Desktop | — | ✓ | ✓ |
+| Fabric REST (workspaces · datasets · refresh) | — | — | ✓ |
+| Web config tool for sources, rules, model | — | — | ✓ |
+| One-command install of skills + CLI | — | — | ✓ |
+| Multi-install (MSI + Microsoft Store) detection | — | partial | ✓ |
+| MIT-licensed, PyPI-distributed | n/a | ✓ | ✓ |
 
 ---
 
@@ -312,10 +391,12 @@ flowchart LR
 <summary><code>► connect — Link to Power BI Desktop</code></summary>
 
 ```bash
-pbi-agent connect                     # Auto-detect first instance
-pbi-agent connect --list              # List all open PBI instances
+pbi-agent connect                     # Auto-detect — picks the most-recently-opened PBI instance
+pbi-agent connect --list              # List all open PBI instances (MSI + Microsoft Store)
 pbi-agent connect --port 59856        # Specify SSAS port manually
 ```
+
+Detection covers both **Power BI Desktop (MSI)** and **Power BI Desktop (Microsoft Store)** installs. The reader falls back from UTF-16 LE to UTF-8 for older PBI builds, so port discovery works against every Desktop version Microsoft ships.
 
 Once connected, Claude can use the `connect-pbid` skill to work directly via TOM and ADOMD.NET:
 ```
@@ -753,7 +834,7 @@ powerbi-agent/
 │       ├── [+ 10 more governance, modeling, security skills]
 │
 ├── docs/assets/            ◄── SVG diagrams and visual assets
-├── tests/                  ◄── pytest suite · 44 tests · no PBI Desktop required
+├── tests/                  ◄── pytest suite · 63 tests · no PBI Desktop required
 ├── .github/workflows/ci.yml        ◄── Test on Windows + Linux + macOS, Python 3.10–3.13
 ├── .github/workflows/publish.yml   ◄── Auto-publish to PyPI on git tag (OIDC)
 ├── pyproject.toml
@@ -817,7 +898,7 @@ SETUP:
   git clone https://github.com/santoshkanthety/powerbi-agent
   cd powerbi-agent
   pip install -e ".[dev]"
-  pytest                    # all 44 tests should pass
+  pytest                    # 63 tests should pass
 ```
 
 [![Issues](https://img.shields.io/github/issues/santoshkanthety/powerbi-agent?style=for-the-badge&color=00e5ff&labelColor=030509)](https://github.com/santoshkanthety/powerbi-agent/issues)
@@ -832,9 +913,11 @@ v0.1  ✓ Core CLI (connect · dax · model · report · fabric · doctor · ui)
 v0.2  ✓ Windows installation fixes (PATH · UTF-8 · pythonnet · bundled skills)
 v0.3  ✓ 44-skill library (TMDL · BPA · Deneb · Python/R visuals · fab CLI ·
          TOM/ADOMD · PBIR/PBIP · Power Query · Naming Conventions · Lineage)
-v0.4  ── fab CLI deep integration (DuckDB querying · OneLake · notebook mgmt)
-v0.5  ── Tabular Editor 3 CLI integration (full TE3 support + BPA automation)
-v0.6  ── Multi-agent workflows (model-auditor · pbip-validator · deneb-reviewer)
+v0.4  ✓ Detection hardening (Microsoft Store install · UTF-8 port fallback ·
+         multi-instance ordering · typed Click error hierarchy)
+v0.5  ── fab CLI deep integration (DuckDB querying · OneLake · notebook mgmt)
+v0.6  ── Tabular Editor 3 CLI integration (full TE3 support + BPA automation)
+v0.7  ── Multi-agent workflows (model-auditor · pbip-validator · deneb-reviewer)
 v1.0  ── Full agentic pipeline:
           ingest → transform → model → BPA → test → refresh → validate → deploy
 ```
@@ -844,10 +927,10 @@ v1.0  ── Full agentic pipeline:
 ## `> ATTRIBUTIONS`
 
 Inspired by and building on:
-- **[pbi-cli](https://github.com/MinaSaad1/pbi-cli)** (Mina Saad) — MIT · direct .NET TOM/ADOMD interop pattern
-- **[power-bi-agentic-development](https://github.com/data-goblin/power-bi-agentic-development)** (Kurt Buhler) — GPL-3.0 · 23 production-grade skills ported (v0.22.4)
+- **[pbi-cli](https://github.com/MinaSaad1/pbi-cli)** (Mina Saad) — MIT · direct .NET TOM/ADOMD interop pattern; v0.4 detection hardening (Microsoft Store path, UTF-8 fallback, multi-instance ordering, typed Click errors) was patterned after pbi-cli and re-implemented from scratch in this codebase.
+- **[power-bi-agentic-development](https://github.com/data-goblin/power-bi-agentic-development)** (Kurt Buhler / data-goblin) — GPL-3.0 · inspired the Claude Code skill-files concept.
 
-No code was copied from either project. Skill content adapted under GPL-3.0. See [ATTRIBUTIONS.md](ATTRIBUTIONS.md) for full license details.
+All Python code in this repo is original work. No code, skill files, or documentation were copied from either project; pbi-cli inspirations are MIT-compatible, and data-goblin is GPL-3.0 so its content is intentionally not vendored into this MIT-licensed project. See [ATTRIBUTIONS.md](ATTRIBUTIONS.md) for full license details.
 
 *Not affiliated with or endorsed by Microsoft Corporation.*
 
@@ -858,13 +941,13 @@ No code was copied from either project. Skill content adapted under GPL-3.0. See
 ```
 ╔═══════════════════════════════════════════════════════════════╗
 ║                                                               ║
-║   ⚡  POWERBI · AGENT  //  TRON ARES  //  v0.3.0             ║
+║   ⚡  POWERBI · AGENT  //  TRON ARES  //  v0.4               ║
 ║                                                               ║
 ║   Built by  SANTOSH KANTHETY                                  ║
 ║   20+ years of Technology & Data transformation               ║
 ║   delivery and strategy                                       ║
 ║                                                               ║
-║   44 skills  ·  8 CLI commands  ·  44 tests                   ║
+║   44 skills  ·  8 CLI commands  ·  63 tests                   ║
 ║                                                               ║
 ║   github.com/santoshkanthety/powerbi-agent                    ║
 ║   linkedin.com/in/santoshkanthety                             ║

@@ -94,18 +94,20 @@ def _check_report_builder():
 
 @check("Workspace directories")
 def _check_workspaces():
-    import os as _os
+    from powerbi_agent.connect import WORKSPACE_GLOB, _workspace_roots
 
-    from powerbi_agent.connect import WORKSPACE_GLOB
+    roots = [r for r in _workspace_roots() if r.exists()]
+    if not roots:
+        return None, "Power BI Desktop folders not found (MSI or Store install expected on Windows)"
 
-    local_app_data = Path(_os.environ.get("LOCALAPPDATA", ""))
-    pbi_root = local_app_data / "Microsoft" / "Power BI Desktop"
-    if not pbi_root.exists():
-        return None, "Power BI Desktop AppData folder not found (expected on Windows)"
-    workspaces = list(pbi_root.glob(WORKSPACE_GLOB))
-    if not workspaces:
-        return None, f"No active workspaces in {pbi_root}"
-    return True, f"{len(workspaces)} workspace(s) in {pbi_root}"
+    found: list[tuple[Path, int]] = []
+    for root in roots:
+        count = len(list(root.glob(WORKSPACE_GLOB)))
+        if count:
+            found.append((root, count))
+    if not found:
+        return None, "No active workspaces in: " + ", ".join(str(r) for r in roots)
+    return True, "; ".join(f"{n} in {r}" for r, n in found)
 
 
 @check("SSAS connectivity")

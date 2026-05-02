@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 220" role="img" aria-label="powerbi-agent v0.4 hardening release">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#030509"/>
+      <stop offset="100%" stop-color="#0a0c1a"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#00b4d8"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00ff88"/>
+      <stop offset="100%" stop-color="#007a40"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="880" height="220" fill="url(#bg)" rx="14"/>
+  <rect x="1" y="1" width="878" height="218" fill="none" stroke="url(#cyan)" stroke-width="1.4" rx="14" opacity="0.6"/>
+
+  <g transform="translate(36,36)">
+    <rect width="74" height="32" rx="6" fill="url(#cyan)"/>
+    <text x="37" y="22" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="14" font-weight="700" fill="#030509">v0.4</text>
+  </g>
+
+  <text x="124" y="58" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="22" font-weight="700" fill="#e6f7ff" filter="url(#glow)">DETECTION HARDENING RELEASE</text>
+  <text x="124" y="82" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" fill="#7fd6ff">Power BI Desktop · MSI + Microsoft Store · 63 tests green</text>
+
+  <g font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" fill="#cfeefc">
+    <g transform="translate(36,116)">
+      <circle cx="6" cy="6" r="6" fill="url(#green)"/>
+      <text x="22" y="10">Microsoft Store install auto-detected</text>
+    </g>
+    <g transform="translate(36,144)">
+      <circle cx="6" cy="6" r="6" fill="url(#green)"/>
+      <text x="22" y="10">UTF-16 LE → UTF-8 port file fallback</text>
+    </g>
+    <g transform="translate(36,172)">
+      <circle cx="6" cy="6" r="6" fill="url(#green)"/>
+      <text x="22" y="10">Multi-instance — most-recent PBI first</text>
+    </g>
+
+    <g transform="translate(460,116)">
+      <circle cx="6" cy="6" r="6" fill="url(#green)"/>
+      <text x="22" y="10">Click-integrated typed error hierarchy</text>
+    </g>
+    <g transform="translate(460,144)">
+      <circle cx="6" cy="6" r="6" fill="url(#green)"/>
+      <text x="22" y="10">ConnectionRequiredError · DotNetNotFoundError</text>
+    </g>
+    <g transform="translate(460,172)">
+      <circle cx="6" cy="6" r="6" fill="url(#green)"/>
+      <text x="22" y="10">DaxQueryError · TomError · ReportNotFoundError</text>
+    </g>
+  </g>
+</svg>
