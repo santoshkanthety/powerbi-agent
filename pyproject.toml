@@ -34,13 +34,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# pythonnet ONLY needed for Power BI Desktop local SSAS connection (Windows, Python <=3.13)
-# It is intentionally NOT included in fabric or ui extras — those work on any OS/Python version
+# pythonnet ONLY needed for Power BI Desktop local SSAS connection (Windows, Python <=3.13).
+# It is intentionally NOT included in the fabric extra — Fabric works on any OS/Python version.
 desktop = [
     "pythonnet>=3.0; python_version < '3.14' and sys_platform == 'win32'",
 ]
 fabric  = ["azure-identity>=1.15"]
-ui      = ["fastapi>=0.111", "uvicorn>=0.29", "jinja2>=3.1", "python-multipart>=0.0.9", "aiofiles>=23.0"]
 dev     = [
     "pytest>=8.0",
     "pytest-cov",

@@ -190,7 +190,7 @@
   <text x="988" y="430" font-family="'Courier New', monospace" font-size="8" fill="#00b860" text-anchor="middle" letter-spacing="1" opacity="0.8">VISUALS · THEMES · BOOKMARKS · MOBILE</text>
   <text x="988" y="446" font-family="'Courier New', monospace" font-size="8" fill="#00b860" text-anchor="middle" opacity="0.6">DRILLTHROUGH · CONDITIONAL FORMAT · RLS</text>
 
-  <!-- ══ RIGHT: Claude + UI tools ══ -->
+  <!-- ══ RIGHT: Claude Code + pbi-agent CLI ══ -->
   <!-- Claude Code panel -->
   <rect x="1115" y="190" width="75" height="50" rx="4" fill="#050218" stroke="#00e5ff" stroke-width="1" opacity="0.8"/>
   <rect x="1115" y="190" width="75" height="3" fill="#00e5ff" opacity="0.6"/>
@@ -198,18 +198,18 @@
   <text x="1152" y="226" font-family="'Courier New', monospace" font-size="8" fill="#00e5ff" text-anchor="middle" letter-spacing="1">CODE</text>
   <text x="1152" y="238" font-family="'Courier New', monospace" font-size="7" fill="#00b4d8" text-anchor="middle" opacity="0.6">AI AGENT</text>
 
-  <!-- pbi-agent ui panel -->
-  <rect x="1115" y="260" width="75" height="50" rx="4" fill="#050218" stroke="#ff6b00" stroke-width="1" opacity="0.8"/>
-  <rect x="1115" y="260" width="75" height="3" fill="#ff6b00" opacity="0.6"/>
-  <text x="1152" y="282" font-family="'Courier New', monospace" font-size="8" fill="#ff6b00" text-anchor="middle" letter-spacing="1">PBI</text>
-  <text x="1152" y="296" font-family="'Courier New', monospace" font-size="8" fill="#ff6b00" text-anchor="middle" letter-spacing="1">AGENT UI</text>
-  <text x="1152" y="308" font-family="'Courier New', monospace" font-size="7" fill="#cc4400" text-anchor="middle" opacity="0.6">WEB CONFIG</text>
+  <!-- pbi-agent CLI panel -->
+  <rect x="1115" y="260" width="75" height="50" rx="4" fill="#050218" stroke="#00ff88" stroke-width="1" opacity="0.8"/>
+  <rect x="1115" y="260" width="75" height="3" fill="#00ff88" opacity="0.6"/>
+  <text x="1152" y="282" font-family="'Courier New', monospace" font-size="8" fill="#00ff88" text-anchor="middle" letter-spacing="1">PBI</text>
+  <text x="1152" y="296" font-family="'Courier New', monospace" font-size="8" fill="#00ff88" text-anchor="middle" letter-spacing="1">AGENT CLI</text>
+  <text x="1152" y="308" font-family="'Courier New', monospace" font-size="7" fill="#007a40" text-anchor="middle" opacity="0.6">TOM · ADOMD · FABRIC</text>
 
   <!-- Connecting lines: model/reports → Claude -->
   <path d="M 1098 265 L 1115 235" fill="none" stroke="#00e5ff" stroke-width="1" stroke-dasharray="3,2" opacity="0.35"/>
   <path d="M 1098 415 L 1115 285" fill="none" stroke="#00e5ff" stroke-width="1" stroke-dasharray="3,2" opacity="0.2"/>
 
-  <!-- Vertical pipe from Claude to UI -->
+  <!-- Vertical pipe from Claude to CLI -->
   <path d="M 1152 240 L 1152 260" fill="none" stroke="#444" stroke-width="1" opacity="0.4"/>
 
   <!-- Bottom legend row -->
