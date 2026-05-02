@@ -15,29 +15,33 @@
 
 ---
 
-> **The agent layer for Power BI.** A Click CLI plus 44 Claude Code skills that turn natural-language prompts into TOM, ADOMD, TMDL, PBIR, and Fabric REST calls — board-ready analytics, without the ceremony.
+> **The agent layer for Power BI analytics delivery.** A Click CLI plus 44 Claude Code skills that streamline **Data Engineering · Discovery · Delivery** — natural-language prompts become TOM, ADOMD, TMDL, PBIR, and Fabric REST calls. Board-ready analytics, without the ceremony. **No web UIs. No config sprawl. Just the CLI, the skills, and your model.**
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║  MISSION BRIEFING                                                ║
 ║                                                                  ║
-║  You have data in the wild. Databases, APIs, CSV drops,          ║
-║  web feeds. It needs to become board-ready Power BI analytics.   ║
+║  Three jobs stand between raw data and a board-ready report:     ║
 ║                                                                  ║
-║  Between you and that goal:  medallion architecture decisions,   ║
-║  Delta table optimization, Kimball star schemas, 400 lines of    ║
-║  DAX, RLS for 5,000 users, PBIR report layouts, Fabric pipelines ║
-║  TMDL authoring, BPA audits, Deneb visuals, TOM scripting        ║
+║    [DE] DATA ENGINEERING                                         ║
+║         Sources · Bronze/Silver/Gold · Delta · Fabric pipelines  ║
 ║                                                                  ║
-║  You know all of this.  It takes time.                           ║
-║  POWERBI·AGENT gives that time back.                             ║
+║    [DX] DISCOVERY                                                ║
+║         Profiling · BPA · lineage · governance · model audit     ║
+║                                                                  ║
+║    [DL] DELIVERY                                                 ║
+║         Star schemas · DAX · RLS · PBIR layouts · refresh        ║
+║                                                                  ║
+║  Each job is hours of TMDL, DAX, fab CLI, TOM scripting,         ║
+║  Deneb specs, BPA rules and PBIR JSON.  You know all of this.    ║
+║  POWERBI·AGENT gives the time back.                              ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
 
 ### `> 30-SECOND TOUR`
 
 ```powershell
-pip install "powerbi-agent[desktop,fabric,ui]"   # 1. install
+pip install "powerbi-agent[desktop,fabric]"      # 1. install
 pbi-agent skills install                         # 2. wire 44 skills into Claude Code
 pbi-agent connect                                # 3. attach to open Power BI Desktop
 ```
@@ -97,18 +101,18 @@ flowchart LR
 *v0.4 detection hardening — both PBI Desktop install variants resolve through the same fallback chain.*
 | **v0.3** | 44-skill library — TMDL, BPA, Deneb, Python/R visuals, fab CLI, TOM/ADOMD, PBIR/PBIP, Power Query, naming conventions, lineage |
 | **v0.2** | Windows installation hardening — PATH, UTF-8 console, pythonnet, bundled skill assets |
-| **v0.1** | Core CLI — `connect`, `dax`, `model`, `report`, `fabric`, `doctor`, `ui` |
+| **v0.1** | Core CLI — `connect`, `dax`, `model`, `report`, `fabric`, `doctor` |
 
 ### `> WHY POWERBI·AGENT`
 
 | | **Skill packs alone** | **Raw `pbi-cli`** | **`powerbi-agent`** |
 |---|---|---|---|
-| Natural-language Power BI workflows in Claude Code | ✓ | — | ✓ |
+| Natural-language workflows in Claude Code | ✓ | — | ✓ |
 | Direct TOM / ADOMD interop with PBI Desktop | — | ✓ | ✓ |
 | Fabric REST (workspaces · datasets · refresh) | — | — | ✓ |
-| Web config tool for sources, rules, model | — | — | ✓ |
-| One-command install of skills + CLI | — | — | ✓ |
-| Multi-install (MSI + Microsoft Store) detection | — | partial | ✓ |
+| Spans **Data Engineering · Discovery · Delivery** | — | — | ✓ |
+| One-command install of CLI + 44 skills | — | — | ✓ |
+| Multi-install detection (MSI + Microsoft Store) | — | partial | ✓ |
 | MIT-licensed, PyPI-distributed | n/a | ✓ | ✓ |
 
 ---
@@ -121,16 +125,31 @@ flowchart LR
 flowchart TD
     U(["👤 You in Claude Code"]):::user
 
-    subgraph SKILLS ["⚡ 44 Skills Layer  ·  pure knowledge, zero code execution"]
+    subgraph DE ["🛠️ DATA ENGINEERING  ·  ingest → transform → land"]
         direction LR
-        S1["🔌 Connectivity\nconnect-pbid · fabric-cli"]:::skill
-        S2["📊 Semantic Model\nDAX · TMDL · Power Query\nBPA · TOM · TE2-CLI"]:::skill
-        S3["🎨 Reports & Visuals\nDesign · Deneb · Python\nR · SVG · PBIR/PBIP"]:::skill
-        S4["⚙️ Fabric Platform\nPipelines · Medallion\nRefresh · Lineage"]:::skill
-        S5["🔒 Security & Governance\nRLS · GDPR · Cyber\nCatalog · Naming"]:::skill
+        DE1["source-integration\nfabric-pipelines"]:::skill
+        DE2["medallion-architecture\ndata-transformation"]:::skill
+        DE3["power-query\nperformance-scale"]:::skill
     end
 
-    subgraph CLI ["🛠️ CLI Layer  ·  pbi-agent commands"]
+    subgraph DX ["🔍 DISCOVERY  ·  profile → audit → govern"]
+        direction LR
+        DX1["review-semantic-model\nbpa-rules · te2-cli"]:::skill
+        DX2["lineage-analysis\ndata-catalog-lineage"]:::skill
+        DX3["audit-tenant-settings\ndata-governance-traceability"]:::skill
+        DX4["standardize-naming-conventions\ncyber-security"]:::skill
+    end
+
+    subgraph DL ["🚀 DELIVERY  ·  model → secure → ship"]
+        direction LR
+        DL1["dax-mastery · dax-performance\ntmdl · star-schema-modeling"]:::skill
+        DL2["security-rls\ntime-series-data · measure-glossary"]:::skill
+        DL3["pbi-report-design · review-report\nreport-structure · report-theming"]:::skill
+        DL4["deneb-visuals · python-visuals\nr-visuals · svg-visuals"]:::skill
+        DL5["refresh-semantic-model\nfabric-cli · pbir-cli"]:::skill
+    end
+
+    subgraph CLI ["⚙️ pbi-agent CLI  ·  what Claude actually executes"]
         direction LR
         C1["connect"]:::cmd
         C2["dax"]:::cmd
@@ -139,31 +158,25 @@ flowchart TD
         C5["fabric"]:::cmd
         C6["skills"]:::cmd
         C7["doctor"]:::cmd
-        C8["ui"]:::cmd
-    end
-
-    subgraph PBIRT ["🔧 pbir.tools Layer"]
-        P1["Pages &\nVisuals"]:::pbir
-        P2["Themes &\nColors"]:::pbir
-        P3["Format\nConversion"]:::pbir
     end
 
     subgraph TARGET ["🎯 Outputs"]
-        T1["Power BI\nDesktop / TOM"]:::out
+        T1["Power BI\nDesktop · TOM"]:::out
         T2["Microsoft\nFabric"]:::out
-        T3["PBIR / PBIX\nPBIP / TMDL"]:::out
+        T3["PBIR · PBIX\nPBIP · TMDL"]:::out
     end
 
-    U -->|"natural language"| SKILLS
-    SKILLS -->|"Claude executes"| CLI
-    CLI -->|"pythonnet / TOM / fab CLI"| TARGET
-    SKILLS -->|"Claude executes"| PBIRT
-    PBIRT --> TARGET
+    U -->|"natural language"| DE
+    U --> DX
+    U --> DL
+    DE --> CLI
+    DX --> CLI
+    DL --> CLI
+    CLI -->|"pythonnet · TOM · fab CLI · REST"| TARGET
 
     classDef user fill:#ff4e00,color:#fff,stroke:none
     classDef skill fill:#030c1a,color:#00e5ff,stroke:#00e5ff,stroke-width:1px
     classDef cmd fill:#030c08,color:#00ff88,stroke:#007a40,stroke-width:1px
-    classDef pbir fill:#0a0514,color:#d080ff,stroke:#7030c0,stroke-width:1px
     classDef out fill:#1a0a00,color:#ffb060,stroke:#ff6600,stroke-width:1px
 ```
 
@@ -175,19 +188,19 @@ Before installing, ensure the following are in place:
 
 | Requirement | Version | Notes |
 |---|---|---|
-| **Python** | 3.10 – 3.13 | `python --version` (3.14+ works for Fabric/UI; Desktop requires ≤3.13) |
+| **Python** | 3.10 – 3.13 | `python --version` (3.14+ works for Fabric-only; Desktop requires ≤3.13) |
 | **pip** | Latest | `python -m pip install --upgrade pip` |
 | **Claude Code** | Latest | [Install guide](https://claude.ai/code) — required for skills |
 | **Power BI Desktop** | Latest | Windows only · Required for `pbi-agent connect`, DAX, TOM/ADOMD commands |
 | **Power BI Report Builder** | Latest | Windows only · Provides TOM & ADOMD DLLs for model/DAX commands. [Download](https://www.microsoft.com/en-us/download/details.aspx?id=58158). Override path with `PBI_REPORT_BUILDER` env var |
-| **Windows OS** | 10 / 11 | Desktop integration uses .NET/pythonnet — Linux/macOS for Fabric-only workflows |
+| **Windows OS** | 10 / 11 | Desktop integration uses .NET/pythonnet — Linux/macOS work for Fabric-only workflows |
 | **Microsoft Fabric / Power BI Service** | — | Required for `pbi-agent fabric` commands — Azure subscription needed |
 | **fab CLI** | Latest | `pip install ms-fabric-cli` — required for `fabric-cli` skill |
 | **pbir.tools** | 0.9.4+ | `uv tool install pbir-cli` — required for `report-structure`, `report-theming`, `report-conversion` skills |
 | **Azure AD / Entra ID account** | — | Required for Fabric authentication (`pbi-agent fabric login`) |
 
-> **Minimal setup** (Fabric + Claude Code only, no Desktop, any OS): `pip install "powerbi-agent[fabric,ui]"`
-> **Full setup** (Desktop + Fabric + UI, Windows + Python ≤3.13): `pip install "powerbi-agent[desktop,fabric,ui]"`
+> **Minimal setup** (Fabric + Claude Code only, no Desktop, any OS): `pip install "powerbi-agent[fabric]"`
+> **Full setup** (Desktop + Fabric, Windows + Python ≤3.13): `pip install "powerbi-agent[desktop,fabric]"`
 
 ---
 
@@ -197,12 +210,12 @@ Before installing, ensure the following are in place:
 
 > **Not on PyPI yet?** Install directly from GitHub until the first PyPI release:
 > ```powershell
-> pip install "powerbi-agent[desktop,fabric,ui] @ git+https://github.com/santoshkanthety/powerbi-agent.git"
+> pip install "powerbi-agent[desktop,fabric] @ git+https://github.com/santoshkanthety/powerbi-agent.git"
 > ```
 
 ```powershell
 # STEP 1 ── Install (Windows PowerShell)
-pip install "powerbi-agent[desktop,fabric,ui]"
+pip install "powerbi-agent[desktop,fabric]"
 ```
 
 ```powershell
@@ -264,15 +277,15 @@ pbi-agent --version
 ```powershell
 # Force UTF-8 in the current session
 $env:PYTHONUTF8 = "1"
-pip install "powerbi-agent[desktop,fabric,ui]"
+pip install "powerbi-agent[desktop,fabric]"
 pbi-agent skills install
 ```
 
 **pythonnet fails on Python 3.14**
 ```powershell
 # pythonnet has no stable release for 3.14 yet — use Python 3.12 or 3.13 for Desktop features
-# Fabric and UI extras work on any Python version including 3.14
-pip install "powerbi-agent[fabric,ui]"   # no [desktop]
+# The [fabric] extra works on any Python version including 3.14
+pip install "powerbi-agent[fabric]"   # no [desktop]
 ```
 
 **`pbi-agent skills install` reports "Skill file not found"**
@@ -281,105 +294,73 @@ pip install "powerbi-agent[fabric,ui]"   # no [desktop]
 pip install --force-reinstall powerbi-agent
 pbi-agent skills install
 # Or install from source:
-pip install "powerbi-agent[desktop,fabric,ui] @ git+https://github.com/santoshkanthety/powerbi-agent.git"
+pip install "powerbi-agent[desktop,fabric] @ git+https://github.com/santoshkanthety/powerbi-agent.git"
 ```
 
 </details>
 
 ---
 
-## `> WEB_CONFIG_TOOL`
+## `> DELIVERY_SEQUENCE`
 
-**Design your entire pipeline visually. No YAML. No JSON editing.**
-
-```bash
-pbi-agent ui                          # Opens at http://localhost:8765
-pbi-agent ui --project my-platform   # Named project
-pbi-agent ui --port 9000 --no-open   # Headless mode
-```
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  ██ POWERBI·AGENT  │ Config Tool          Project: demo │
-├────────────┬────────────────────────────────────────────┤
-│ Dashboard  │  ┌─────┐  ┌─────┐  ┌─────┐  ┌─────────┐  │
-│ ─────────  │  │ 4   │  │ 12  │  │ 8   │  │ Analytics│  │
-│ INGEST     │  │Srcs │  │Rules│  │Tbls │  │Workspace │  │
-│  Sources   │  └─────┘  └─────┘  └─────┘  └─────────┘  │
-│            │                                            │
-│ TRANSFORM  │  Sources→Bronze→Silver→Gold→Model→Reports  │
-│  Rules     │  ══════════════════════════════════════►   │
-│  Model     │                                            │
-│            │  [ Add Source ] [ Add Rule ] [ Fabric → ]  │
-│ DELIVER    │                                            │
-│  Fabric    └────────────────────────────────────────────┘
-└────────────┘
-```
-
-| Page | What You Configure |
-|---|---|
-| **Data Sources** | DB connections (SQL Server, PostgreSQL, Oracle, Snowflake), REST APIs (OAuth/Bearer/API Key), CSV uploads, web scrapers — each with load strategy, watermark column, Bronze target |
-| **Rule Engine** | Quality checks (not\_null, unique, regex, range), transformations (cast, rename, derive, fill\_null) — each rule has an action: fail\_pipeline / quarantine / drop\_row / flag\_and\_pass |
-| **Data Model** | Bronze/Silver/Gold table designer — column definitions, PK/FK relationships, PII flags, SCD type, partition column |
-| **Fabric & Power BI** | Workspace, lakehouse, DirectLake toggle, incremental refresh windows, cron schedule — go-live readiness checklist |
-
----
-
-## `> PIPELINE_SEQUENCE`
-
-**The exact order. Every time.**
+**Three pillars. One workflow. Claude drives the CLI; you stay in the driver's seat.**
 
 ```mermaid
 flowchart LR
-    C1["⚙️ 01\nCONFIGURE\npbi-agent ui"]:::step
-    C2["🔌 02\nCONNECT\nfabric login"]:::step
-    C3["📥 03\nINGEST\nBronze layer"]:::step
-    C4["🔄 04\nTRANSFORM\nSilver + tests"]:::step
-    C5["📐 05\nMODEL\nDAX measures"]:::step
-    C6["🔒 06\nSECURE\nRLS + OLS"]:::step
-    C7["📊 07\nREPORT\nPBIR layout"]:::step
-    C8["🔁 08\nREFRESH\nFabric sync"]:::step
-    C9["✅ 09\nAUDIT\ngovernance"]:::step
+    subgraph DE_["🛠️ DATA ENGINEERING"]
+        direction TB
+        D1["01 CONNECT<br/>fabric login · pbi-agent connect"]:::de
+        D2["02 INGEST<br/>Bronze · Delta · OneLake"]:::de
+        D3["03 TRANSFORM<br/>Silver tests · Power Query"]:::de
+    end
+    subgraph DX_["🔍 DISCOVERY"]
+        direction TB
+        X1["04 PROFILE<br/>review-semantic-model"]:::dx
+        X2["05 AUDIT<br/>BPA · lineage · naming"]:::dx
+        X3["06 GOVERN<br/>tenant-settings · catalog · cyber"]:::dx
+    end
+    subgraph DL_["🚀 DELIVERY"]
+        direction TB
+        L1["07 MODEL<br/>star schema · DAX · TMDL"]:::dl
+        L2["08 SECURE<br/>RLS · OLS · USERPRINCIPALNAME"]:::dl
+        L3["09 REPORT<br/>PBIR · Deneb · themes"]:::dl
+        L4["10 REFRESH + SHIP<br/>fabric refresh · deploy"]:::dl
+    end
 
-    C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8 --> C9
+    DE_ --> DX_ --> DL_
 
-    classDef step fill:#030c1a,color:#00e5ff,stroke:#00e5ff,stroke-width:1px
+    classDef de fill:#0a0c1a,color:#00e5ff,stroke:#00e5ff,stroke-width:1px
+    classDef dx fill:#1a0a14,color:#d080ff,stroke:#7030c0,stroke-width:1px
+    classDef dl fill:#001a0a,color:#00ff88,stroke:#007a40,stroke-width:1px
 ```
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
+│  DATA ENGINEERING                                                   │
+│  ────────────────                                                   │
+│  01. CONNECT      pbi-agent fabric login                            │
+│                   pbi-agent connect            (PBI Desktop / TOM)  │
+│  02. INGEST       Ask Claude: "Run Bronze ingestion for all sources"│
+│  03. TRANSFORM    Ask Claude: "Apply Silver transforms + tests"     │
 │                                                                     │
-│  01. CONFIGURE    pbi-agent ui                                      │
-│      ─────────    Add sources · Build rule engine · Design model    │
+│  DISCOVERY                                                          │
+│  ─────────                                                          │
+│  04. PROFILE      Ask Claude: "Review the semantic model and        │
+│                    surface BPA / AI-readiness gaps"                 │
+│  05. AUDIT        Ask Claude: "Run lineage on Sales[CustomerKey]    │
+│                    and standardize naming SQLBI-style"              │
+│  06. GOVERN       Ask Claude: "Audit Fabric tenant settings;        │
+│                    flag GDPR + cyber-security exposure"             │
 │                                                                     │
-│  02. CONNECT      pbi-agent fabric login                            │
-│      ────────     Authenticate with Microsoft Fabric / Azure        │
-│                   pbi-agent connect  (Power BI Desktop / TOM)       │
-│                                                                     │
-│  03. INGEST       Ask Claude:                                       │
-│      ───────      "Run the Bronze ingestion for all sources"        │
-│                                                                     │
-│  04. TRANSFORM    Ask Claude:                                       │
-│      ──────────   "Apply Silver transformations and run tests"      │
-│                                                                     │
-│  05. MODEL        pbi-agent model info                              │
-│      ─────        pbi-agent model measures                          │
+│  DELIVERY                                                           │
+│  ────────                                                           │
+│  07. MODEL        pbi-agent model info / measures / relationships   │
 │                   pbi-agent model add-measure "Total Sales" ...     │
-│                   Ask Claude: "Review the semantic model for BPA"   │
-│                                                                     │
-│  06. SECURE       pbi-agent security roles                          │
-│      ──────       pbi-agent security test-rls --user alice@...      │
-│                                                                     │
-│  07. REPORT       pbi-agent report pages report.pbix                │
-│      ──────       pbi-agent report add-page "Executive Summary"     │
-│                   Ask Claude: "Review the report design"            │
-│                                                                     │
-│  08. REFRESH      pbi-agent fabric refresh "Sales Analytics" --wait │
-│      ───────                                                        │
-│                                                                     │
-│  09. AUDIT        pbi-agent model audit --all                       │
-│      ─────        Ask Claude: "Run lineage analysis on this model"  │
-│                                                                     │
+│  08. SECURE       Ask Claude: "Set up RLS for sales reps —          │
+│                    each sees only their territory"                  │
+│  09. REPORT       pbi-agent report add-page "Executive Summary"     │
+│                   Ask Claude: "Review report design + accessibility"│
+│  10. REFRESH      pbi-agent fabric refresh "Sales Analytics" --wait │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -539,18 +520,7 @@ pbi-agent skills uninstall            # Remove all skills
 pbi-agent doctor                      # Run all environment checks
 ```
 
-Checks: Python version, OS, PATH, Power BI Desktop install, pythonnet, azure-identity, connection config, Claude Code skills installed.
-</details>
-
-<details>
-<summary><code>► ui — Web configuration tool</code></summary>
-
-```bash
-pbi-agent ui                          # http://localhost:8765
-pbi-agent ui --port 9000              # Custom port
-pbi-agent ui --project my-platform   # Named project
-pbi-agent ui --no-open                # Don't open browser
-```
+Checks: Python version, OS, PATH, Power BI Desktop install (MSI + Microsoft Store), Power BI Report Builder (TOM/ADOMD DLLs), pythonnet, azure-identity, workspace directories, SSAS connectivity, Claude Code skills installed.
 </details>
 
 ---
@@ -770,21 +740,18 @@ mindmap
 powerbi-agent/
 │
 ├── src/powerbi_agent/
-│   ├── cli.py              ◄── Click CLI · connect · dax · model · report · fabric
-│   ├── connect.py          ◄── SSAS auto-detection via workspace port files
+│   ├── cli.py              ◄── Click CLI · connect · dax · model · report · fabric · skills · doctor
+│   ├── connect.py          ◄── SSAS auto-detection · MSI + Microsoft Store · UTF-16/UTF-8 fallback
 │   ├── dax.py              ◄── DAX execution via ADOMD.NET (pythonnet)
 │   ├── model.py            ◄── TOM read/write (measures · tables · RLS)
 │   ├── report.py           ◄── PBIR JSON manipulation (no Desktop needed)
 │   ├── fabric.py           ◄── Power BI REST API · workspace · refresh
 │   ├── doctor.py           ◄── Environment health checks (PATH, pythonnet, skills)
-│   ├── skills/
-│   │   ├── installer.py    ◄── install/uninstall/list 44 skills in ~/.claude/skills/
-│   │   └── data/           ◄── Bundled skill .md files (pip install distributes these)
-│   └── web/                ◄── FastAPI config tool (pbi-agent ui)
-│       ├── app.py
-│       ├── models/config.py    ◄── Pydantic models for all config entities
-│       ├── routes/             ◄── sources · rules · model · pipeline · api
-│       └── templates/          ◄── Tailwind CSS + HTMX pages
+│   ├── errors.py           ◄── Click-integrated typed error hierarchy
+│   ├── _asm.py             ◄── pythonnet assembly resolver (TOM + ADOMD)
+│   └── skills/
+│       ├── installer.py    ◄── install/uninstall/list 44 skills in ~/.claude/skills/
+│       └── data/           ◄── Bundled skill .md files (pip install distributes these)
 │
 ├── skills/                 ◄── 44 Claude Code skill markdown files
 │   │
@@ -858,23 +825,20 @@ pip install "powerbi-agent[desktop]"
 # + Microsoft Fabric / Power BI Service (any OS, any Python 3.10+)
 pip install "powerbi-agent[fabric]"
 
-# + Web configuration tool (any OS, any Python 3.10+)
-pip install "powerbi-agent[ui]"
-
 # Everything (Windows + Python ≤3.13 for full Desktop support)
-pip install "powerbi-agent[desktop,fabric,ui]"
+pip install "powerbi-agent[desktop,fabric]"
 
 
 # ── From GitHub (latest dev builds) ─────────────────────────────────────────
-pip install "powerbi-agent[desktop,fabric,ui] @ git+https://github.com/santoshkanthety/powerbi-agent.git"
+pip install "powerbi-agent[desktop,fabric] @ git+https://github.com/santoshkanthety/powerbi-agent.git"
 
 
 # ── Using pipx (auto-manages PATH — recommended for CLI-first users) ─────────
 pipx install powerbi-agent
-pipx inject powerbi-agent azure-identity fastapi uvicorn
+pipx inject powerbi-agent azure-identity
 ```
 
-> **Python 3.14 users**: The `[desktop]` extra (pythonnet) requires Python ≤3.13. Install without it and use Fabric/UI features: `pip install "powerbi-agent[fabric,ui]"`
+> **Python 3.14 users**: The `[desktop]` extra (pythonnet) requires Python ≤3.13. Install Fabric-only: `pip install "powerbi-agent[fabric]"`
 
 ---
 
@@ -909,7 +873,7 @@ SETUP:
 ## `> ROADMAP`
 
 ```
-v0.1  ✓ Core CLI (connect · dax · model · report · fabric · doctor · ui)
+v0.1  ✓ Core CLI (connect · dax · model · report · fabric · doctor)
 v0.2  ✓ Windows installation fixes (PATH · UTF-8 · pythonnet · bundled skills)
 v0.3  ✓ 44-skill library (TMDL · BPA · Deneb · Python/R visuals · fab CLI ·
          TOM/ADOMD · PBIR/PBIP · Power Query · Naming Conventions · Lineage)

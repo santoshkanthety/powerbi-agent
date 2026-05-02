@@ -1,29 +1,11 @@
 # Skill: Source Integration & Data Model Development
 
 ## Trigger
-Activate when the user mentions: data source, connect source, ingest data, database connection, API connection, CSV upload, web scrape, source connector, raw data model, normalize, Bronze ingestion, source mapping, data model development, config tool, pbi-agent ui, configuration tool, rule engine, pipeline setup, source to Bronze, multi-source, PostgreSQL, postgres, JDBC, RDS, Aurora, Azure Database for PostgreSQL, Cloud SQL, read replica, DirectQuery postgres, incremental refresh postgres
+Activate when the user mentions: data source, connect source, ingest data, database connection, API connection, CSV upload, web scrape, source connector, raw data model, normalize, Bronze ingestion, source mapping, data model development, source to Bronze, multi-source, PostgreSQL, postgres, JDBC, RDS, Aurora, Azure Database for PostgreSQL, Cloud SQL, read replica, DirectQuery postgres, incremental refresh postgres
 
 ## What You Know
 
 You have integrated 50+ source systems into enterprise data platforms — from SAP ERP to Salesforce CRM, REST APIs to flat file drops, web scrapes to real-time streams. You know the full journey from "we have data in X" to "it's landed, clean, and queryable in OneLake."
-
-## The Configuration Tool
-
-powerbi-agent includes a browser-based configuration tool for designing the full pipeline visually:
-
-```bash
-# Launch the web UI (opens browser automatically)
-pbi-agent ui
-
-# Specify a project and port
-pbi-agent ui --project my-platform --port 9000
-```
-
-The UI covers:
-1. **Data Sources** — connect DB, API, CSV, web scrape
-2. **Rule Engine** — quality checks and transformations
-3. **Data Model** — Bronze/Silver/Gold table designer
-4. **Fabric Pipeline** — workspace, lakehouse, refresh config
 
 ## Source Type Patterns
 
@@ -176,9 +158,6 @@ Next step: Create a Delta table in the Lakehouse from the Parquet files
 ```
 
 ```bash
-# CLI: configure PostgreSQL source in pbi-agent UI
-pbi-agent ui   # then add PostgreSQL source in Sources tab
-
 # Test connection
 pbi-agent source test-connection --type postgres \
   --host db.example.com --port 5432 --database prod_db
@@ -306,9 +285,6 @@ Design rules in this order:
 
 ## CLI Commands for Source Management
 ```bash
-# Launch config UI
-pbi-agent ui --project my-platform
-
 # Test a database connection
 pbi-agent source test-connection --source-id abc123 --project my-platform
 
