@@ -202,6 +202,52 @@ def report_add_page(name, pbix_path):
     add_page(name=name, pbix_path=pbix_path)
 
 
+# ─── visual ───────────────────────────────────────────────────────────────────
+
+@main.group()
+@click.option("--path", "-p", default=None,
+              help="Path to .Report folder (auto-detected from CWD if omitted).")
+@click.pass_context
+def visual(ctx, path):
+    """Manage custom visuals (.pbiviz) in PBIR reports."""
+    ctx.ensure_object(dict)
+    ctx.obj["report_path"] = path
+
+
+@visual.command("import-custom")
+@click.argument("pbiviz_file", type=click.Path(exists=True, dir_okay=False))
+@click.option("--replace", is_flag=True, default=False,
+              help="Overwrite an existing custom visual with the same GUID.")
+@click.pass_context
+def visual_import_custom(ctx, pbiviz_file, replace):
+    """Import a locally-built .pbiviz into the report.
+
+    \b
+    Examples:
+        pbi-agent visual import-custom dist/myvisual.pbiviz
+        pbi-agent visual import-custom dist/myvisual.pbiviz --replace
+    """
+    from powerbi_agent.visual import cli_import_custom
+    cli_import_custom(ctx.obj.get("report_path"), pbiviz_file, replace)
+
+
+@visual.command("list-custom")
+@click.pass_context
+def visual_list_custom(ctx):
+    """List embedded and public custom visuals registered in the report."""
+    from powerbi_agent.visual import cli_list_custom
+    cli_list_custom(ctx.obj.get("report_path"))
+
+
+@visual.command("remove-custom")
+@click.argument("identifier")
+@click.pass_context
+def visual_remove_custom(ctx, identifier):
+    """Remove an embedded custom visual by GUID or friendly name."""
+    from powerbi_agent.visual import cli_remove_custom
+    cli_remove_custom(ctx.obj.get("report_path"), identifier)
+
+
 # ─── fabric ───────────────────────────────────────────────────────────────────
 
 @main.group()
