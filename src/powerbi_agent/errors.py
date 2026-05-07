@@ -85,3 +85,11 @@ class ReportNotFoundError(PowerBIAgentError):
         ),
     ) -> None:
         super().__init__(message)
+
+
+class VisualError(PowerBIAgentError):
+    """Raised when a visual or custom-visual operation fails."""
+
+    def __init__(self, detail: str) -> None:
+        self.detail = detail
+        super().__init__(detail)

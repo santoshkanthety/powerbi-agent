@@ -54,6 +54,7 @@ SKILL_NAMES = [
     "python-visuals",
     "r-visuals",
     "svg-visuals",
+    "power-bi-custom-visuals",
     # PBIP / PBIR format
     "pbip-format",
     "pbir-format-enhanced",
