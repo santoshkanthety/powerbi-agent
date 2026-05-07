@@ -23,7 +23,7 @@ This project was inspired by the broader Power BI open-source community. We grat
 - Repository: https://github.com/data-goblin/power-bi-agentic-development
 - License: **GPL-3.0**
 - Inspired the concept of Claude Code skill files as domain-specific knowledge modules for Power BI agentic development.
-- **Important:** No code, skill file content, or documentation text was copied or derived from this GPL-3.0 licensed project. All skill files in the `skills/` directory are original works by Santosh Kanthety, written from scratch based on independent expertise and experience. This project's MIT license applies only to its own original content.
+- **Important:** No code, skill file content, or documentation text was copied or derived from this GPL-3.0 licensed project. All skill files in the `skills/` directory — including `te-docs.md` (added v0.2.0 after data-goblin v0.26.1 introduced a same-named skill upstream) — are original works by Santosh Kanthety, written from scratch based on independent expertise and the public Tabular Editor / Microsoft Analysis Services documentation. This project's MIT license applies only to its own original content.
 - If you fork this project and wish to incorporate any content from `power-bi-agentic-development`, you must comply with its GPL-3.0 terms.
 
 ---
