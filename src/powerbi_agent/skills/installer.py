@@ -39,6 +39,7 @@ SKILL_NAMES = [
     "bpa-rules",
     "c-sharp-scripting",
     "te2-cli",
+    "te-docs",
     "audit-tenant-settings",
     # Report authoring
     "report-authoring",
@@ -101,6 +102,7 @@ You have access to the following Power BI / Fabric skills. Load and apply them a
 - **bpa-rules**: Tabular Editor Best Practice Analyzer rules — authoring and execution
 - **c-sharp-scripting**: C# scripting in Tabular Editor for bulk model operations
 - **te2-cli**: Tabular Editor 2 CLI for TMDL deployment, BPA, scripting
+- **te-docs**: Tabular Editor (TE2/TE3) documentation lookup — scripting cookbook, BPA rule reference, CLI flags, calculation groups
 
 ### Report Authoring
 - **report-authoring**: General Power BI report authoring patterns

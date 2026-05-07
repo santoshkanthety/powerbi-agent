@@ -42,7 +42,7 @@
 
 ```powershell
 pip install "powerbi-agent[desktop,fabric]"      # 1. install
-pbi-agent skills install                         # 2. wire 44 skills into Claude Code
+pbi-agent skills install                         # 2. wire 45 skills into Claude Code
 pbi-agent connect                                # 3. attach to open Power BI Desktop
 ```
 
@@ -99,6 +99,7 @@ flowchart LR
     classDef skip fill:#1a0000,color:#ff6060,stroke:#aa0000
 ```
 *v0.4 detection hardening — both PBI Desktop install variants resolve through the same fallback chain.*
+| **v0.5** | New `te-docs` skill — Tabular Editor documentation lookup (TE2/TE3 distributions, scripting cookbook, BPA rule expressions, CLI flag reference, calculation groups, TOM escalation guidance) |
 | **v0.3** | 44-skill library — TMDL, BPA, Deneb, Python/R visuals, fab CLI, TOM/ADOMD, PBIR/PBIP, Power Query, naming conventions, lineage |
 | **v0.2** | Windows installation hardening — PATH, UTF-8 console, pythonnet, bundled skill assets |
 | **v0.1** | Core CLI — `connect`, `dax`, `model`, `report`, `fabric`, `doctor` |
@@ -111,7 +112,7 @@ flowchart LR
 | Direct TOM / ADOMD interop with PBI Desktop | — | ✓ | ✓ |
 | Fabric REST (workspaces · datasets · refresh) | — | — | ✓ |
 | Spans **Data Engineering · Discovery · Delivery** | — | — | ✓ |
-| One-command install of CLI + 44 skills | — | — | ✓ |
+| One-command install of CLI + 45 skills | — | — | ✓ |
 | Multi-install detection (MSI + Microsoft Store) | — | partial | ✓ |
 | MIT-licensed, PyPI-distributed | n/a | ✓ | ✓ |
 
@@ -226,7 +227,7 @@ $scripts = python -c "import sysconfig; print(sysconfig.get_path('scripts'))"
 ```
 
 ```powershell
-# STEP 3 ── Register 44 skills with Claude Code (one-time)
+# STEP 3 ── Register 45 skills with Claude Code (one-time)
 pbi-agent skills install
 
 # STEP 4 ── Connect to Power BI Desktop
@@ -251,7 +252,7 @@ Power BI Desktop installed              OK      C:\Program Files\...\PBIDesktop.
 pythonnet (for Desktop integration)     OK      pythonnet 3.0.x
 azure-identity (for Fabric integration) --      Not installed (optional)
 Connection config                       --      Not connected — run: pbi-agent connect
-Claude Code skills installed            OK      44/44 skill(s) installed
+Claude Code skills installed            OK      44/45 skill(s) installed
 
 All checks passed! You're good to go.
 ```
@@ -506,7 +507,7 @@ pbi-agent fabric refresh "Sales Analytics" \
 <summary><code>► skills — Claude Code skill management</code></summary>
 
 ```bash
-pbi-agent skills install              # Register all 44 skills with Claude Code
+pbi-agent skills install              # Register all 45 skills with Claude Code
 pbi-agent skills install --force      # Overwrite existing
 pbi-agent skills list                 # Show install status for all skills
 pbi-agent skills uninstall            # Remove all skills
@@ -619,7 +620,7 @@ Checks: Python version, OS, PATH, Power BI Desktop install (MSI + Microsoft Stor
 
 ```mermaid
 mindmap
-  root((**pbi-agent**\n44 skills))
+  root((**pbi-agent**\n45 skills))
     🔌 Connectivity
       connect-pbid
       fabric-cli
@@ -750,7 +751,7 @@ powerbi-agent/
 │   ├── errors.py           ◄── Click-integrated typed error hierarchy
 │   ├── _asm.py             ◄── pythonnet assembly resolver (TOM + ADOMD)
 │   └── skills/
-│       ├── installer.py    ◄── install/uninstall/list 44 skills in ~/.claude/skills/
+│       ├── installer.py    ◄── install/uninstall/list 45 skills in ~/.claude/skills/
 │       └── data/           ◄── Bundled skill .md files (pip install distributes these)
 │
 ├── skills/                 ◄── 44 Claude Code skill markdown files
@@ -911,7 +912,7 @@ All Python code in this repo is original work. No code, skill files, or document
 ║   20+ years of Technology & Data transformation               ║
 ║   delivery and strategy                                       ║
 ║                                                               ║
-║   44 skills  ·  8 CLI commands  ·  63 tests                   ║
+║   45 skills  ·  8 CLI commands  ·  63 tests                   ║
 ║                                                               ║
 ║   github.com/santoshkanthety/powerbi-agent                    ║
 ║   linkedin.com/in/santoshkanthety                             ║
