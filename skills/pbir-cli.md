@@ -1,7 +1,7 @@
 ---
 name: pbir-cli
-version: 0.26.0
-description: Advanced Power BI report manipulation and execution using pbir CLI and object model; executable scripts for complex workflows, domain-specific references, and reusable templates. Automatically invoke when the user works with .pbir/.pbip report files, or asks to "add a visual", "format a chart", "bind fields", "set a theme", "add conditional formatting", "create a page", "add a thin-report measure", "validate a report", "audit report formatting", "bulk format visuals", "publish to Fabric", "explore a report", or mentions pbir, pbir-cli, report visuals, visual formatting, field bindings, report extensions, or Fabric workspace integration for reports.
+version: 0.26.20
+description: Advanced Power BI report manipulation and execution using pbir CLI and object model; executable scripts for complex workflows, domain-specific references, and reusable templates. Automatically invoke when the user works with .pbir/.pbip report files, or asks to "add a visual", "format a chart", "bind fields", "set a theme", "add conditional formatting", "create a page", "add a thin-report measure", "validate a report", "audit report formatting", "bulk format visuals", "publish to Fabric", "explore a report", "group visuals", "apply a style preset", "run BPA on a report", or mentions pbir, pbir-cli, report visuals, visual formatting, field bindings, report extensions, visual groups, style presets, or Fabric workspace integration for reports.
 ---
 
 # Working with Power BI reports using `pbir`
@@ -273,6 +273,68 @@ pbir filters list "Report.Report"
 ```
 
 For comprehensive audit checklist, consult **`references/audit-report.md`**.
+
+### Best Practice Analyzer (BPA)
+
+Run design and layout rules against a report. Pair with `pbir validate` (schema/structure) for a full health check.
+
+```bash
+# Run BPA
+pbir bpa run "Report.Report"
+pbir bpa run "Report.Report" --fail-on error -o json   # CI-friendly; exit code follows max severity
+pbir bpa run "Report.Report" --fix --save              # Apply auto-safe fixes in place
+
+# Manage rules
+pbir bpa rules list                                    # All rules with IDs and severities
+pbir bpa rules ignore PBIR_DROP_SHADOW "Report.Report"
+pbir bpa rules unignore PBIR_DROP_SHADOW "Report.Report"
+```
+
+Rules cover design patterns: excessive drop shadows, misaligned visuals, overlapping elements, missing titles, inconsistent font sizes, accessibility concerns. See **`references/bpa.md`** for the full rule catalogue and severity table.
+
+### Visual Groups
+
+Group visuals together so they scale and position as a unit. Useful for KPI clusters, icon+number pairs, or composite chart arrangements.
+
+```bash
+# List groups on a page
+pbir visuals group "Report.Report/Page.Page" --list
+
+# Create a group
+pbir visuals group "Report.Report/Page.Page" --create "KPI Group"
+
+# Add / remove members
+pbir visuals group "Report.Report/Page.Page/KPI Group.Visual" --add "Card.Visual" --add "KPI.Visual"
+pbir visuals group "Report.Report/Page.Page/KPI Group.Visual" --remove "Card.Visual"
+
+# Ungroup
+pbir visuals group "Report.Report/Page.Page/Visual.Visual" --ungroup  # Remove visual from its group
+pbir visuals group "Report.Report/Page.Page/KPI Group.Visual" --ungroup  # Delete group, free all members
+```
+
+**When to use groups vs. page templates**: groups are for layout coupling (move/scale together); page templates are for reusable page structures with placeholder visuals.
+
+### Style Presets
+
+Apply a curated formatting bundle to one or more visuals in a single command. Presets set a consistent combination of border, padding, shadow, background, and title styling.
+
+```bash
+# List available presets
+pbir visuals preset --list                            # minimal, bold, clean, emphasis, presentation
+
+# Apply to a single visual
+pbir visuals preset "Report.Report/Page.Page/Visual.Visual" --name minimal
+
+# Apply to all visuals on a page or report (glob)
+pbir visuals preset "Report.Report/Page.Page/**/*.Visual" --name clean
+pbir visuals preset "Report.Report/**/*.Visual" --name presentation
+
+# Pair with a theme change for full visual consistency
+pbir theme apply-template "Report.Report" --name corporate
+pbir visuals preset "Report.Report/**/*.Visual" --name minimal
+```
+
+**Preset vs. theme-level formatting**: use a preset for a fast, opinionated starting point; use `pbir theme set-formatting` when you need precise per-property control that cascades across all reports using the same theme.
 
 
 ## Command Reference
@@ -647,6 +709,33 @@ pbir bookmarks page "path" "bookmark" "page":
   args: report path, bookmark name, page name (omit page to show current)
 ```
 
+### Visual Groups and Style Presets
+
+```yaml
+pbir visuals group "path":
+  use: create, manage, or dissolve visual groups on a page
+  flags: --create "Name", --add "Visual", --remove "Visual", --ungroup, --list
+
+pbir visuals preset "path" --name <preset>:
+  use: apply a curated formatting bundle (minimal/bold/clean/emphasis/presentation)
+  flags: --list (show available presets)
+  note: glob patterns supported; pair with pbir theme apply-template for full consistency
+```
+
+### Best Practice Analyzer
+
+```yaml
+pbir bpa run "path":
+  use: run design and layout rules against a report
+  flags: --fail-on info|warning|error, -o json, --fix, --save, --strict
+
+pbir bpa rules list:
+  use: list all BPA rules with IDs and severities
+
+pbir bpa rules ignore/unignore RULE_ID "path":
+  use: suppress or re-enable a specific rule for a report
+```
+
 ### Page Operations
 
 ```yaml
@@ -757,6 +846,7 @@ references/visual-calculations.md: visual calculations (RUNNINGSUM, RANK, etc.)
 references/filters.md: filter types (Categorical, TopN, Advanced, RelativeDate), management, pane styling
 references/bookmarks.md: bookmark management, copying, button references
 references/audit-report.md: report quality audit checklist
+references/bpa.md: BPA rule catalogue, severities, auto-fix eligibility, CI integration
 references/vague-prompts.md: handling underspecified prompts; targeted questions, sensible defaults
 references/property-catalogue.md: offline property index (49 types, 15 containers, 12,600+ slots)
 references/visualTypes/*.md: per-visual-type design rules, CLI commands, and best practices
