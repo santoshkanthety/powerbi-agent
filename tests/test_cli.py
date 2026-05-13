@@ -5,10 +5,12 @@ from powerbi_agent.cli import main
 
 
 def test_version():
+    from powerbi_agent import __version__
     runner = CliRunner()
     result = runner.invoke(main, ["--version"])
     assert result.exit_code == 0
-    assert "0.1.0" in result.output
+    assert __version__ in result.output
+    assert __version__ != "0.0.0+dev", "version must resolve from package metadata"
 
 
 def test_help():
