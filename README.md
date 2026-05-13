@@ -99,7 +99,7 @@ flowchart LR
     classDef skip fill:#1a0000,color:#ff6060,stroke:#aa0000
 ```
 *v0.4 detection hardening — both PBI Desktop install variants resolve through the same fallback chain.*
-| **v0.5** | Custom visual authoring (`pbi-agent visual import-custom/list-custom/remove-custom`) + `power-bi-custom-visuals` skill (vibe-code .pbiviz workflow ported from pbi-cli PR #4) |
+| **v0.5** | Custom visual authoring (`pbi-agent visual import-custom/list-custom/remove-custom`) + `power-bi-custom-visuals` skill; `te-docs` skill for Tabular Editor docs lookup (TE2/TE3, scripting cookbook, BPA rule expressions, TOM escalation) |
 | **v0.3** | 44-skill library — TMDL, BPA, Deneb, Python/R visuals, fab CLI, TOM/ADOMD, PBIR/PBIP, Power Query, naming conventions, lineage |
 | **v0.2** | Windows installation hardening — PATH, UTF-8 console, pythonnet, bundled skill assets |
 | **v0.1** | Core CLI — `connect`, `dax`, `model`, `report`, `fabric`, `doctor` |
