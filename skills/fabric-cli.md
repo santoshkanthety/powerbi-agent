@@ -1,6 +1,6 @@
 ---
 name: fabric-cli
-version: 0.26.0
+version: 0.26.20
 description: Expert guidance for using the Fabric CLI (`fab`) to fully interact with Fabric workspaces, items, and configuration. Automatically invoke this skill whenever the user mentions "Fabric" or "Power BI Service" or a "Fabric/Power BI workspace".
 ---
 
@@ -10,6 +10,7 @@ Guidance for using `fab` to programmatically manage Fabric & Power BI service
 
 - Install via `uv tool install ms-fabric-cli` (get `uv` via `winget install uv` or `brew install uv`)
 - Fabric CLI is for working with the Cloud environment and not local files; it works with Power BI Pro, PPU, or Fabric; you DO NOT need a Fabric SKU to use the Fabric CLI
+- **Target version: ≥ 1.6.1.** Older versions lack `fab find`, the interactive REPL, `--format` on export, `fab deploy`, and several item types. Run `fab --version` to confirm. Key version deltas in [Fab CLI version history](#fab-cli-version-history) below.
 
 > [!IMPORTANT] 
 > Any time you encounter errors, user preferences or learnings when using the Fabric cli, ALWAYS note these down in the user memory rules, i.e. `.claude/rules/fabric-cli.md` for future improvement. 
@@ -52,32 +53,39 @@ You must read and understand the common list of operations with simple examples
 
 0. Check the commands, syntax, and auth status: `fab --help` and `fab auth status`
 1. Check if the item exists if the user gave the workspace and item name: `fab exists "spaceparts-dev.Workspace/spaceparts-otc-full.SemanticModel"`
-2. Find the workspace: `fab ls`
-3. Find the item: `fab ls "Workspace Name.Workspace"`
-4. Check the commands for that item: 
+2. Find an item by name across all accessible workspaces: `fab find 'sales' -P type=Report -l` (requires fab ≥ 1.6.1; substring on name/description/workspace; `-P type=X` to filter by type; `-l` for IDs; `-q '<jmespath>'` for client-side projection)
+   - For governance fields not returned by `fab find` (last visit, last refresh, owner, storage mode, capacity SKU): use `scripts/search_across_workspaces.py` instead
+3. Find the workspace: `fab ls`
+4. Find the item: `fab ls "Workspace Name.Workspace"`
+5. Check the commands for that item:
    - `fab desc` to get itemTypes
    - `fab desc .<ItemType>` for commands i.e. `fab desc .SemanticModel`
-5. What's in that item; what's it for; what is it?:
+6. What's in that item; what's it for; what is it?:
    - Full TMDL definition: `fab get "spaceparts-dev.Workspace/spaceparts-otc-full.SemanticModel" -q "definition" -f`
    - Search a specific measure / table / column: `fab get "ws.Workspace/Model.SemanticModel" -q "definition" -f | rga -i "Sales Amount"`
-6. Get files, tables, or table schemas:
+7. Get files, tables, or table schemas:
    - List lakehouse files: `fab ls "ws.Workspace/LH.Lakehouse/Files"`
    - List lakehouse tables: `fab ls "ws.Workspace/LH.Lakehouse/Tables"`
    - Table schema: `fab table schema "ws.Workspace/LH.Lakehouse/Tables/gold/orders"`
-7. Query data (always prefer the wrapper scripts over raw `fab api` / `duckdb` / `sqlcmd`; they resolve IDs, hosts, and auth for you):
+8. Query data (always prefer the wrapper scripts over raw `fab api` / `duckdb` / `sqlcmd`; they resolve IDs, hosts, and auth for you):
    - Semantic model (DAX): `python3 scripts/execute_dax.py "ws.Workspace/Model.SemanticModel" -q "EVALUATE TOPN(10, 'Orders')"`
    - Lakehouse or warehouse (DuckDB + Delta against OneLake): `python3 scripts/query_lakehouse_duckdb.py "ws.Workspace/LH.Lakehouse" -q "SELECT * FROM tbl LIMIT 10" -t gold.orders`
    - Lakehouse SQL endpoint, warehouse, or SQL database (T-SQL via `sqlcmd` + `az` session): `python3 scripts/query_sql_endpoint.py "ws.Workspace/LH.Lakehouse" -q "SELECT TOP 10 * FROM dbo.orders"`
-8. Set properties for an item or workspace: `fab set "ws.Workspace/Item.Notebook" -q displayName -i "New Name"` or `fab set "ws.Workspace" -q description -i "Production environment"`
-9. Review or manage permissions:
-   - Item ACL: `fab acl ls "ws.Workspace/Model.SemanticModel"` then `fab acl set "ws.Workspace/Model.SemanticModel" -I user@contoso.com -R Read`
-   - Workspace roles: `fab acl ls "ws.Workspace"` then `fab acl set "ws.Workspace" -I user@contoso.com -R Member`
-10. Deploy items to Fabric: `fab import "ws.Workspace/New.Notebook" -i ./local-path/Nb.Notebook -f`
-11. Download items from Fabric: `fab export "ws.Workspace/Nb.Notebook" -o ./backup -f` (always `mkdir -p ./backup` first)
-12. Copy or move items between workspaces: `fab cp "dev.Workspace/Item.Notebook" "prod.Workspace" -f` or `fab mv "ws.Workspace/Old.Notebook" "ws.Workspace/New.Notebook" -f`
-13. Open item in Fabric via browser: `fab open "spaceparts-dev.SpaceParts/Amazing Report.Report"`
-14. Using Fabric or Power BI APIs: `fab api -A powerbi "groups/<ws-id>/datasets/<model-id>/refreshes" -X post -i '{"type":"Full"}'` or `fab api "workspaces/<ws-id>/items"`
-15. Using [Azure CLI](./references/fab-vs-az-cli.md) (advanced) when Fabric CLI doesn't suffice:
+9. Set properties for an item or workspace: `fab set "ws.Workspace/Item.Notebook" -q displayName -i "New Name"` or `fab set "ws.Workspace" -q description -i "Production environment"`
+10. Review or manage permissions:
+    - Item ACL: `fab acl ls "ws.Workspace/Model.SemanticModel"` then `fab acl set "ws.Workspace/Model.SemanticModel" -I user@contoso.com -R Read`
+    - Workspace roles: `fab acl ls "ws.Workspace"` then `fab acl set "ws.Workspace" -I user@contoso.com -R Member`
+11. Deploy items to Fabric:
+    - Single item: `fab import "ws.Workspace/New.Notebook" -i ./local-path/Nb.Notebook -f`
+    - Multi-item CI/CD pipeline (dev→test→prod): `fab deploy` (requires fab ≥ 1.5.0, integrates with fabric-cicd; replaces hand-rolled deploy scripts)
+12. Download items from Fabric: `fab export "ws.Workspace/Nb.Notebook" -o ./backup -f` (always `mkdir -p ./backup` first)
+13. Copy or move items between workspaces: `fab cp "dev.Workspace/Item.Notebook" "prod.Workspace" -f` or `fab mv "ws.Workspace/Old.Notebook" "ws.Workspace/New.Notebook" -f`
+14. Delete items:
+    - Soft-delete (recycle bin): `fab rm "ws/Item.Type" -f`
+    - Hard/permanent delete (skips recycle bin, requires fab ≥ 1.6.1): `fab rm --hard "ws/Item.Type" -f`
+15. Open item in Fabric via browser: `fab open "spaceparts-dev.SpaceParts/Amazing Report.Report"`
+16. Using Fabric or Power BI APIs: `fab api -A powerbi "groups/<ws-id>/datasets/<model-id>/refreshes" -X post -i '{"type":"Full"}'` or `fab api "workspaces/<ws-id>/items"`
+17. Using [Azure CLI](./references/fab-vs-az-cli.md) (advanced) when Fabric CLI doesn't suffice:
     - T-SQL over any SQL-capable item ; use [`scripts/query_sql_endpoint.py`](./scripts/query_sql_endpoint.py) (reuses `az login` via `ActiveDirectoryAzCli`; full walkthrough in [querying-data.md](./references/querying-data.md#sqlcmd-over-lakehouse-warehouse-and-sql-database))
     - Pass a Key Vault secret to a consumer without ever reading, echoing, or persisting it: `az login --service-principal -u <appId> -t <tenantId> --password "$(az keyvault secret show --vault-name <vault> --name <secret> --query value -o tsv)"` ; command substitution pipes the secret directly into the child process arg list, never stdout, a file, or a named shell variable
     - Full fab-vs-az decision matrix: [fab-vs-az-cli.md](./references/fab-vs-az-cli.md)
@@ -247,7 +255,8 @@ Fabric discovery follows a drill-down pattern:
   - Get item details: `fab get "ws.Workspace/Item"`
   - Pull a single field: `fab get "ws.Workspace" -q "id"`
 - Cross-workspace search:
-  - Rich metadata, no admin required: [`scripts/search_across_workspaces.py`](./scripts/search_across_workspaces.py)
+  - Routine discovery by name/type (no admin required): `fab find '<text>' -P type=<Type> -l` (fab ≥ 1.6.1)
+  - Governance metadata not in `fab find` (last visit, last refresh, owner, storage mode, capacity SKU): [`scripts/search_across_workspaces.py`](./scripts/search_across_workspaces.py)
   - Downstream reports for a given model: [`scripts/get-downstream-reports.py`](./scripts/get-downstream-reports.py)
   - Tenant-wide admin APIs: [admin.md](./references/admin.md)
 
@@ -353,7 +362,9 @@ Check references before changing metadata:
 | `fab unassign` | Detach capacity / domain | `fab unassign .capacities/cap.Capacity -W ws.Workspace` |
 | `fab start` / `fab stop` | Resume / pause capacity | `fab start .capacities/cap.Capacity` |
 | `fab cp -r` | Fork workspace | `fab cp "dev.Workspace" "prod.Workspace" -r -f` |
-| `fab rm` | Soft-delete (see [recovery](./references/reference.md#recovering-deleted-items)) | `fab rm "ws/Item.Type" -f` |
+| `fab rm` | Soft-delete (recycle bin) | `fab rm "ws/Item.Type" -f` |
+| `fab rm --hard` | Hard/permanent delete (no recycle bin; fab ≥ 1.6.1) | `fab rm --hard "ws/Item.Type" -f` |
+| `fab deploy` | CI/CD deploy via fabric-cicd (fab ≥ 1.5.0) | `fab deploy -w prod.Workspace -s ./pipeline.yml` |
 
 Flags:
 - `-P key=value` (creation params for `fab mkdir`)
@@ -492,8 +503,9 @@ Every Fabric item has a serializable definition. Move definitions between enviro
 - Full workspace snapshot (items + lakehouse files):
   - Backups, offline analysis, cross-tenant forks: [`scripts/download_workspace.py`](./scripts/download_workspace.py)
 - Promotion between Dev, Test, Prod:
-  - Fabric deployment pipelines API (covers all item types)
-  - Power BI pipelines API (Power BI items only, but finer-grained deploy flags like `allowPurgeData`, `allowTakeOver`)
+  - `fab deploy` (fab ≥ 1.5.0): integrates with [fabric-cicd](https://github.com/microsoft/fabric-cicd); replaces hand-rolled deploy scripts for most cases; recommended default
+  - Fabric deployment pipelines API (covers all item types, finer-grained control)
+  - Power BI pipelines API (Power BI items only; flags like `allowPurgeData`, `allowTakeOver`)
   - When to use each, selective deploy, LRO polling: [deployment-pipelines.md](./references/deployment-pipelines.md)
 - Git integration (connect workspace to repo, branch, commit, update from git):
   - Workspace git section in [workspaces.md](./references/workspaces.md)
@@ -513,11 +525,38 @@ Check references before deploying:
 
 - `audit-tenant-settings` (in the `fabric-admin` plugin) ; Fabric governance workflow covering tenant settings, delegated overrides (capacity / domain / workspace), and the Entra security groups those settings reference. Read-only; holds the curated metadata baseline and the audit + change-detection script.
 
+## Interactive REPL
+
+Run `fab` with no arguments to enter an interactive session (fab ≥ 1.4.0). Tab-completion and persistent auth across commands.
+
+```bash
+fab                            # enter REPL
+fab config set mode interactive  # make interactive the default
+```
+
+Useful when running multiple commands in sequence — avoids re-auth overhead per call.
+
+
+## Fab CLI version history
+
+Minimum version for features used in this skill: **≥ 1.6.1**.
+
+| Version | Key additions |
+|---|---|
+| **1.6.1** (2026-04-29) | `fab find` cross-workspace catalog search · `fab rm --hard` permanent delete · Lakehouse import/export · `VariableLibrary` full CRUD · `Map` + `DigitalTwinBuilder` item types |
+| **1.5.0** (2026-03-12) | `fab deploy` (fabric-cicd integration) · Semantic Model + SparkJobDefinition export/import |
+| **1.4.0** (2026-02-09) | Interactive REPL (`fab` with no args) · `fab export --format` (`.ipynb`/`.py`) · `fab connection set/rm` · `fab get` includes `properties` · new types: CosmosDBDatabase, UserDataFunction, GraphQuerySet |
+
+Source: [Fabric CLI release notes](https://microsoft.github.io/fabric-cli/release-notes/).
+
+
 ## Gotchas
 
 - **IMPORTANT:** DON'T try to use `fab ls` on items that aren't data items (.Lakehouse, .Warehouse, etc); use `fab ls` to find workspaces and items, and use `fab get` to look at definitions
 - ALWAYS Use the `-f` flag when using `fab get`, `fab import`, `fab export`, etc. as described above
 - ONLY fallback to `fab api` when a command doesn't exist
+- `fab find` requires fab ≥ 1.6.1; fall back to `scripts/search_across_workspaces.py` on older installs
+- `fab rm --hard` bypasses the recycle bin — no recovery possible; confirm with user before use
 
 ## References
 
