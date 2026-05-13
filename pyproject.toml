@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "powerbi-agent"
-version = "0.1.0"
+version = "0.2.0"
 description = "Give Claude Code enterprise-grade Power BI superpowers — community-driven, AI-powered BI automation"
 readme = "README.md"
 license = { text = "MIT" }

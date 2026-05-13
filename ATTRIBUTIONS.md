@@ -18,6 +18,7 @@ This project was inspired by the broader Power BI open-source community. We grat
   - UTF-16 LE → UTF-8 fallback when reading `msmdsrv.port.txt` — `connect._read_port_file`
   - Most-recent-instance ordering when multiple Power BI Desktop sessions are open
   - Click-integrated error hierarchy — `powerbi_agent.errors`
+- The PBIR custom-visual embedding logic in `powerbi_agent.visual` (resource-package layout, `customVisuals` registration, GUID-based filename pattern, patch-bump cache invalidation) was ported from pbi-cli's `core/custom_visual_backend.py` (PR #4, MIT). The CLI surface and skill content are adapted to powerbi-agent. The module docstring carries the attribution.
 
 ### power-bi-agentic-development — Kurt Buhler (data-goblin)
 - Repository: https://github.com/data-goblin/power-bi-agentic-development
