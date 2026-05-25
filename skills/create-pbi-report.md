@@ -126,6 +126,26 @@ pbir theme set-formatting "Sales.Report" "card.*.border.radius" --value 8
 
 ### Step 6: Add Visuals to Pages
 
+**Prerequisite: Measures must exist in the semantic model before binding.**
+`pbir visuals bind` records that a measure should exist — it does NOT create it. If the measure is missing from the TMDL, every visual bound to it will show a field error in Desktop.
+
+Before binding any visual to a measure, verify it exists:
+
+```bash
+# Option A: inspect TMDL directly
+# Look for `measure '...' =` lines in SemanticModel/definition/tables/*.tmdl
+
+# Option B: query via pbir model
+pbir model "Report.Report" -d
+```
+
+**Checklist before opening Desktop:**
+- Every `--field`, `--value`, `--indicator` reference points to a real measure or column in the TMDL
+- Table names match exactly (case-sensitive in PBIR): `"Fact_Sales"` ≠ `"fact_sales"`
+- Measure names match exactly: `"Total Revenue"` ≠ `"Total_Revenue"`
+
+After adding measures directly to a TMDL file (without `pbir connect`): close and reopen the `.pbip` file in Power BI Desktop. Desktop only reads TMDL on file open — it does not hot-reload disk changes.
+
 Check actual page dimensions first -- do not assume 1280x720. Use `pbir pages json "Report.Report/Page.Page"` to verify. The object model validates that visuals fit within page bounds.
 
 Fill the canvas with a purposeful visual hierarchy. Standard composition for a 1280x720 page:
