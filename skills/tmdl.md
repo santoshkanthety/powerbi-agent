@@ -16,6 +16,38 @@ Expert guidance for authoring and editing TMDL (Tabular Model Definition Languag
 >
 > Direct TMDL editing does not validate DAX syntax, check referential integrity, or verify that property values are valid. Errors will only surface when the model is next loaded in Power BI Desktop or deployed via XMLA. Use the **`pbip-validator`** agent to check TMDL files for syntax issues, indentation errors, and referential integrity before opening in PBI Desktop.
 
+## Validation: tmdl-validate v0.2.0
+
+`tmdl-validate` supports two modes:
+
+```bash
+# Single-file mode — validate one .tmdl file (used by PostToolUse hook per edit)
+tmdl-validate path/to/tables/Sales.tmdl
+
+# Directory mode — validate the whole model at once (v0.2.0+)
+tmdl-validate path/to/Model.SemanticModel/definition
+```
+
+**Directory mode adds one critical check not in single-file mode:**
+
+**M-expression name collision** — `expressions.tmdl` defines named shared expressions (Power Query parameters and queries). If a shared expression has the same name as a table, the model fails to load in Desktop with a silent error. Directory mode detects this.
+
+```
+# Example collision — expression "Sales" collides with table "Sales"
+# expressions.tmdl:
+expression Sales = ...    # ← same name as a table in tables/Sales.tmdl
+```
+
+Fix: rename the shared expression or the table so names are unique across both `expressions.tmdl` and `tables/`.
+
+**When to use directory mode:**
+- After bulk renames (tables, shared expressions, parameters)
+- After adding new tables or M parameters
+- Before any Desktop open or XMLA deploy
+- When `pbip-validator` reports unexplained load failures
+
+The single-file hook still runs per-edit; add a directory-mode pass as a final pre-commit step.
+
 ## When to Use This Skill
 
 Activate only when the Tabular Editor CLI, Power BI MCP server, or `connect-pbid` skill are not available, and tasks involve:
