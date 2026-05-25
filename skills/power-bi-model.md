@@ -47,6 +47,20 @@ pbi-agent model info --port 56123
 - For complex DAX with VAR/RETURN, validate via `pbi-agent dax validate` before calling `add-measure`.
 - To inspect a single measure's DAX expression, use `pbi-agent dax query "EVALUATE FILTER(INFO.MEASURES(), [Name] = \"My Measure\")"`.
 
+## Measure Create Syntax Reference
+
+Two CLIs can add measures; their argument forms are different:
+
+```bash
+# pbi-agent (this tool) — positional name, then DAX, then --table flag
+pbi-agent model add-measure "Total Revenue" "SUM(Sales[Amount])" --table Sales
+
+# pbi-cli (if installed separately) — name positional, -e for expression, -t for table
+pbi measure create "Total Revenue" -e "SUM(Sales[Amount])" -t Sales
+```
+
+The three-positional form `pbi measure create TableName "Name" "DAX"` is **wrong** for pbi-cli — Click rejects it. Always use `-e`/`-t` named flags with `pbi measure create`.
+
 ## Common Failures
 - **"No active connection"** → run `pbi-agent connect`
 - **Table not found** → verify with `pbi-agent model tables` (exact case)
