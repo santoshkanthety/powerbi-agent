@@ -35,6 +35,9 @@ jobs:
       - name: Lint with ruff
         run: ruff check src/
 
+      - name: Validate skill schema
+        run: python scripts/validate_skills.py
+
       - name: Run tests
         run: pytest tests/ -v --tb=short -p no:anyio
 
@@ -63,7 +66,7 @@ jobs:
           wheels = list(Path('dist').glob('*.whl'))
           assert wheels, 'No wheel found'
           with zipfile.ZipFile(wheels[0]) as zf:
-              skill_files = [f for f in zf.namelist() if 'skills/data/' in f and f.endswith('.md')]
+              skill_files = [f for f in zf.namelist() if 'skills/data/' in f and f.endswith('SKILL.md')]
               if not skill_files:
                   print('ERROR: No skill .md files bundled in wheel!', file=sys.stderr)
                   sys.exit(1)

@@ -15,7 +15,7 @@
 
 ---
 
-> **The agent layer for Power BI analytics delivery.** A Click CLI plus 44 Claude Code skills that streamline **Data Engineering · Discovery · Delivery** — natural-language prompts become TOM, ADOMD, TMDL, PBIR, and Fabric REST calls. Board-ready analytics, without the ceremony. **No web UIs. No config sprawl. Just the CLI, the skills, and your model.**
+> **The agent layer for Power BI analytics delivery.** A Click CLI plus 51 Claude Code skills that streamline **Data Engineering · Discovery · Delivery** — natural-language prompts become TOM, ADOMD, TMDL, PBIR, and Fabric REST calls. Board-ready analytics, without the ceremony. **No web UIs. No config sprawl. Just the CLI, the skills, and your model.**
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
@@ -42,7 +42,7 @@
 
 ```powershell
 pip install "powerbi-agent[desktop,fabric]"      # 1. install
-pbi-agent skills install                         # 2. wire 45 skills into Claude Code
+pbi-agent skills install                         # 2. wire 51 skills into Claude Code
 pbi-agent connect                                # 3. attach to open Power BI Desktop
 ```
 
@@ -57,7 +57,7 @@ sequenceDiagram
     autonumber
     actor U as 👤 You
     participant C as 🤖 Claude Code
-    participant S as ⚡ Skill<br/>(dax-mastery · tmdl · fabric-cli)
+    participant S as ⚡ Skill<br/>(powerbi-dax-mastery · powerbi-tmdl · powerbi-fabric-cli)
     participant A as 🛠️ pbi-agent CLI
     participant P as 🪟 Power BI Desktop / Fabric
 
@@ -91,20 +91,22 @@ sequenceDiagram
 
 ### `> THE PORTABLE CORE`
 
-Most skill packs are written *for* one platform. These aren't. **Ten concerns in this repo appear again in [databricks-agent](https://github.com/santoshkanthety/databricks-agent) under the same names — each fully rewritten in that platform's own idiom, not copy-pasted.** Governance, lineage, medallion layering and test strategy don't change when the engine does; only their expression does:
+Most skill packs are written *for* one platform. These aren't. **Ten concerns in this repo have a one-to-one counterpart in [databricks-agent](https://github.com/santoshkanthety/databricks-agent) — `powerbi-medallion-architecture` ↔ `databricks-medallion-architecture`, and nine more — each written in that platform's own idiom, not copy-pasted.** Governance, lineage, medallion layering and test strategy don't change when the engine does; only their expression does. The paired concerns:
 
 `medallion-architecture` · `data-catalog-lineage` · `data-governance-traceability` · `data-transformation` · `source-integration` · `performance-scale` · `testing-validation` · `time-series-data` · `cyber-security` · `project-management`
+
+Each exists as `powerbi-<concern>` here and `databricks-<concern>` there. The prefix is load-bearing: both packs install into `~/.claude/skills/`, so without it one would silently overwrite the other. Both repos validate against the same [skill schema](SKILL_SCHEMA.md) in CI.
 
 Six more are the same doctrine expressed in each platform's dialect:
 
 | Doctrine layer | Power BI dialect | Databricks dialect |
 |---|---|---|
-| Metric semantics | `measure-glossary` | `metric-glossary` |
-| Access control | `security-rls` | `security-governance` |
-| Query language | `dax-mastery` | `spark-sql-mastery` |
-| Physical modeling | `power-bi-model` | `delta-modeling` |
-| Orchestration | `fabric-pipelines` | `dlt-pipelines` |
-| Presentation | `pbi-report-design` | `dashboard-authoring` |
+| Metric semantics | `powerbi-measure-glossary` | `databricks-metric-glossary` |
+| Access control | `powerbi-security-rls` | `databricks-security-governance` |
+| Query language | `powerbi-dax-mastery` | `databricks-spark-sql-mastery` |
+| Physical modeling | `powerbi-model` | `databricks-delta-modeling` |
+| Orchestration | `powerbi-fabric-pipelines` | `databricks-dlt-pipelines` |
+| Presentation | `powerbi-report-design` | `databricks-dashboard-authoring` |
 
 ```mermaid
 flowchart TD
@@ -191,6 +193,7 @@ flowchart LR
     classDef skip fill:#1a0000,color:#ff6060,stroke:#aa0000
 ```
 *v0.4 detection hardening — both PBI Desktop install variants resolve through the same fallback chain.*
+| **v0.6 — skill schema** | Skills now ship in the canonical `<skill-name>/SKILL.md` layout Claude Code actually discovers — the previous flat `skills/*.md` files were never loaded. All 51 skills carry Agent Skills spec frontmatter (`name`, `description`, `license`) and are namespaced `powerbi-*` so they no longer collide with `databricks-agent`. Shared [skill schema](SKILL_SCHEMA.md) + `scripts/validate_skills.py` enforced in CI. 93 tests |
 | **v0.5** | Custom visual authoring (`pbi-agent visual import-custom/list-custom/remove-custom`) + `power-bi-custom-visuals` skill; `te-docs` skill for Tabular Editor docs lookup (TE2/TE3, scripting cookbook, BPA rule expressions, TOM escalation) |
 | **v0.3** | 44-skill library — TMDL, BPA, Deneb, Python/R visuals, fab CLI, TOM/ADOMD, PBIR/PBIP, Power Query, naming conventions, lineage |
 | **v0.2** | Windows installation hardening — PATH, UTF-8 console, pythonnet, bundled skill assets |
@@ -204,7 +207,7 @@ flowchart LR
 | Direct TOM / ADOMD interop with PBI Desktop | — | ✓ | ✓ |
 | Fabric REST (workspaces · datasets · refresh) | — | — | ✓ |
 | Spans **Data Engineering · Discovery · Delivery** | — | — | ✓ |
-| One-command install of CLI + 45 skills | — | — | ✓ |
+| One-command install of CLI + 51 skills | — | — | ✓ |
 | Multi-install detection (MSI + Microsoft Store) | — | partial | ✓ |
 | MIT-licensed, PyPI-distributed | n/a | ✓ | ✓ |
 
@@ -235,7 +238,7 @@ flowchart TD
 
     subgraph DL ["🚀 DELIVERY  ·  model → secure → ship"]
         direction LR
-        DL1["dax-mastery · dax-performance\ntmdl · star-schema-modeling"]:::skill
+        DL1["powerbi-dax-mastery · powerbi-dax-performance\npowerbi-tmdl · powerbi-star-schema-modeling"]:::skill
         DL2["security-rls\ntime-series-data · measure-glossary"]:::skill
         DL3["pbi-report-design · review-report\nreport-structure · report-theming"]:::skill
         DL4["deneb-visuals · python-visuals\nr-visuals · svg-visuals\npower-bi-custom-visuals"]:::skill
@@ -320,7 +323,7 @@ $scripts = python -c "import sysconfig; print(sysconfig.get_path('scripts'))"
 ```
 
 ```powershell
-# STEP 3 ── Register 45 skills with Claude Code (one-time)
+# STEP 3 ── Register 51 skills with Claude Code (one-time)
 pbi-agent skills install
 
 # STEP 4 ── Connect to Power BI Desktop
@@ -345,7 +348,7 @@ Power BI Desktop installed              OK      C:\Program Files\...\PBIDesktop.
 pythonnet (for Desktop integration)     OK      pythonnet 3.0.x
 azure-identity (for Fabric integration) --      Not installed (optional)
 Connection config                       --      Not connected — run: pbi-agent connect
-Claude Code skills installed            OK      44/45 skill(s) installed
+Claude Code skills installed            OK      51/51 skill(s) installed
 
 All checks passed! You're good to go.
 ```
@@ -497,7 +500,7 @@ pbi-agent dax validate "CALCULATE([Total Sales], SAMEPERIODLASTYEAR(Date[Date]))
 pbi-agent dax validate "SUMX(FILTER(Sales, Sales[Amount] > 1000), Sales[Amount])"
 ```
 
-**Ask Claude instead (uses `dax-mastery` + `dax-performance` skills):**
+**Ask Claude instead (uses `powerbi-dax-mastery` + `powerbi-dax-performance` skills):**
 ```
 "Run a DAX query showing top 10 products by sales for 2024"
 "Validate this RANKX expression before I add it to the model"
@@ -600,7 +603,7 @@ pbi-agent fabric refresh "Sales Analytics" \
 <summary><code>► skills — Claude Code skill management</code></summary>
 
 ```bash
-pbi-agent skills install              # Register all 45 skills with Claude Code
+pbi-agent skills install              # Register all 51 skills with Claude Code
 pbi-agent skills install --force      # Overwrite existing
 pbi-agent skills list                 # Show install status for all skills
 pbi-agent skills uninstall            # Remove all skills
@@ -709,63 +712,63 @@ Checks: Python version, OS, PATH, Power BI Desktop install (MSI + Microsoft Stor
 
 ## `> SKILL_MATRIX`
 
-**44 domain skills loaded into Claude Code by `pbi-agent skills install`:**
+**51 domain skills loaded into Claude Code by `pbi-agent skills install`:**
 
 ```mermaid
 mindmap
-  root((**pbi-agent**\n45 skills))
+  root((**pbi-agent**\n51 skills))
     🔌 Connectivity
-      connect-pbid
-      fabric-cli
-      power-bi-connect
+      powerbi-connect-pbid
+      powerbi-fabric-cli
+      powerbi-connect
     📊 Semantic Model
-      dax-mastery
-      dax-performance
-      tmdl
-      power-query
-      review-semantic-model
-      standardize-naming-conventions
-      refresh-semantic-model
-      lineage-analysis
-      bpa-rules
-      c-sharp-scripting
-      te2-cli
+      powerbi-dax-mastery
+      powerbi-dax-performance
+      powerbi-tmdl
+      powerbi-power-query
+      powerbi-review-semantic-model
+      powerbi-standardize-naming-conventions
+      powerbi-refresh-semantic-model
+      powerbi-lineage-analysis
+      powerbi-bpa-rules
+      powerbi-c-sharp-scripting
+      powerbi-te2-cli
     🎨 Reports
-      pbi-report-design
-      create-pbi-report
-      review-report
-      report-authoring
-      report-structure
-      report-theming
-      report-conversion
-      modifying-theme-json
+      powerbi-report-design
+      powerbi-create-pbi-report
+      powerbi-review-report
+      powerbi-report-authoring
+      powerbi-report-structure
+      powerbi-report-theming
+      powerbi-report-conversion
+      powerbi-modifying-theme-json
     🖼️ Visuals
-      deneb-visuals
-      python-visuals
-      r-visuals
-      svg-visuals
+      powerbi-deneb-visuals
+      powerbi-python-visuals
+      powerbi-r-visuals
+      powerbi-svg-visuals
     📁 PBIP Format
-      pbip-format
-      pbir-format-enhanced
-      pbir-cli
+      powerbi-pbip-format
+      powerbi-pbir-format-enhanced
+      powerbi-pbir-cli
     ⚙️ Platform
-      fabric-pipelines
-      medallion-architecture
-      data-transformation
-      data-catalog-lineage
-      source-integration
+      powerbi-fabric-pipelines
+      powerbi-medallion-architecture
+      powerbi-data-transformation
+      powerbi-data-catalog-lineage
+      powerbi-source-integration
     🏗️ Modeling
-      star-schema-modeling
-      measure-glossary
-      performance-scale
-      security-rls
-      time-series-data
+      powerbi-star-schema-modeling
+      powerbi-measure-glossary
+      powerbi-performance-scale
+      powerbi-security-rls
+      powerbi-time-series-data
     📋 Governance
-      audit-tenant-settings
-      data-governance-traceability
-      testing-validation
-      project-management
-      cyber-security
+      powerbi-audit-tenant-settings
+      powerbi-data-governance-traceability
+      powerbi-testing-validation
+      powerbi-project-management
+      powerbi-cyber-security
 ```
 
 ```
@@ -774,9 +777,9 @@ mindmap
 ├─ 🔌 CONNECTIVITY ───────────────┼──────────────────────────────────────────────────────┤
 │ connect-pbid                    │ TOM · ADOMD · PowerShell · connect PBI Desktop        │
 │ fabric-cli                      │ fab · fab CLI · OneLake · deploy Fabric · lakehouse   │
-│ power-bi-connect                │ connect · local instance · no connection              │
+│ powerbi-connect                 │ connect · local instance · no connection              │
 ├─ 📊 SEMANTIC MODEL ─────────────┼──────────────────────────────────────────────────────┤
-│ dax-mastery                     │ DAX · CALCULATE · time intelligence · YTD · YoY       │
+│ powerbi-dax-mastery             │ DAX · CALCULATE · time intelligence · YTD · YoY       │
 │ dax-performance                 │ slow DAX · server timings · FE/SE · anti-patterns     │
 │ tmdl                            │ TMDL · .tmdl · edit TMDL · PBIP model files           │
 │ power-query                     │ Power Query · M code · M expression · query folding   │
@@ -844,58 +847,58 @@ powerbi-agent/
 │   ├── errors.py           ◄── Click-integrated typed error hierarchy
 │   ├── _asm.py             ◄── pythonnet assembly resolver (TOM + ADOMD)
 │   └── skills/
-│       ├── installer.py    ◄── install/uninstall/list 45 skills in ~/.claude/skills/
-│       └── data/           ◄── Bundled skill .md files (pip install distributes these)
+│       ├── installer.py    ◄── install/uninstall/list 51 skills in ~/.claude/skills/
+│       └── data/           ◄── Bundled skill dirs (pip install distributes these)
 │
-├── skills/                 ◄── 44 Claude Code skill markdown files
+├── skills/                 ◄── 51 skill dirs, each with SKILL.md
 │   │
 │   ├── ── CONNECTIVITY ──
-│   ├── connect-pbid.md         ◄── TOM/ADOMD.NET via PowerShell (v0.22.4)
-│   ├── fabric-cli.md           ◄── fab CLI, DuckDB, OneLake (v0.22.4)
-│   ├── power-bi-connect.md
+│   ├── powerbi-connect-pbid/SKILL.md         ◄── TOM/ADOMD.NET via PowerShell (v0.22.4)
+│   ├── powerbi-fabric-cli/SKILL.md           ◄── fab CLI, DuckDB, OneLake (v0.22.4)
+│   ├── powerbi-connect/SKILL.md
 │   │
 │   ├── ── SEMANTIC MODEL ──
-│   ├── dax-mastery.md
-│   ├── dax-performance.md      ◄── Server timings, FE/SE, anti-patterns (v0.22.4)
-│   ├── tmdl.md                 ◄── TMDL authoring, indentation, quoting (v0.22.4)
-│   ├── power-query.md          ◄── M expressions, query folding (v0.22.4)
-│   ├── review-semantic-model.md ◄── Audit, BPA, AI readiness (v0.22.4)
-│   ├── standardize-naming-conventions.md ◄── SQLBI style (v0.22.4)
-│   ├── refresh-semantic-model.md (v0.26.0)
-│   ├── lineage-analysis.md     ◄── Cross-workspace lineage (v0.22.4)
-│   ├── bpa-rules.md            ◄── Tabular Editor BPA (v0.22.4)
-│   ├── c-sharp-scripting.md    ◄── TE C# bulk scripting (v0.22.4)
-│   ├── te2-cli.md              ◄── Tabular Editor 2 CLI (v0.22.4)
+│   ├── powerbi-dax-mastery/SKILL.md
+│   ├── powerbi-dax-performance/SKILL.md      ◄── Server timings, FE/SE, anti-patterns (v0.22.4)
+│   ├── powerbi-tmdl/SKILL.md                 ◄── TMDL authoring, indentation, quoting (v0.22.4)
+│   ├── powerbi-power-query/SKILL.md          ◄── M expressions, query folding (v0.22.4)
+│   ├── powerbi-review-semantic-model/SKILL.md ◄── Audit, BPA, AI readiness (v0.22.4)
+│   ├── powerbi-standardize-naming-conventions/SKILL.md ◄── SQLBI style (v0.22.4)
+│   ├── powerbi-refresh-semantic-model/SKILL.md (v0.26.0)
+│   ├── powerbi-lineage-analysis/SKILL.md     ◄── Cross-workspace lineage (v0.22.4)
+│   ├── powerbi-bpa-rules/SKILL.md            ◄── Tabular Editor BPA (v0.22.4)
+│   ├── powerbi-c-sharp-scripting/SKILL.md    ◄── TE C# bulk scripting (v0.22.4)
+│   ├── powerbi-te2-cli/SKILL.md              ◄── Tabular Editor 2 CLI (v0.22.4)
 │   │
 │   ├── ── REPORTS ──
-│   ├── pbi-report-design.md    ◄── Design principles, UX (v0.22.4)
-│   ├── create-pbi-report.md    ◄── Step-by-step creation (v0.22.4)
-│   ├── review-report.md        ◄── Design audit (v0.22.4)
-│   ├── report-authoring.md
-│   ├── report-structure.md
-│   ├── report-theming.md
-│   ├── report-conversion.md
-│   ├── modifying-theme-json.md ◄── Custom branding (v0.22.4)
+│   ├── powerbi-report-design/SKILL.md    ◄── Design principles, UX (v0.22.4)
+│   ├── powerbi-create-pbi-report/SKILL.md    ◄── Step-by-step creation (v0.22.4)
+│   ├── powerbi-review-report/SKILL.md        ◄── Design audit (v0.22.4)
+│   ├── powerbi-report-authoring/SKILL.md
+│   ├── powerbi-report-structure/SKILL.md
+│   ├── powerbi-report-theming/SKILL.md
+│   ├── powerbi-report-conversion/SKILL.md
+│   ├── powerbi-modifying-theme-json/SKILL.md ◄── Custom branding (v0.22.4)
 │   │
 │   ├── ── VISUALS ──
-│   ├── deneb-visuals.md        ◄── Vega/Vega-Lite (v0.22.4)
-│   ├── python-visuals.md       ◄── matplotlib, plotly (v0.22.4)
-│   ├── r-visuals.md            ◄── ggplot2, plotly (v0.22.4)
-│   ├── svg-visuals.md          ◄── SVG custom visuals (v0.22.4)
+│   ├── powerbi-deneb-visuals/SKILL.md        ◄── Vega/Vega-Lite (v0.22.4)
+│   ├── powerbi-python-visuals/SKILL.md       ◄── matplotlib, plotly (v0.22.4)
+│   ├── powerbi-r-visuals/SKILL.md            ◄── ggplot2, plotly (v0.22.4)
+│   ├── powerbi-svg-visuals/SKILL.md          ◄── SVG custom visuals (v0.22.4)
 │   │
 │   ├── ── PBIP / PBIR ──
-│   ├── pbip-format.md          ◄── PBIP project structure (v0.22.4)
-│   ├── pbir-format-enhanced.md ◄── PBIR JSON schemas (v0.22.4)
-│   ├── pbir-cli.md             ◄── PBIR CLI operations (v0.22.4)
+│   ├── powerbi-pbip-format/SKILL.md          ◄── PBIP project structure (v0.22.4)
+│   ├── powerbi-pbir-format-enhanced/SKILL.md ◄── PBIR JSON schemas (v0.22.4)
+│   ├── powerbi-pbir-cli/SKILL.md             ◄── PBIR CLI operations (v0.22.4)
 │   │
 │   └── ── PLATFORM / GOVERNANCE ──
-│       ├── fabric-pipelines.md
-│       ├── medallion-architecture.md
-│       ├── audit-tenant-settings.md  ◄── Fabric/PBI tenant governance audit (v0.26.0)
+│       ├── powerbi-fabric-pipelines/SKILL.md
+│       ├── powerbi-medallion-architecture/SKILL.md
+│       ├── powerbi-audit-tenant-settings/SKILL.md  ◄── Fabric/PBI tenant governance audit (v0.26.0)
 │       ├── [+ 10 more governance, modeling, security skills]
 │
 ├── docs/assets/            ◄── SVG diagrams and visual assets
-├── tests/                  ◄── pytest suite · 63 tests · no PBI Desktop required
+├── tests/                  ◄── pytest suite · 93 tests · no PBI Desktop required
 ├── .github/workflows/ci.yml        ◄── Test on Windows + Linux + macOS, Python 3.10–3.13
 ├── .github/workflows/publish.yml   ◄── Auto-publish to PyPI on git tag (OIDC)
 ├── pyproject.toml
@@ -956,7 +959,7 @@ SETUP:
   git clone https://github.com/santoshkanthety/powerbi-agent
   cd powerbi-agent
   pip install -e ".[dev]"
-  pytest                    # 63 tests should pass
+  pytest                    # 93 tests should pass
 ```
 
 [![Issues](https://img.shields.io/github/issues/santoshkanthety/powerbi-agent?style=for-the-badge&color=00e5ff&labelColor=030509)](https://github.com/santoshkanthety/powerbi-agent/issues)
@@ -973,6 +976,8 @@ v0.3  ✓ 44-skill library (TMDL · BPA · Deneb · Python/R visuals · fab CLI 
          TOM/ADOMD · PBIR/PBIP · Power Query · Naming Conventions · Lineage)
 v0.4  ✓ Detection hardening (Microsoft Store install · UTF-8 port fallback ·
          multi-instance ordering · typed Click error hierarchy)
+v0.6  ✓ Canonical skill layout + shared schema (validator in CI, namespaced
+         skills, spec-compliant frontmatter portable to claude.ai / Skills API)
 v0.5  ── fab CLI deep integration (DuckDB querying · OneLake · notebook mgmt)
 v0.6  ── Tabular Editor 3 CLI integration (full TE3 support + BPA automation)
 v0.7  ── Multi-agent workflows (model-auditor · pbip-validator · deneb-reviewer)
@@ -1005,7 +1010,7 @@ All Python code in this repo is original work. No code, skill files, or document
 ║   20+ years of Technology & Data transformation               ║
 ║   delivery and strategy                                       ║
 ║                                                               ║
-║   45 skills  ·  8 CLI commands  ·  63 tests                   ║
+║   51 skills  ·  8 CLI commands  ·  93 tests                   ║
 ║                                                               ║
 ║   github.com/santoshkanthety/powerbi-agent                    ║
 ║   linkedin.com/in/santoshkanthety                             ║
