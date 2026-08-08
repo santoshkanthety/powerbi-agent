@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import platform
 import shutil
-import sysconfig
 import sys
+import sysconfig
 from pathlib import Path
 
 from rich.console import Console
@@ -139,9 +139,12 @@ def _check_connectivity():
 @check("pythonnet (for Desktop integration)")
 def _check_pythonnet():
     try:
-        import clr  # noqa: F401
+        from importlib.metadata import PackageNotFoundError
+
         # Use importlib.metadata — pythonnet pre-releases lack __version__
-        from importlib.metadata import version as pkg_version, PackageNotFoundError
+        from importlib.metadata import version as pkg_version
+
+        import clr  # noqa: F401
         try:
             ver = pkg_version("pythonnet")
         except PackageNotFoundError:
