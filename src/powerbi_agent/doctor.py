@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import platform
 import shutil
-import sysconfig
 import sys
+import sysconfig
 from pathlib import Path
 
 from rich.console import Console
@@ -139,9 +139,12 @@ def _check_connectivity():
 @check("pythonnet (for Desktop integration)")
 def _check_pythonnet():
     try:
-        import clr  # noqa: F401
+        from importlib.metadata import PackageNotFoundError
+
         # Use importlib.metadata — pythonnet pre-releases lack __version__
-        from importlib.metadata import version as pkg_version, PackageNotFoundError
+        from importlib.metadata import version as pkg_version
+
+        import clr  # noqa: F401
         try:
             ver = pkg_version("pythonnet")
         except PackageNotFoundError:
@@ -174,7 +177,7 @@ def _check_skills():
     skills_dir = Path.home() / ".claude" / "skills"
     if not skills_dir.exists():
         return None, "Not installed — run: pbi-agent skills install"
-    installed = [s for s in SKILL_NAMES if (skills_dir / f"{s}.md").exists()]
+    installed = [s for s in SKILL_NAMES if (skills_dir / s / "SKILL.md").exists()]
     if installed:
         return True, f"{len(installed)}/{len(SKILL_NAMES)} skill(s) installed"
     return None, "Not installed — run: pbi-agent skills install"

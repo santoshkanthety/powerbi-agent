@@ -299,7 +299,7 @@ def skills():
 def skills_install(force):
     """Register powerbi-agent skills with Claude Code.
 
-    Copies skill files into ~/.claude/skills/ and updates ~/.claude/CLAUDE.md.
+    Copies each skill into ~/.claude/skills/<skill-name>/SKILL.md.
     """
     from powerbi_agent.skills.installer import install_skills
     install_skills(force=force)

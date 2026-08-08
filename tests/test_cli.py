@@ -43,4 +43,4 @@ def test_skills_list():
     runner = CliRunner()
     result = runner.invoke(main, ["skills", "list"])
     assert result.exit_code == 0
-    assert "power-bi-connect" in result.output
+    assert "powerbi-connect" in result.output
