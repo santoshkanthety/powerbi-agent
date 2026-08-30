@@ -16,6 +16,8 @@
 ---
 
 > **The agent layer for Power BI analytics delivery.** A Click CLI plus 51 Claude Code skills that streamline **Data Engineering · Discovery · Delivery** — natural-language prompts become TOM, ADOMD, TMDL, PBIR, and Fabric REST calls. Board-ready analytics, without the ceremony. **No web UIs. No config sprawl. Just the CLI, the skills, and your model.**
+>
+> **Free and open source (MIT).** Built in the open and given back to the data community — [contributions of any size are welcome](#-contribute).
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
@@ -941,6 +943,15 @@ pipx inject powerbi-agent azure-identity
 
 ## `> CONTRIBUTE`
 
+**This project is MIT-licensed and open to anyone.** Fork it, run it in client work,
+rip it apart for parts, build your own adapter on top. No CLA, no gatekeeping.
+
+Everything I know about analytics delivery I learned from people who published their
+work for free — blog posts, sample models, half-finished repos, DAX answers on forums at
+2am. This is me paying that forward to the data community. If it saves you a week, it
+did its job. **You do not need to be a Power BI expert to contribute** — a typo fix in a
+skill file is a real contribution, and a first-ever PR is welcome here.
+
 ```
 The grid is open. All skill levels welcome.
 
@@ -964,6 +975,9 @@ SETUP:
 
 [![Issues](https://img.shields.io/github/issues/santoshkanthety/powerbi-agent?style=for-the-badge&color=00e5ff&labelColor=030509)](https://github.com/santoshkanthety/powerbi-agent/issues)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-00ff88?style=for-the-badge&labelColor=030509)](https://github.com/santoshkanthety/powerbi-agent/pulls)
+[![Good First Issue](https://img.shields.io/badge/Good_first_issue-start_here-00e5ff?style=for-the-badge&labelColor=030509)](https://github.com/santoshkanthety/powerbi-agent/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+
+Full guidelines in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
