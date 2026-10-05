@@ -1,6 +1,5 @@
 """Main CLI entry point for powerbi-agent."""
 
-import io
 import sys
 
 import click
@@ -13,11 +12,23 @@ from powerbi_agent import __version__
 # The default Windows console uses cp1252 which cannot encode Unicode emoji
 # (e.g. ⚠, ✓, ✗). Force UTF-8 so Rich output never crashes with
 # UnicodeEncodeError: 'charmap' codec can't encode character ...
+#
+# reconfigure() rewrites the encoding on the existing stream. The earlier approach
+# — rebinding sys.stdout to a new TextIOWrapper around sys.stdout.buffer — broke
+# the Windows test runs: the discarded wrapper closes the underlying buffer when it
+# is garbage-collected, and under pytest that buffer is the capture tmpfile, so
+# collection died with "ValueError: I/O operation on closed file" and zero tests ran.
+# Reconfiguring in place creates no second owner of the buffer.
 if sys.platform == "win32":
-    if hasattr(sys.stdout, "buffer"):
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-    if hasattr(sys.stderr, "buffer"):
-        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+    for _stream in (sys.stdout, sys.stderr):
+        # Absent on a replaced/duck-typed stream (pytest capture, embedded hosts).
+        if hasattr(_stream, "reconfigure"):
+            try:
+                _stream.reconfigure(encoding="utf-8", errors="replace")
+            except (ValueError, OSError):
+                # Detached or already-closed stream — nothing to force, and failing
+                # here would make the CLI unimportable.
+                pass
 
 console = Console()
 
