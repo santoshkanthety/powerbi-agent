@@ -61,6 +61,8 @@ pbi measure create "Total Revenue" -e "SUM(Sales[Amount])" -t Sales
 
 The three-positional form `pbi measure create TableName "Name" "DAX"` is **wrong** for pbi-cli — Click rejects it. Always use `-e`/`-t` named flags with `pbi measure create`.
 
+A measure must exist in the model before any report-layer tool can bind a visual to it — `pbi visual bind` and `pbir` both write a *reference*, not a definition. Create the measure first, then bind. See `powerbi-pbi-cli` for how the kind (Column vs Measure) and the implicit aggregation are resolved.
+
 ## Common Failures
 - **"No active connection"** → run `pbi-agent connect`
 - **Table not found** → verify with `pbi-agent model tables` (exact case)

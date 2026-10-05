@@ -1,6 +1,5 @@
 """Main CLI entry point for powerbi-agent."""
 
-import io
 import sys
 
 import click
@@ -13,11 +12,23 @@ from powerbi_agent import __version__
 # The default Windows console uses cp1252 which cannot encode Unicode emoji
 # (e.g. ⚠, ✓, ✗). Force UTF-8 so Rich output never crashes with
 # UnicodeEncodeError: 'charmap' codec can't encode character ...
+#
+# reconfigure() rewrites the encoding on the existing stream. The earlier approach
+# — rebinding sys.stdout to a new TextIOWrapper around sys.stdout.buffer — broke
+# the Windows test runs: the discarded wrapper closes the underlying buffer when it
+# is garbage-collected, and under pytest that buffer is the capture tmpfile, so
+# collection died with "ValueError: I/O operation on closed file" and zero tests ran.
+# Reconfiguring in place creates no second owner of the buffer.
 if sys.platform == "win32":
-    if hasattr(sys.stdout, "buffer"):
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-    if hasattr(sys.stderr, "buffer"):
-        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+    for _stream in (sys.stdout, sys.stderr):
+        # Absent on a replaced/duck-typed stream (pytest capture, embedded hosts).
+        if hasattr(_stream, "reconfigure"):
+            try:
+                _stream.reconfigure(encoding="utf-8", errors="replace")
+            except (ValueError, OSError):
+                # Detached or already-closed stream — nothing to force, and failing
+                # here would make the CLI unimportable.
+                pass
 
 console = Console()
 
@@ -285,6 +296,135 @@ def fabric_refresh(dataset_name, workspace, wait):
     """Trigger a dataset refresh in Power BI Service / Fabric."""
     from powerbi_agent.fabric import trigger_refresh
     trigger_refresh(dataset_name=dataset_name, workspace=workspace, wait=wait)
+
+
+# ─── fabric-app ───────────────────────────────────────────────────────────────
+
+@main.group("fabric-app")
+def fabric_app():
+    """Fabric Apps via the Rayfin SDK — scaffold, run, deploy, connect to a model.
+
+    \b
+    Wraps the Rayfin CLI (@microsoft/rayfin-cli); requires Node.js 20+.
+    Rayfin's own API surface is version-locked per project: after scaffolding,
+    read .agents/skills/rayfin/SKILL.md before writing app code.
+    """
+
+
+@fabric_app.command("new")
+@click.argument("name")
+@click.option("--template", default="dataapp", show_default=True,
+              help="Rayfin template. 'dataapp' for an app over a Power BI semantic model; "
+                   "'blankapp' for auth and nothing else.")
+@click.option("--workspace", "-w", default=None, help="Target Fabric workspace name")
+@click.option("--directory", "-C", default=None, help="Parent directory (default: cwd)")
+def fabric_app_new(name, template, workspace, directory):
+    """Scaffold a new Fabric App from a Rayfin template.
+
+    \b
+    Examples:
+        pbi-agent fabric-app new sales-explorer -w "Analytics"
+        pbi-agent fabric-app new scratch-app --template blankapp
+    """
+    from powerbi_agent.fabricapp import new_app
+    new_app(name=name, template=template, workspace=workspace, directory=directory)
+
+
+@fabric_app.command("init")
+@click.option("--name", default=None, help="Project name (required to initialise)")
+@click.option("--directory", "-C", default=None, help="Directory to initialise (default: cwd)")
+@click.option("--list-templates", is_flag=True, help="List available templates and exit")
+def fabric_app_init(name, directory, list_templates):
+    """Add Rayfin to a directory that already has source code."""
+    from powerbi_agent.fabricapp import init_app
+    init_app(name=name, directory=directory, list_templates=list_templates)
+
+
+@fabric_app.command("templates")
+def fabric_app_templates():
+    """List the templates the installed Rayfin CLI can scaffold from."""
+    from powerbi_agent.fabricapp import templates
+    templates()
+
+
+@fabric_app.command("dev", context_settings={"ignore_unknown_options": True})
+@click.argument("extra", nargs=-1, type=click.UNPROCESSED)
+def fabric_app_dev(extra):
+    """Run the app and its Functions locally. Extra args pass through to `rayfin dev`."""
+    from powerbi_agent.fabricapp import dev
+    dev(extra=extra)
+
+
+@fabric_app.command("deploy", context_settings={"ignore_unknown_options": True})
+@click.option("--workspace-id", default=None, help="Target Fabric workspace ID")
+@click.option("--dry-run", is_flag=True, help="Validate and resolve the workspace; deploy nothing")
+@click.option("--force", is_flag=True,
+              help="Allow DESTRUCTIVE data-schema changes. Requires --yes.")
+@click.option("--yes", is_flag=True, help="Accept confirmations non-interactively")
+@click.argument("extra", nargs=-1, type=click.UNPROCESSED)
+def fabric_app_deploy(workspace_id, dry_run, force, yes, extra):
+    """Deploy the app to Fabric (`rayfin up`).
+
+    \b
+    Examples:
+        pbi-agent fabric-app deploy --dry-run
+        pbi-agent fabric-app deploy --workspace-id <guid> --yes
+        pbi-agent fabric-app deploy -- --exclude-services functions
+    """
+    from powerbi_agent.fabricapp import deploy
+    deploy(workspace_id=workspace_id, dry_run=dry_run, force=force, yes=yes, extra=extra)
+
+
+@fabric_app.command("status")
+@click.option("--json", "json_out", is_flag=True, help="Emit JSON")
+def fabric_app_status(json_out):
+    """Show local project state and the recorded Fabric deployment."""
+    from powerbi_agent.fabricapp import status
+    status(json_out=json_out)
+
+
+@fabric_app.command("connector", context_settings={"ignore_unknown_options": True})
+@click.argument("action", type=click.Choice(
+    ["types", "search", "add", "list", "inspect", "invoke", "remove"]))
+@click.argument("extra", nargs=-1, type=click.UNPROCESSED)
+def fabric_app_connector(action, extra):
+    """Manage Fabric data connectors, including fabric-semanticmodel.
+
+    \b
+    Examples:
+        pbi-agent fabric-app connector types -- -v
+        pbi-agent fabric-app connector search -- --type fabric-semanticmodel --json
+        pbi-agent fabric-app connector add -- --type fabric-semanticmodel \\
+            --workspace-id <ws> --item-id <model> --name salesModel --operations executeQuery
+        pbi-agent fabric-app connector inspect -- --name salesModel --entity Sales
+    """
+    from powerbi_agent.fabricapp import connectors
+    connectors(action=action, extra=extra)
+
+
+@fabric_app.command("ai-files")
+@click.option("--check", is_flag=True, help="Report file state instead of installing")
+@click.option("--force", is_flag=True, help="Overwrite modified managed items (never AGENTS.md)")
+def fabric_app_ai_files(check, force):
+    """Install or check the Rayfin agent context files (incl. the version-locked skill)."""
+    from powerbi_agent.fabricapp import ai_files
+    ai_files(check=check, force=force)
+
+
+@fabric_app.command("login")
+@click.option("--status", "status_only", is_flag=True, help="Report sign-in state only")
+@click.option("--tenant", default=None, help="Microsoft Entra tenant ID")
+def fabric_app_login(status_only, tenant):
+    """Sign in to the Rayfin platform."""
+    from powerbi_agent.fabricapp import login
+    login(status_only=status_only, tenant=tenant)
+
+
+@fabric_app.command("doctor")
+def fabric_app_doctor():
+    """Check Node, the Rayfin CLI, and the current project's deployment state."""
+    from powerbi_agent.fabricapp import doctor
+    doctor()
 
 
 # ─── skills ───────────────────────────────────────────────────────────────────

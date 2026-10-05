@@ -171,6 +171,18 @@ def _check_azure():
 
 
 
+@check("Node.js (for Fabric Apps / Rayfin)")
+def _check_node():
+    from powerbi_agent.fabricapp import MIN_NODE_MAJOR, _node_version
+    ver = _node_version()
+    if ver is None:
+        return None, f"Not installed (optional) — Node.js {MIN_NODE_MAJOR}+ needed for Fabric Apps"
+    major, raw = ver
+    if major < MIN_NODE_MAJOR:
+        return False, f"{raw} is too old — Fabric Apps needs Node.js {MIN_NODE_MAJOR}+"
+    return True, f"Node.js {raw}"
+
+
 @check("Claude Code skills installed")
 def _check_skills():
     from powerbi_agent.skills.installer import SKILL_NAMES
