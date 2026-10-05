@@ -57,6 +57,7 @@ SKILL_NAMES = [
     "powerbi-bpa-rules",
     "powerbi-c-sharp-scripting",
     "powerbi-te2-cli",
+    "powerbi-te-cli",
     "powerbi-te-docs",
     "powerbi-audit-tenant-settings",
     # Report authoring
@@ -68,6 +69,7 @@ SKILL_NAMES = [
     "powerbi-report-theming",
     "powerbi-report-conversion",
     "powerbi-modifying-theme-json",
+    "powerbi-paginated-reports",
     # Visuals
     "powerbi-deneb-visuals",
     "powerbi-python-visuals",
@@ -78,8 +80,15 @@ SKILL_NAMES = [
     "powerbi-pbip-format",
     "powerbi-pbir-format-enhanced",
     "powerbi-pbir-cli",
+    "powerbi-pbi-cli",
     # Fabric / data platform
     "powerbi-fabric-pipelines",
+    "powerbi-fabric-capacity",
+    "powerbi-spark-livy",
+    "powerbi-duckdb-lakehouse",
+    # Fabric Apps (Rayfin SDK)
+    "powerbi-fabric-apps",
+    "powerbi-fabric-app-templates",
     "powerbi-medallion-architecture",
     "powerbi-data-transformation",
     "powerbi-data-catalog-lineage",

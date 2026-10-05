@@ -15,7 +15,7 @@
 
 ---
 
-> **The agent layer for Power BI analytics delivery.** A Click CLI plus 51 Claude Code skills that streamline **Data Engineering · Discovery · Delivery** — natural-language prompts become TOM, ADOMD, TMDL, PBIR, and Fabric REST calls. Board-ready analytics, without the ceremony. **No web UIs. No config sprawl. Just the CLI, the skills, and your model.**
+> **The agent layer for Power BI analytics delivery.** A Click CLI plus 59 Claude Code skills that streamline **Data Engineering · Discovery · Delivery** — natural-language prompts become TOM, ADOMD, TMDL, PBIR, and Fabric REST calls. Board-ready analytics, without the ceremony. **No web UIs. No config sprawl. Just the CLI, the skills, and your model.**
 >
 > **Free and open source (MIT).** Built in the open and given back to the data community — [contributions of any size are welcome](#-contribute).
 
@@ -44,7 +44,7 @@
 
 ```powershell
 pip install "powerbi-agent[desktop,fabric]"      # 1. install
-pbi-agent skills install                         # 2. wire 51 skills into Claude Code
+pbi-agent skills install                         # 2. wire 59 skills into Claude Code
 pbi-agent connect                                # 3. attach to open Power BI Desktop
 ```
 
@@ -195,6 +195,7 @@ flowchart LR
     classDef skip fill:#1a0000,color:#ff6060,stroke:#aa0000
 ```
 *v0.4 detection hardening — both PBI Desktop install variants resolve through the same fallback chain.*
+| **v0.7 — Fabric Apps & the Rayfin SDK** | **Build a custom app on your governed semantic model, from this CLI.** New `pbi-agent fabric-app` command group wrapping the [Rayfin CLI](https://learn.microsoft.com/fabric/apps/cli-reference) — `new` · `init` · `templates` · `dev` · `deploy` · `status` · `connector` · `ai-files` · `login` · `doctor`, with Node detection, deployment-state reading from `rayfin/.deployments.json`, and a confirmation gate on destructive schema deploys. Eight new skills: `powerbi-fabric-apps` (Rayfin SDK + the `fabric-semanticmodel` connector that executes DAX from an app under the signed-in user's identity), `powerbi-fabric-app-templates` (the `dataapp` template, the awesome-rayfin gallery, authoring your own), `powerbi-fabric-capacity` (CU accounting, smoothing, the four throttling stages, cost-before-action), `powerbi-pbi-cli` (pbi-cli ≥ 3.12.0 — Column vs Measure resolution, implicit aggregation, `--no-sync` batching), `powerbi-te-cli` (the cross-platform `te` CLI), `powerbi-paginated-reports` (RDL + Export To File), `powerbi-spark-livy`, `powerbi-duckdb-lakehouse`. 59 skills, 119 tests |
 | **v0.6 — skill schema** | Skills now ship in the canonical `<skill-name>/SKILL.md` layout Claude Code actually discovers — the previous flat `skills/*.md` files were never loaded. All 51 skills carry Agent Skills spec frontmatter (`name`, `description`, `license`) and are namespaced `powerbi-*` so they no longer collide with `databricks-agent`. Shared [skill schema](SKILL_SCHEMA.md) + `scripts/validate_skills.py` enforced in CI. 93 tests |
 | **v0.5** | Custom visual authoring (`pbi-agent visual import-custom/list-custom/remove-custom`) + `power-bi-custom-visuals` skill; `te-docs` skill for Tabular Editor docs lookup (TE2/TE3, scripting cookbook, BPA rule expressions, TOM escalation) |
 | **v0.3** | 44-skill library — TMDL, BPA, Deneb, Python/R visuals, fab CLI, TOM/ADOMD, PBIR/PBIP, Power Query, naming conventions, lineage |
@@ -209,7 +210,9 @@ flowchart LR
 | Direct TOM / ADOMD interop with PBI Desktop | — | ✓ | ✓ |
 | Fabric REST (workspaces · datasets · refresh) | — | — | ✓ |
 | Spans **Data Engineering · Discovery · Delivery** | — | — | ✓ |
-| One-command install of CLI + 51 skills | — | — | ✓ |
+| Fabric Apps (Rayfin) scaffold · deploy · semantic-model connector | — | — | ✓ |
+| Capacity CU cost estimated *before* a refresh or deploy | — | — | ✓ |
+| One-command install of CLI + 59 skills | — | — | ✓ |
 | Multi-install detection (MSI + Microsoft Store) | — | partial | ✓ |
 | MIT-licensed, PyPI-distributed | n/a | ✓ | ✓ |
 
@@ -227,14 +230,14 @@ flowchart TD
         direction LR
         DE1["source-integration\nfabric-pipelines"]:::skill
         DE2["medallion-architecture\ndata-transformation"]:::skill
-        DE3["power-query\nperformance-scale"]:::skill
+        DE3["power-query · spark-livy\nduckdb-lakehouse · performance-scale"]:::skill
     end
 
     subgraph DX ["🔍 DISCOVERY  ·  profile → audit → govern"]
         direction LR
         DX1["review-semantic-model\nbpa-rules · te2-cli"]:::skill
         DX2["lineage-analysis\ndata-catalog-lineage"]:::skill
-        DX3["audit-tenant-settings\ndata-governance-traceability"]:::skill
+        DX3["audit-tenant-settings · fabric-capacity\ndata-governance-traceability"]:::skill
         DX4["standardize-naming-conventions\ncyber-security"]:::skill
     end
 
@@ -244,7 +247,8 @@ flowchart TD
         DL2["security-rls\ntime-series-data · measure-glossary"]:::skill
         DL3["pbi-report-design · review-report\nreport-structure · report-theming"]:::skill
         DL4["deneb-visuals · python-visuals\nr-visuals · svg-visuals\npower-bi-custom-visuals"]:::skill
-        DL5["refresh-semantic-model\nfabric-cli · pbir-cli"]:::skill
+        DL5["refresh-semantic-model\nfabric-cli · pbir-cli · pbi-cli"]:::skill
+        DL6["fabric-apps · fabric-app-templates\npaginated-reports"]:::skill
     end
 
     subgraph CLI ["⚙️ pbi-agent CLI  ·  what Claude actually executes"]
@@ -255,14 +259,16 @@ flowchart TD
         C4["report"]:::cmd
         C5["fabric"]:::cmd
         C6["visual"]:::cmd
-        C7["skills"]:::cmd
-        C8["doctor"]:::cmd
+        C7["fabric-app"]:::cmd
+        C8["skills"]:::cmd
+        C9["doctor"]:::cmd
     end
 
     subgraph TARGET ["🎯 Outputs"]
         T1["Power BI\nDesktop · TOM"]:::out
         T2["Microsoft\nFabric"]:::out
         T3["PBIR · PBIX\nPBIP · TMDL"]:::out
+        T4["Fabric App\nRayfin · GraphQL"]:::out
     end
 
     U -->|"natural language"| DE
@@ -296,6 +302,11 @@ Before installing, ensure the following are in place:
 | **Microsoft Fabric / Power BI Service** | — | Required for `pbi-agent fabric` commands — Azure subscription needed |
 | **fab CLI** | Latest | `pip install ms-fabric-cli` — required for `fabric-cli` skill |
 | **pbir.tools** | 0.9.4+ | `uv tool install pbir-cli` — required for `report-structure`, `report-theming`, `report-conversion` skills |
+| **Node.js** | 20+ | Required for `pbi-agent fabric-app` / Fabric Apps — the Rayfin CLI is a Node package. `winget install OpenJS.NodeJS.LTS` or `brew install node` |
+| **Rayfin CLI** | preview | Resolved on demand by `npx`; or `npm i @microsoft/rayfin-cli`. Also needs the **Fabric Apps (preview)** tenant setting and a workspace on Fabric capacity in a [supported region](https://learn.microsoft.com/fabric/admin/region-availability) |
+| **pbi-cli** | 3.12.0+ | Optional. `pipx install pbi-cli` then `pbi-cli skills install`. Earlier versions mis-bind every field as a `Measure` — see `powerbi-pbi-cli` |
+| **DuckDB** | 1.0+ | Optional. `pip install duckdb` — for the `duckdb-lakehouse` skill's profiling and reconciliation queries |
+| **Power BI Report Builder** | Latest | Also the authoring tool for the `paginated-reports` skill |
 | **Azure AD / Entra ID account** | — | Required for Fabric authentication (`pbi-agent fabric login`) |
 
 > **Minimal setup** (Fabric + Claude Code only, no Desktop, any OS): `pip install "powerbi-agent[fabric]"`
@@ -325,7 +336,7 @@ $scripts = python -c "import sysconfig; print(sysconfig.get_path('scripts'))"
 ```
 
 ```powershell
-# STEP 3 ── Register 51 skills with Claude Code (one-time)
+# STEP 3 ── Register 59 skills with Claude Code (one-time)
 pbi-agent skills install
 
 # STEP 4 ── Connect to Power BI Desktop
@@ -350,7 +361,7 @@ Power BI Desktop installed              OK      C:\Program Files\...\PBIDesktop.
 pythonnet (for Desktop integration)     OK      pythonnet 3.0.x
 azure-identity (for Fabric integration) --      Not installed (optional)
 Connection config                       --      Not connected — run: pbi-agent connect
-Claude Code skills installed            OK      51/51 skill(s) installed
+Claude Code skills installed            OK      59/59 skill(s) installed
 
 All checks passed! You're good to go.
 ```
@@ -602,10 +613,52 @@ pbi-agent fabric refresh "Sales Analytics" \
 </details>
 
 <details>
+<summary><code>► fabric-app — Fabric Apps on the Rayfin SDK</code></summary>
+
+**A custom app on your semantic model, scaffolded, run and deployed from the same terminal as the model itself.** Fabric Apps (preview) is Microsoft's managed backend-as-a-service inside Fabric: a TypeScript decorator data model becomes a SQL database, Entra SSO, a GraphQL API, storage and static hosting, deployed as one Fabric item. The `fabric-semanticmodel` connector is the part that matters to a Power BI practice — delegated, typed DAX execution against a model you already govern. No embedding, no service principal, no Execute Queries REST calls in your own code, and RLS still enforced because the caller is the signed-in user.
+
+```bash
+# Scaffold — the dataapp template ships DAX guidance, chart primitives and a validation harness
+pbi-agent fabric-app new sales-explorer -w "Analytics"
+pbi-agent fabric-app new scratch --template blankapp
+pbi-agent fabric-app templates                     # what the installed CLI can scaffold
+pbi-agent fabric-app init --name legacy-app        # add Rayfin to an existing codebase
+
+# Attach a semantic model
+pbi-agent fabric-app connector search -- --type fabric-semanticmodel --json
+pbi-agent fabric-app connector add -- --type fabric-semanticmodel \
+    --workspace-id <ws> --item-id <model> --name salesModel --operations executeQuery
+pbi-agent fabric-app connector inspect -- --name salesModel --entity Sales --rows 10
+
+# Run, deploy, inspect
+pbi-agent fabric-app dev
+pbi-agent fabric-app deploy --dry-run              # always first
+pbi-agent fabric-app deploy --workspace-id <ws> --yes
+pbi-agent fabric-app status --json                 # local state + recorded deployment
+pbi-agent fabric-app ai-files --check              # is the in-project skill current?
+pbi-agent fabric-app doctor
+```
+
+Requires **Node.js 20+** (the Rayfin CLI is a Node package), the **Fabric Apps (preview)** tenant setting, and a workspace on Fabric capacity in a [supported region](https://learn.microsoft.com/fabric/admin/region-availability).
+
+**Guard rails, built in.** `--force` on a deploy allows destructive data-schema changes, so it is refused unless `--yes` is also passed. Scaffolding refuses to nest one app inside another. `status` reads `rayfin/.deployments.json` so nobody has to copy GUIDs around.
+
+**We deliberately do not reimplement Rayfin.** The SDK surface is version-locked per project and moves fast in preview, so every operation shells out to the installed CLI, and the `powerbi-fabric-apps` skill routes Claude to the project's own `.agents/skills/rayfin/SKILL.md` rather than letting it write Rayfin APIs from memory.
+
+**Ask Claude instead (uses `powerbi-fabric-apps` + `powerbi-fabric-app-templates`):**
+```
+"Build a Fabric app on the Sales Analytics semantic model with a region filter and a trend card"
+"Add the Finance semantic model as a connector and smoke-test a DAX query through it"
+"What will this app cost the F64 capacity if 40 people use it daily?"
+"Deploy to the Analytics workspace — dry run first"
+```
+</details>
+
+<details>
 <summary><code>► skills — Claude Code skill management</code></summary>
 
 ```bash
-pbi-agent skills install              # Register all 51 skills with Claude Code
+pbi-agent skills install              # Register all 59 skills with Claude Code
 pbi-agent skills install --force      # Overwrite existing
 pbi-agent skills list                 # Show install status for all skills
 pbi-agent skills uninstall            # Remove all skills
@@ -714,14 +767,15 @@ Checks: Python version, OS, PATH, Power BI Desktop install (MSI + Microsoft Stor
 
 ## `> SKILL_MATRIX`
 
-**51 domain skills loaded into Claude Code by `pbi-agent skills install`:**
+**59 domain skills loaded into Claude Code by `pbi-agent skills install`:**
 
 ```mermaid
 mindmap
-  root((**pbi-agent**\n51 skills))
+  root((**pbi-agent**\n59 skills))
     🔌 Connectivity
       powerbi-connect-pbid
       powerbi-fabric-cli
+      powerbi-pbi-cli
       powerbi-connect
     📊 Semantic Model
       powerbi-dax-mastery
@@ -735,6 +789,7 @@ mindmap
       powerbi-bpa-rules
       powerbi-c-sharp-scripting
       powerbi-te2-cli
+      powerbi-te-cli
     🎨 Reports
       powerbi-report-design
       powerbi-create-pbi-report
@@ -744,6 +799,7 @@ mindmap
       powerbi-report-theming
       powerbi-report-conversion
       powerbi-modifying-theme-json
+      powerbi-paginated-reports
     🖼️ Visuals
       powerbi-deneb-visuals
       powerbi-python-visuals
@@ -755,10 +811,16 @@ mindmap
       powerbi-pbir-cli
     ⚙️ Platform
       powerbi-fabric-pipelines
+      powerbi-fabric-capacity
+      powerbi-spark-livy
+      powerbi-duckdb-lakehouse
       powerbi-medallion-architecture
       powerbi-data-transformation
       powerbi-data-catalog-lineage
       powerbi-source-integration
+    🧩 Fabric Apps
+      powerbi-fabric-apps
+      powerbi-fabric-app-templates
     🏗️ Modeling
       powerbi-star-schema-modeling
       powerbi-measure-glossary
@@ -779,6 +841,7 @@ mindmap
 ├─ 🔌 CONNECTIVITY ───────────────┼──────────────────────────────────────────────────────┤
 │ connect-pbid                    │ TOM · ADOMD · PowerShell · connect PBI Desktop        │
 │ fabric-cli                      │ fab · fab CLI · OneLake · deploy Fabric · lakehouse   │
+│ pbi-cli                         │ pbi visual bind · report reload · --no-sync · sync    │
 │ powerbi-connect                 │ connect · local instance · no connection              │
 ├─ 📊 SEMANTIC MODEL ─────────────┼──────────────────────────────────────────────────────┤
 │ powerbi-dax-mastery             │ DAX · CALCULATE · time intelligence · YTD · YoY       │
@@ -792,6 +855,7 @@ mindmap
 │ bpa-rules                       │ BPA · best practice · Tabular Editor rules            │
 │ c-sharp-scripting               │ C# script · Tabular Editor script · bulk model ops   │
 │ te2-cli                         │ Tabular Editor CLI · te2 · BPA CLI · deploy TMDL     │
+│ te-cli                          │ te CLI · cross-platform TE · te bpa run · te deploy  │
 ├─ 🎨 REPORTS ────────────────────┼──────────────────────────────────────────────────────┤
 │ pbi-report-design               │ report design · UX · layout · accessibility           │
 │ create-pbi-report               │ create report · new report · build report             │
@@ -801,6 +865,7 @@ mindmap
 │ report-theming                  │ colors · fonts · theme template · conditional format  │
 │ report-conversion               │ PBIR/PBIX/PBIP convert · merge · split · rebind      │
 │ modifying-theme-json            │ theme JSON · brand colors · custom theme · fonts      │
+│ paginated-reports               │ RDL · Report Builder · print · export to PDF/Excel    │
 ├─ 🖼️ VISUALS ─────────────────────┼──────────────────────────────────────────────────────┤
 │ deneb-visuals                   │ Deneb · Vega · Vega-Lite · custom visual · IBCS       │
 │ python-visuals                  │ Python visual · matplotlib · seaborn · plotly         │
@@ -810,8 +875,14 @@ mindmap
 │ pbip-format                     │ PBIP · PBIP project · definition.pbir · Git           │
 │ pbir-format-enhanced            │ PBIR · visual.json · report.json · PBIR schema        │
 │ pbir-cli                        │ PBIR CLI · pbir-cli · export report · import report   │
+├─ 🧩 FABRIC APPS (RAYFIN) ───────┼──────────────────────────────────────────────────────┤
+│ fabric-apps                     │ Fabric App · Rayfin · rayfin up · data app · GraphQL  │
+│ fabric-app-templates            │ rayfin template · dataapp · awesome-rayfin · starter  │
 ├─ ⚙️ PLATFORM ───────────────────┼──────────────────────────────────────────────────────┤
 │ fabric-pipelines                │ pipeline · ingestion · ETL · watermark · Spark        │
+│ fabric-capacity                 │ CU · capacity · throttling · smoothing · F64 · cost   │
+│ spark-livy                      │ Livy · PySpark in Fabric · Spark without a notebook   │
+│ duckdb-lakehouse                │ DuckDB · delta_scan · profile · freshness · reconcile  │
 │ medallion-architecture          │ medallion · bronze · silver · gold · lakehouse         │
 │ data-transformation             │ union · append · type cast · hash key · schema        │
 │ data-catalog-lineage            │ catalog · lineage · Purview · glossary · impact       │
@@ -839,20 +910,21 @@ mindmap
 powerbi-agent/
 │
 ├── src/powerbi_agent/
-│   ├── cli.py              ◄── Click CLI · connect · dax · model · report · fabric · skills · doctor
+│   ├── cli.py              ◄── Click CLI · connect · dax · model · report · visual · fabric · fabric-app · skills · doctor
 │   ├── connect.py          ◄── SSAS auto-detection · MSI + Microsoft Store · UTF-16/UTF-8 fallback
 │   ├── dax.py              ◄── DAX execution via ADOMD.NET (pythonnet)
 │   ├── model.py            ◄── TOM read/write (measures · tables · RLS)
 │   ├── report.py           ◄── PBIR JSON manipulation (no Desktop needed)
 │   ├── fabric.py           ◄── Power BI REST API · workspace · refresh
+│   ├── fabricapp.py        ◄── Fabric Apps via the Rayfin CLI · project detection · deploy gate
 │   ├── doctor.py           ◄── Environment health checks (PATH, pythonnet, skills)
 │   ├── errors.py           ◄── Click-integrated typed error hierarchy
 │   ├── _asm.py             ◄── pythonnet assembly resolver (TOM + ADOMD)
 │   └── skills/
-│       ├── installer.py    ◄── install/uninstall/list 51 skills in ~/.claude/skills/
+│       ├── installer.py    ◄── install/uninstall/list 59 skills in ~/.claude/skills/
 │       └── data/           ◄── Bundled skill dirs (pip install distributes these)
 │
-├── skills/                 ◄── 51 skill dirs, each with SKILL.md
+├── skills/                 ◄── 59 skill dirs, each with SKILL.md
 │   │
 │   ├── ── CONNECTIVITY ──
 │   ├── powerbi-connect-pbid/SKILL.md         ◄── TOM/ADOMD.NET via PowerShell (v0.22.4)
@@ -871,6 +943,7 @@ powerbi-agent/
 │   ├── powerbi-bpa-rules/SKILL.md            ◄── Tabular Editor BPA (v0.22.4)
 │   ├── powerbi-c-sharp-scripting/SKILL.md    ◄── TE C# bulk scripting (v0.22.4)
 │   ├── powerbi-te2-cli/SKILL.md              ◄── Tabular Editor 2 CLI (v0.22.4)
+│   ├── powerbi-te-cli/SKILL.md               ◄── Cross-platform `te` CLI, preview cutoff warning (v0.7)
 │   │
 │   ├── ── REPORTS ──
 │   ├── powerbi-report-design/SKILL.md    ◄── Design principles, UX (v0.22.4)
@@ -892,20 +965,29 @@ powerbi-agent/
 │   ├── powerbi-pbip-format/SKILL.md          ◄── PBIP project structure (v0.22.4)
 │   ├── powerbi-pbir-format-enhanced/SKILL.md ◄── PBIR JSON schemas (v0.22.4)
 │   ├── powerbi-pbir-cli/SKILL.md             ◄── PBIR CLI operations (v0.22.4)
+│   ├── powerbi-pbi-cli/SKILL.md              ◄── pbi-cli 3.12 bind semantics, sync model (v0.7)
+│   │
+│   ├── ── FABRIC APPS (RAYFIN) ──
+│   ├── powerbi-fabric-apps/SKILL.md          ◄── Rayfin SDK/CLI, fabric-semanticmodel connector (v0.7)
+│   ├── powerbi-fabric-app-templates/SKILL.md ◄── dataapp, awesome-rayfin, authoring templates (v0.7)
 │   │
 │   └── ── PLATFORM / GOVERNANCE ──
 │       ├── powerbi-fabric-pipelines/SKILL.md
 │       ├── powerbi-medallion-architecture/SKILL.md
 │       ├── powerbi-audit-tenant-settings/SKILL.md  ◄── Fabric/PBI tenant governance audit (v0.26.0)
+│       ├── powerbi-fabric-capacity/SKILL.md        ◄── CU accounting, throttling, cost-before-action (v0.7)
+│       ├── powerbi-spark-livy/SKILL.md             ◄── Ephemeral Spark via Livy, no notebook (v0.7)
+│       ├── powerbi-duckdb-lakehouse/SKILL.md       ◄── DuckDB over OneLake, zero capacity cost (v0.7)
+│       ├── powerbi-paginated-reports/SKILL.md      ◄── RDL, Export To File, SSRS migration (v0.7)
 │       ├── [+ 10 more governance, modeling, security skills]
 │
 ├── docs/assets/            ◄── SVG diagrams and visual assets
-├── tests/                  ◄── pytest suite · 93 tests · no PBI Desktop required
+├── tests/                  ◄── pytest suite · 119 tests · no PBI Desktop required
 ├── .github/workflows/ci.yml        ◄── Test on Windows + Linux + macOS, Python 3.10–3.13
 ├── .github/workflows/publish.yml   ◄── Auto-publish to PyPI on git tag (OIDC)
 ├── pyproject.toml
 ├── CONTRIBUTING.md
-└── ATTRIBUTIONS.md         ◄── License credits (pbi-cli MIT, data-goblin GPL-3.0)
+└── ATTRIBUTIONS.md         ◄── License credits (pbi-cli MIT · data-goblin GPL-3.0 · Microsoft Rayfin)
 ```
 
 ---
@@ -992,11 +1074,16 @@ v0.4  ✓ Detection hardening (Microsoft Store install · UTF-8 port fallback ·
          multi-instance ordering · typed Click error hierarchy)
 v0.6  ✓ Canonical skill layout + shared schema (validator in CI, namespaced
          skills, spec-compliant frontmatter portable to claude.ai / Skills API)
-v0.5  ── fab CLI deep integration (DuckDB querying · OneLake · notebook mgmt)
-v0.6  ── Tabular Editor 3 CLI integration (full TE3 support + BPA automation)
-v0.7  ── Multi-agent workflows (model-auditor · pbip-validator · deneb-reviewer)
+v0.7  ✓ Fabric Apps & the Rayfin SDK (pbi-agent fabric-app · dataapp template ·
+         fabric-semanticmodel connector · capacity CU accounting · te CLI ·
+         pbi-cli 3.12 bind semantics · Livy · DuckDB · paginated reports)
+v0.8  ── Fabric App delivery harness (connector scaffolding from a model's
+         measure glossary · browser-validation gate wired into CI)
+v0.9  ── Capacity cost model (measured CU baselines per operation, so
+         cost-before-action quotes a number instead of an order of magnitude)
 v1.0  ── Full agentic pipeline:
           ingest → transform → model → BPA → test → refresh → validate → deploy
+          → serve (report · paginated · Fabric App)
 ```
 
 ---
@@ -1005,9 +1092,11 @@ v1.0  ── Full agentic pipeline:
 
 Inspired by and building on:
 - **[pbi-cli](https://github.com/MinaSaad1/pbi-cli)** (Mina Saad) — MIT · direct .NET TOM/ADOMD interop pattern; v0.4 detection hardening (Microsoft Store path, UTF-8 fallback, multi-instance ordering, typed Click errors) was patterned after pbi-cli and re-implemented from scratch in this codebase.
-- **[power-bi-agentic-development](https://github.com/data-goblin/power-bi-agentic-development)** (Kurt Buhler / data-goblin) — GPL-3.0 · inspired the Claude Code skill-files concept.
+- **[power-bi-agentic-development](https://github.com/data-goblin/power-bi-agentic-development)** (Kurt Buhler / data-goblin) — GPL-3.0 · inspired the Claude Code skill-files concept, and its v26.40 line is where the Fabric Apps / Rayfin and cross-platform CLI capability areas first appeared in an agentic Power BI toolkit.
+- **[Rayfin](https://github.com/microsoft/rayfin)** and **[awesome-rayfin](https://github.com/microsoft/awesome-rayfin)** (Microsoft) — MIT · the Fabric Apps SDK and CLI that `pbi-agent fabric-app` wraps. Nothing is reimplemented: every operation shells out to the installed CLI, and the `powerbi-fabric-apps` skill defers to the project's own version-locked `.agents/skills/rayfin/SKILL.md`.
+- **[Tabular Editor](https://tabulareditor.com)** (Kapacity / Daniel Otykier) — the `te` CLI and TE2, documented in `powerbi-te-cli` and `powerbi-te2-cli`.
 
-All Python code in this repo is original work. No code, skill files, or documentation were copied from either project; pbi-cli inspirations are MIT-compatible, and data-goblin is GPL-3.0 so its content is intentionally not vendored into this MIT-licensed project. See [ATTRIBUTIONS.md](ATTRIBUTIONS.md) for full license details.
+All Python code in this repo is original work. No code, skill files, or documentation were copied from either project; pbi-cli inspirations are MIT-compatible, and data-goblin is GPL-3.0 so its content is intentionally not vendored into this MIT-licensed project. Skill content covering the same *capability areas* as upstream projects — Fabric capacity, Spark/Livy, DuckDB, paginated reports, Fabric Apps — was written from scratch against Microsoft's public documentation. See [ATTRIBUTIONS.md](ATTRIBUTIONS.md) for full license details.
 
 *Not affiliated with or endorsed by Microsoft Corporation.*
 
@@ -1018,13 +1107,13 @@ All Python code in this repo is original work. No code, skill files, or document
 ```
 ╔═══════════════════════════════════════════════════════════════╗
 ║                                                               ║
-║   ⚡  POWERBI · AGENT  //  TRON ARES  //  v0.4               ║
+║   ⚡  POWERBI · AGENT  //  TRON ARES  //  v0.7               ║
 ║                                                               ║
 ║   Built by  SANTOSH KANTHETY                                  ║
 ║   20+ years of Technology & Data transformation               ║
 ║   delivery and strategy                                       ║
 ║                                                               ║
-║   51 skills  ·  8 CLI commands  ·  93 tests                   ║
+║   59 skills  ·  9 CLI commands  ·  119 tests                  ║
 ║                                                               ║
 ║   github.com/santoshkanthety/powerbi-agent                    ║
 ║   linkedin.com/in/santoshkanthety                             ║

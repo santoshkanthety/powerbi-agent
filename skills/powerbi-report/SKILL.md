@@ -29,7 +29,7 @@ pbi-agent report add-page "Regional Deep Dive" path/to/MyReport.Report
 ## Guidance
 - The `PBIX_PATH` argument is optional. When omitted, powerbi-agent searches the current working directory for a `.Report` folder.
 - Page names become folder names on disk — avoid special characters (slashes, colons) that would break filesystem paths.
-- After adding a page, reload it in Power BI Desktop via pbi-cli's `pbi report reload` (if available) or reopen the project.
+- After adding a page, reload it in Power BI Desktop via pbi-cli's `pbi report reload` (if available) or reopen the project. `pbi report reload` is **not** a keyboard shortcut: it saves and closes the open `.pbip`, re-applies the PBIR edits Desktop's save would overwrite, then reopens the file. Every pbi-cli write command auto-syncs the same way, so pass `--no-sync` on each step of a multi-step build and reload once at the end — see `powerbi-pbi-cli`.
 
 ## Schema Rules (Don't Break These)
 
